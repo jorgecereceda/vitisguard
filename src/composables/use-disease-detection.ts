@@ -32,6 +32,8 @@ export function useDiseaseDetection() {
     const config = DISEASE_CONFIGS[diseaseType]
     if (!config) {
       return {
+        id: `disease-${diseaseType}-unknown`,
+        category: 'disease',
         disease: diseaseType,
         level: 'low',
         probability: 0,
@@ -103,6 +105,8 @@ export function useDiseaseDetection() {
     const recommendation = config.recommendations[level]
 
     return {
+      id: `disease-${diseaseType}-${Date.now()}`,
+      category: 'disease',
       disease: diseaseType,
       level,
       probability,
