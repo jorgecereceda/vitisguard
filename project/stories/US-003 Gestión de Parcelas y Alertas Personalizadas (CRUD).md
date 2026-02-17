@@ -8,7 +8,7 @@ Gestión de Parcelas y Alertas Personalizadas (CRUD)
 
 ## Descripción
 **Como** Viticultor de Txakoli 
-**Quiero** ver, registrar, editar y eliminar los datos de mis parcelas (nombre, ubicación y Denominacion de origen.).
+**Quiero** ver, registrar, editar y eliminar los datos de mis parcelas (nombre, ubicación).
 **Para**  Tener un control organizado de mis cultivos y recibir alertas específicas según la zona de cada viñedo.
 
 ## Criterios de Aceptación
@@ -30,11 +30,11 @@ Entonces el sistema debe mostrar que no hay datos para mostrar y un boton para a
 ### Escenario 3: Registro de una nueva parcela
 ```gherkin
 Dado que el viticultor se encuentra en la sección "My Vineyards"
-Cuando completa el formulario con el nombre de la parcela y selecciona su Denominacion de origen (Getaria, Bizkaia o Araba)
+Cuando completa el formulario con el nombre de la parcela y selecciona su Denominacion de origen (Getaria, Bizkaia o Alaba)
 Entonces el sistema debe guardar los datos en el servidor (Json-Server) mediante una petición POST Y la nueva parcela debe aparecer inmediatamente en la lista de parcelas.
 ```
 
-### Escenario 4: Editar una nueva parcela
+### Escenario 4: Editar una parcela
 ```gherkin
 Dado que el viticultor se encuentra en la sección "My Vineyards"
 Cuando seleccione editar una parcela
