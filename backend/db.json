@@ -1,0 +1,13 @@
+{
+  "users": [
+    { 
+        "id": 1, 
+        "name": "Yoandres", 
+        "email": "ylcruz.dev@gmail.com", 
+        "password": "ylcruz.dev@gmail.com" 
+    }
+  ],
+  "yards": [
+    
+  ]
+}

@@ -14,6 +14,11 @@ Siguiendo los requerimientos del documento guía, el proyecto se construirá con
   - **Backend Simulado:** JSON-Server para la gestión de un CRUD de alertas personalizadas por el usuario.
 - **Calidad de Código:** Testing con Jest/Cypress (mínimo 5 tests).
 - **Diseño:** Mobile-first, responsive (2 breakpoints) y prototipado en Figma.
+- **Estilo visual y colores:**
+  - **tema claro:** fondo blanco
+  - **Colores primarios:** #23C55F, #0F172A, #475569,
+  - **Colores Secundarios:** #DC2626, #D97706, #2563EB
+  - **Textos e iconos:** #475569, #D7DDE4
 
 ## 3. Arquitectura de Datos y Componentes
 Se aplicará la filosofía de Atomic Web Design y Modularización.
