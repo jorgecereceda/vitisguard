@@ -97,6 +97,63 @@ export interface DailyData {
   relative_humidity_2m_min?: number[]
 }
 
+export const CURRENT_VARIABLES = [
+  'temperature_2m',
+  'relative_humidity_2m',
+  'apparent_temperature',
+  'precipitation',
+  'rain',
+  'showers',
+  'snowfall',
+  'weather_code',
+  'cloud_cover',
+  'wind_speed_10m',
+  'wind_direction_10m',
+  'wind_gusts_10m',
+] as const
+
+export type CurrentVariable = typeof CURRENT_VARIABLES[number]
+
+export interface CurrentData {
+  time: string
+  temperature_2m?: number
+  relative_humidity_2m?: number
+  apparent_temperature?: number
+  precipitation?: number
+  rain?: number
+  showers?: number
+  snowfall?: number
+  weather_code?: number
+  cloud_cover?: number
+  wind_speed_10m?: number
+  wind_direction_10m?: number
+  wind_gusts_10m?: number
+}
+
+export interface Parcel {
+  id: string
+  name: string
+  latitude: number
+  longitude: number
+}
+
+export interface WeatherMetadata {
+  latitude: number
+  longitude: number
+  elevation: number
+  utc_offset_seconds: number
+  timezone: string
+  timezone_abbreviation: string
+  generationtime_ms: number
+}
+
+export interface WeatherData {
+  current: CurrentData
+  hourly: HourlyData
+  daily: DailyData
+  metadata: WeatherMetadata
+}
+
 export interface WeatherResponse {
   latitude: number
   longitude: number
@@ -107,4 +164,5 @@ export interface WeatherResponse {
   generationtime_ms: number
   hourly: HourlyData
   daily: DailyData
+  current?: CurrentData
 }
