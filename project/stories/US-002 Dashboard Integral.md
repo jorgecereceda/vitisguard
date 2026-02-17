@@ -16,7 +16,7 @@ Dashboard Integral de Monitoreo y Alerta Temprana
 ### Escenario 1: Visualización de métricas críticas
 ```gherkin
 Dado que el usuario ha iniciado sesión
-Cuando carga la vista principal (Dashboard)
+Cuando carga la vista principal (Dashboard).
 Entonces debe ver tarjetas con datos en tiempo real de:
   - Temperatura y Humedad Ambiental 
   - Temperatura y Humedad del Suelo 
