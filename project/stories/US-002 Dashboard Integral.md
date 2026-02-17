@@ -62,5 +62,5 @@ Alta.
 | **TK-003-03** | Creación del Composable `useWeather.ts` para gestionar la lógica de fetching | Equipo Dev |
 | **TK-003-04** | Diseño de componentes atómicos (`DataCard`) siguiendo Atomic Design | Equipo Dev |
 | **TK-002-05** | Desarrollo de la lógica de negocio para detectar umbrales de Mildiú y Botrytis | Equipo Dev |
-| **TK-002-06** | Sistema de recomendaciones dinámicas basadas en el estado del cultivo | Equipo Dev |
+| **TK-002-06** | Sistema de recomendaciones dinámicas basadas en el estado del cultivo. | Equipo Dev |
 | **TK-003-07** | Implementación de la vista `DashboardView.vue` con soporte para `<Suspense />` | Equipo Dev |
