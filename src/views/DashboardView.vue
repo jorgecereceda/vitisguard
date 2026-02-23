@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { watch } from 'vue'
-import { useWeather } from '@/composables/useWeather'
+import { useWeather } from '@/composables/use-weather'
 import { useGeolocation } from '@/composables/useGeolocation'
 import DataCard from '@/components/atoms/DataCard.vue'
 
@@ -180,6 +180,7 @@ const retryFetch = () => {
   font-weight: bold;
 }
 
+
 .dashboard__loading, .dashboard__error {
   text-align: center;
   padding: 3rem;
@@ -205,5 +206,12 @@ const retryFetch = () => {
   .dashboard__alerts {
     background: rgba(197, 48, 48, 0.1);
   }
+}
+
+.dashboard__location {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #27ae60;
+  margin-bottom: 1rem;
 }
 </style>

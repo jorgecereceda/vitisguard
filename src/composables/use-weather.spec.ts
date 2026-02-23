@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import type { WeatherResponse } from '@/types/weather'
+import type { WeatherData } from '@/types/weather'
 import { useWeather } from './use-weather'
 
 vi.mock('@/services/weather-api', () => ({
-  fetchWeatherForecast: vi.fn(),
+  fetchWeatherData: vi.fn(),
 }))
 
-import { fetchWeatherForecast } from '@/services/weather-api'
-const mockedFetch = fetchWeatherForecast as ReturnType<typeof vi.fn>
+import { fetchWeatherData } from '@/services/weather-api'
+const mockedFetch = fetchWeatherData as ReturnType<typeof vi.fn>
 
 describe('useWeather', () => {
   beforeEach(() => {
@@ -30,15 +30,18 @@ describe('useWeather', () => {
 
   it('loadWeather fetches data successfully', async () => {
     const mockData = {
-      latitude: 43.0,
-      longitude: -2.9,
-      elevation: 100,
-      utc_offset_seconds: 0,
-      timezone: 'UTC',
-      timezone_abbreviation: 'UTC',
-      generationtime_ms: 100,
+      current: { time: '2024-01-01T00:00:00Z', temperature_2m: 20 },
       hourly: { time: ['2024-01-01'] },
       daily: { time: ['2024-01-01'] },
+      metadata: {
+        latitude: 43.0,
+        longitude: -2.9,
+        elevation: 100,
+        utc_offset_seconds: 0,
+        timezone: 'UTC',
+        timezone_abbreviation: 'UTC',
+        generationtime_ms: 100
+      },
     }
 
     mockedFetch.mockResolvedValueOnce(mockData)
@@ -59,7 +62,7 @@ describe('useWeather', () => {
   })
 
   it('sets isLoading to true during fetch', async () => {
-    let resolveFetch: (value: WeatherResponse) => void
+    let resolveFetch: (value: WeatherData) => void
     mockedFetch.mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -75,15 +78,18 @@ describe('useWeather', () => {
     expect(isLoading.value).toBe(true)
 
     resolveFetch!({
-      latitude: 43.0,
-      longitude: -2.9,
-      elevation: 100,
-      utc_offset_seconds: 0,
-      timezone: 'UTC',
-      timezone_abbreviation: 'UTC',
-      generationtime_ms: 100,
+      current: { time: '2024-01-01T00:00:00Z', temperature_2m: 20 },
       hourly: { time: ['2024-01-01'] },
       daily: { time: ['2024-01-01'] },
+      metadata: {
+        latitude: 43.0,
+        longitude: -2.9,
+        elevation: 100,
+        utc_offset_seconds: 0,
+        timezone: 'UTC',
+        timezone_abbreviation: 'UTC',
+        generationtime_ms: 100
+      },
     })
     await promise
 
@@ -113,15 +119,18 @@ describe('useWeather', () => {
       .mockRejectedValueOnce(new Error('Error 1'))
       .mockRejectedValueOnce(new Error('Error 2'))
       .mockResolvedValueOnce({
-        latitude: 43.0,
-        longitude: -2.9,
-        elevation: 100,
-        utc_offset_seconds: 0,
-        timezone: 'UTC',
-        timezone_abbreviation: 'UTC',
-        generationtime_ms: 100,
+        current: { time: '2024-01-01T00:00:00Z', temperature_2m: 20 },
         hourly: { time: ['2024-01-01'] },
         daily: { time: ['2024-01-01'] },
+        metadata: {
+          latitude: 43.0,
+          longitude: -2.9,
+          elevation: 100,
+          utc_offset_seconds: 0,
+          timezone: 'UTC',
+          timezone_abbreviation: 'UTC',
+          generationtime_ms: 100
+        },
       })
 
     const { error, loadWeather } = useWeather({ retryAttempts: 3, retryDelay: 10 })
@@ -205,15 +214,18 @@ describe('useWeather', () => {
     vi.useFakeTimers()
 
     mockedFetch.mockResolvedValue({
-      latitude: 43.0,
-      longitude: -2.9,
-      elevation: 100,
-      utc_offset_seconds: 0,
-      timezone: 'UTC',
-      timezone_abbreviation: 'UTC',
-      generationtime_ms: 100,
+      current: { time: '2024-01-01T00:00:00Z', temperature_2m: 20 },
       hourly: { time: ['2024-01-01'] },
       daily: { time: ['2024-01-01'] },
+      metadata: {
+        latitude: 43.0,
+        longitude: -2.9,
+        elevation: 100,
+        utc_offset_seconds: 0,
+        timezone: 'UTC',
+        timezone_abbreviation: 'UTC',
+        generationtime_ms: 100
+      },
     })
 
     const { startPolling, stopPolling, loadWeather, weather: _weather } = useWeather()
@@ -232,5 +244,100 @@ describe('useWeather', () => {
     vi.advanceTimersByTime(60000)
 
     expect(mockedFetch).toHaveBeenCalledTimes(2)
+  })
+
+  it('calculates alerts correctly based on weather data', async () => {
+    const { alerts, loadWeather } = useWeather()
+
+    // Mock data that should trigger Mildew and Heat Wave alerts
+    const mockData = {
+      current: {
+        time: '2024-01-01T00:00:00Z',
+        temperature_2m: 22,
+        relative_humidity_2m: 88, // > 85
+      },
+      daily: {
+        time: ['2024-01-01'],
+        temperature_2m_min: [10],
+        temperature_2m_max: [34], // > 32
+      },
+      metadata: { latitude: 0, longitude: 0 },
+    }
+
+    mockedFetch.mockResolvedValueOnce(mockData)
+
+    await loadWeather({ latitude: 0, longitude: 0 })
+
+    expect(alerts.value).toContain('Riesgo de Mildiú detectado: Humedad alta y temperaturas moderadas.')
+    expect(alerts.value).toContain('Riesgo por condiciones meteorológicas adversas: Ola de calor.')
+    expect(alerts.value).not.toContain('Riesgo por condiciones meteorológicas adversas: Helada inminente.')
+  })
+
+  it('calculates frost and botrytis alerts', async () => {
+    const { alerts, loadWeather } = useWeather()
+
+    // Mock data that should trigger Botrytis and Frost alerts
+    const mockData = {
+      current: {
+        time: '2024-01-01T00:00:00Z',
+        temperature_2m: 18,
+        relative_humidity_2m: 92, // > 90
+      },
+      daily: {
+        time: ['2024-01-01'],
+        temperature_2m_min: [1], // < 2
+        temperature_2m_max: [25],
+      },
+      metadata: { latitude: 0, longitude: 0 },
+    }
+
+    mockedFetch.mockResolvedValueOnce(mockData)
+
+    await loadWeather({ latitude: 0, longitude: 0 })
+
+    expect(alerts.value).toContain('Riesgo de Botrytis detectado: Niveles de humedad críticos.')
+    expect(alerts.value).toContain('Riesgo por condiciones meteorológicas adversas: Helada inminente.')
+  })
+
+  it('provides weatherData compatibility layer', async () => {
+    const { weatherData, loadWeather } = useWeather()
+
+    const mockData = {
+      current: {
+        time: '2024-01-01T00:00:00Z',
+        temperature_2m: 20,
+        relative_humidity_2m: 50,
+        precipitation: 5,
+        cloud_cover: 75,
+      },
+      daily: {
+        time: ['2024-01-01'],
+        et0_fao_evapotranspiration: [3.5],
+        sunshine_duration: [36000],
+        temperature_2m_min: [10],
+        temperature_2m_max: [25],
+      },
+      hourly: {
+        time: ['2024-01-01T00:00:00Z'],
+        soil_moisture_0_to_7cm: [0.25],
+      },
+      metadata: { latitude: 0, longitude: 0 },
+    }
+
+    mockedFetch.mockResolvedValueOnce(mockData)
+
+    await loadWeather({ latitude: 0, longitude: 0 })
+
+    expect(weatherData.value).toEqual({
+      temperature: 20,
+      humidity: 50,
+      soilHumidity: 0.25,
+      precipitation: 5,
+      cloudCover: 75,
+      et0: 3.5,
+      sunshineDuration: 36000,
+      isFrostLikely: false,
+      isHeatWaveLikely: false,
+    })
   })
 })

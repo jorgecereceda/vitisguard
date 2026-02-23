@@ -1,6 +1,6 @@
 import { ref, toRefs, computed, onUnmounted, getCurrentInstance } from 'vue'
-import type { WeatherLocation, WeatherOptions, WeatherResponse } from '@/types/weather'
-import { fetchWeatherForecast } from '@/services/weather-api'
+import type { WeatherLocation, WeatherOptions, WeatherData } from '@/types/weather'
+import { fetchWeatherData } from '@/services/weather-api'
 import { HOURLY_VARIABLES, DAILY_VARIABLES } from '@/types/weather'
 import type { HourlyVariable, DailyVariable } from '@/types/weather'
 
@@ -22,7 +22,7 @@ export function useWeather(options: UseWeatherOptions = {}) {
     refreshInterval = 60000,
   } = options
 
-  const weather = ref<WeatherResponse | null>(null)
+  const weather = ref<WeatherData | null>(null)
   const isLoading = ref(false)
   const error = ref<Error | null>(null)
   const abortController = ref<AbortController | null>(null)
@@ -39,7 +39,7 @@ export function useWeather(options: UseWeatherOptions = {}) {
   async function loadWeather(
     location: WeatherLocation,
     options?: WeatherOptions
-  ): Promise<WeatherResponse | null> {
+  ): Promise<WeatherData | null> {
     abortPreviousRequest()
 
     isLoading.value = true
@@ -59,7 +59,7 @@ export function useWeather(options: UseWeatherOptions = {}) {
           10000
         )
 
-        const data = await fetchWeatherForecast(
+        const data = await fetchWeatherData(
           location,
           {
             hourly: hourlyVars,
@@ -135,6 +135,75 @@ export function useWeather(options: UseWeatherOptions = {}) {
     }
   }
 
+  const alerts = computed(() => {
+    if (!weather.value) return []
+
+    const currentAlerts: string[] = []
+    const current = weather.value.current
+    const daily = weather.value.daily
+
+    if (!current || !daily) return []
+
+    const temperature = current.temperature_2m ?? 0
+    const humidity = current.relative_humidity_2m ?? 0
+    const minTemp = daily.temperature_2m_min?.[0] ?? 0
+    const maxTemp = daily.temperature_2m_max?.[0] ?? 0
+
+    // Mildew (Mildiú): High humidity (>85%) and moderate temperatures (10-25°C)
+    if (humidity > 85 && temperature >= 10 && temperature <= 25) {
+      currentAlerts.push('Riesgo de Mildiú detectado: Humedad alta y temperaturas moderadas.')
+    }
+
+    // Botrytis: High humidity and moderate temperatures
+    if (humidity > 90 && temperature >= 15 && temperature <= 20) {
+      currentAlerts.push('Riesgo de Botrytis detectado: Niveles de humedad críticos.')
+    }
+
+    // Adverse Weather logic
+    if (minTemp < 2 || temperature < 0) {
+      currentAlerts.push('Riesgo por condiciones meteorológicas adversas: Helada inminente.')
+    }
+
+    if (maxTemp > 32 || temperature > 35) {
+      currentAlerts.push('Riesgo por condiciones meteorológicas adversas: Ola de calor.')
+    }
+
+    return currentAlerts
+  })
+
+  /**
+   * Computed property that maps the raw weather data to a simplified structure
+   * for the UI, maintaining compatibility with the dashboard.
+   */
+  const weatherData = computed(() => {
+    if (!weather.value) return null
+
+    const current = weather.value.current
+    const daily = weather.value.daily
+    const hourly = weather.value.hourly
+
+    if (!current) return null
+
+    return {
+      temperature: current.temperature_2m ?? 0,
+      humidity: current.relative_humidity_2m ?? 0,
+      soilHumidity: hourly?.soil_moisture_0_to_7cm?.[0] ?? 0,
+      precipitation: current.precipitation ?? 0,
+      cloudCover: current.cloud_cover ?? 0,
+      et0: daily?.et0_fao_evapotranspiration?.[0] ?? 0,
+      sunshineDuration: daily?.sunshine_duration?.[0] ?? 0,
+      isFrostLikely: (daily?.temperature_2m_min?.[0] ?? 0) < 2,
+      isHeatWaveLikely: (daily?.temperature_2m_max?.[0] ?? 0) > 32
+    }
+  })
+
+  /**
+   * Convenience wrapper for loadWeather that matches the old fetchWeather signature
+   */
+  async function fetchWeather(lat: number, lon: number) {
+    return loadWeather({ latitude: lat, longitude: lon })
+  }
+
   if (getCurrentInstance()) {
     onUnmounted(() => {
       abortPreviousRequest()
@@ -144,11 +213,14 @@ export function useWeather(options: UseWeatherOptions = {}) {
 
   return {
     weather,
+    weatherData,
     isLoading,
     error,
     isError,
     hasData,
+    alerts,
     loadWeather,
+    fetchWeather,
     clearWeather,
     abortPreviousRequest,
     startPolling,
