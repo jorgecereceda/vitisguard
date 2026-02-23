@@ -1,13 +1,17 @@
 {
   "users": [
-    { 
-        "id": "1a21", 
-        "name": "Yoandres", 
-        "email": "ylcruz.dev@gmail.com", 
-        "password": "ylcruz.dev@gmail.com" 
+    {
+      "id": "1a21",
+      "name": "Yoandres",
+      "email": "ylcruz.dev@gmail.com",
+      "password": "ylcruz.dev@gmail.com"
+    },
+    {
+      "id": "fe5f",
+      "name": "Juan Carlos Gil",
+      "email": "juancarlosgilv@gmail.com",
+      "password": "12345678"
     }
   ],
-  "yards": [
-    
-  ]
+  "yards": []
 }

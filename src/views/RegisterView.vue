@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import AuthCard from '@/components/organisms/AuthCard.vue'
 import AuthForm from '@/components/organisms/AuthForm.vue'
 import AuthSwitch from '@/components/molecules/AuthSwitch.vue'
@@ -12,22 +12,22 @@ interface FormData {
 }
 
 const router = useRouter()
-const loading = ref(false)
+const authStore = useAuthStore()
 
-function handleRegister(data: FormData) {
-  loading.value = true
-  console.log('Register submitted:', data)
-  setTimeout(() => {
-    loading.value = false
+async function handleRegister(data: FormData) {
+  try {
+    await authStore.register(data.name, data.email, data.password)
     router.push('/login')
-  }, 1000)
+  } catch {
+    // Error handled by store
+  }
 }
 </script>
 
 <template>
   <div class="register-view">
     <AuthCard title="Create Account">
-      <AuthForm mode="register" :loading="loading" @submit="handleRegister" />
+      <AuthForm mode="register" :loading="authStore.isLoading" @submit="handleRegister" />
       <AuthSwitch
         text="Already have an account?"
         link-text="Login"

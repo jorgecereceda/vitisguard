@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import AuthCard from '@/components/organisms/AuthCard.vue'
 import AuthForm from '@/components/organisms/AuthForm.vue'
 import AuthSwitch from '@/components/molecules/AuthSwitch.vue'
@@ -10,21 +11,23 @@ interface FormData {
   password: string
 }
 
-const loading = ref(false)
+const router = useRouter()
+const authStore = useAuthStore()
 
-function handleLogin(data: FormData) {
-  loading.value = true
-  console.log('Login submitted:', data)
-  setTimeout(() => {
-    loading.value = false
-  }, 1000)
+async function handleLogin(data: FormData) {
+  try {
+    await authStore.login(data.email, data.password)
+    router.push('/dashboard')
+  } catch {
+    // Error handled by store
+  }
 }
 </script>
 
 <template>
   <div class="login-view">
     <AuthCard title="Welcome Back">
-      <AuthForm mode="login" :loading="loading" @submit="handleLogin" />
+      <AuthForm mode="login" :loading="authStore.isLoading" @submit="handleLogin" />
       <br>
       <AuthSwitch
         text="Don't have an account?"
