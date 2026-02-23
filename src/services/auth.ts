@@ -1,4 +1,5 @@
 import type { User, LoginCredentials, RegisterData } from '@/types/auth'
+import { hashPassword, verifyPassword } from '@/utils/crypto'
 
 const API_BASE_URL = 'http://localhost:3000'
 
@@ -10,9 +11,14 @@ export async function login(credentials: LoginCredentials): Promise<User> {
   }
 
   const users: User[] = await response.json()
-  const user = users.find((u) => u.email === credentials.email && u.password === credentials.password)
+  const user = users.find((u) => u.email === credentials.email)
 
   if (!user) {
+    throw new Error('Invalid email or password')
+  }
+
+  const isValid = await verifyPassword(credentials.password, user.password)
+  if (!isValid) {
     throw new Error('Invalid email or password')
   }
 
@@ -32,6 +38,8 @@ export async function register(data: RegisterData): Promise<User> {
     throw new Error('Email already registered')
   }
 
+  const hashedPassword = await hashPassword(data.password)
+
   const createResponse = await fetch(`${API_BASE_URL}/users`, {
     method: 'POST',
     headers: {
@@ -40,7 +48,7 @@ export async function register(data: RegisterData): Promise<User> {
     body: JSON.stringify({
       name: data.name,
       email: data.email,
-      password: data.password
+      password: hashedPassword
     })
   })
 

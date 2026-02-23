@@ -2,6 +2,11 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 
+vi.mock('@/utils/crypto', () => ({
+  hashPassword: vi.fn(),
+  verifyPassword: vi.fn()
+}))
+
 vi.mock('@/services/auth', () => ({
   login: vi.fn(),
   register: vi.fn()
