@@ -1,0 +1,53 @@
+import type { User, LoginCredentials, RegisterData } from '@/types/auth'
+
+const API_BASE_URL = 'http://localhost:3000'
+
+export async function login(credentials: LoginCredentials): Promise<User> {
+  const response = await fetch(`${API_BASE_URL}/users?email=${credentials.email}`)
+
+  if (!response.ok) {
+    throw new Error('Failed to connect to server')
+  }
+
+  const users: User[] = await response.json()
+  const user = users.find((u) => u.email === credentials.email && u.password === credentials.password)
+
+  if (!user) {
+    throw new Error('Invalid email or password')
+  }
+
+  return user
+}
+
+export async function register(data: RegisterData): Promise<User> {
+  const checkResponse = await fetch(`${API_BASE_URL}/users?email=${data.email}`)
+
+  if (!checkResponse.ok) {
+    throw new Error('Failed to connect to server')
+  }
+
+  const existingUsers: User[] = await checkResponse.json()
+
+  if (existingUsers.length > 0) {
+    throw new Error('Email already registered')
+  }
+
+  const createResponse = await fetch(`${API_BASE_URL}/users`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: data.name,
+      email: data.email,
+      password: data.password
+    })
+  })
+
+  if (!createResponse.ok) {
+    throw new Error('Failed to create user')
+  }
+
+  const newUser: User = await createResponse.json()
+  return newUser
+}
