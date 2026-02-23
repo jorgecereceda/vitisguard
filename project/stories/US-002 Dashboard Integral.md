@@ -80,5 +80,5 @@ Alta.
 | **TK-002-06** | Sistema de recomendaciones dinámicas basadas en el estado del cultivo | Equipo Dev | ✅ Hecho |
 | **TK-002-07** | Implementación de la vista `DashboardView.vue` con soporte para `<Suspense />` | Equipo Dev | ✅ Hecho |
 | **TK-002-08** | Implementación de Unit Tests para la lógica de alertas en `useWeather.ts` | Equipo Dev | ✅ Hecho |
-| **TK-002-09** | Implementación de Component Tests para `DataCard` y `DashboardView` | Equipo Dev | Pendiente |
+| **TK-002-09** | Implementación de Component Tests para `DataCard` y `DashboardView` | Equipo Dev | ✅ Hecho |
 | **TK-002-10** | Manejo de estados de error y "no data" en la UI | Equipo Dev | ✅ Hecho |

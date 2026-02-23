@@ -1,4 +1,4 @@
-import { ref, toRefs, computed, onUnmounted } from 'vue'
+import { ref, toRefs, computed, onUnmounted, getCurrentInstance } from 'vue'
 import type { WeatherLocation, WeatherOptions, WeatherResponse } from '@/types/weather'
 import { fetchWeatherForecast } from '@/services/weather-api'
 import { HOURLY_VARIABLES, DAILY_VARIABLES } from '@/types/weather'
@@ -135,17 +135,17 @@ export function useWeather(options: UseWeatherOptions = {}) {
     }
   }
 
-  onUnmounted(() => {
-    abortPreviousRequest()
-    stopPolling()
-  })
+  if (getCurrentInstance()) {
+    onUnmounted(() => {
+      abortPreviousRequest()
+      stopPolling()
+    })
+  }
 
   return {
-    ...toRefs({
-      weather,
-      isLoading,
-      error,
-    }),
+    weather,
+    isLoading,
+    error,
     isError,
     hasData,
     loadWeather,
