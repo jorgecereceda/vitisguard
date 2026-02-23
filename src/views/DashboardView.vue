@@ -1,26 +1,30 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { watch } from 'vue'
 import { useWeather } from '@/composables/useWeather'
+import { useGeolocation } from '@/composables/useGeolocation'
 import DataCard from '@/components/atoms/DataCard.vue'
 
-const { weatherData, isLoading, error, alerts, fetchWeather } = useWeather()
+const { weatherData, isLoading: isWeatherLoading, error: weatherError, alerts, fetchWeather } = useWeather()
+const { state: geoState, getLocation } = useGeolocation()
 
-onMounted(async () => {
-  // Simulate initial fetching
-  await fetchWeather(43.3183, -1.9812) // San Sebastian/Donostia coords (typical for Txakoli)
+// Watch for coordinate changes to fetch weather
+watch(
+  () => [geoState.value.latitude, geoState.value.longitude],
+  ([lat, lon]) => {
+    if (typeof lat === 'number' && typeof lon === 'number') {
+      fetchWeather(lat, lon)
+    }
+  },
+  { immediate: true }
+)
 
-  // Simulate real data for demonstration
-  weatherData.value = {
-    temperature: 18.5,
-    humidity: 88, // Should trigger Mildew risk
-    soilHumidity: 42,
-    precipitation: 2.5,
-    isFrostLikely: false,
-    isHeatWaveLikely: false
+const retryFetch = () => {
+  if (geoState.value.latitude && geoState.value.longitude) {
+    fetchWeather(geoState.value.latitude, geoState.value.longitude)
+  } else {
+    getLocation()
   }
-})
-
-const retryFetch = () => fetchWeather(43.3183, -1.9812)
+}
 </script>
 
 <template>
@@ -28,22 +32,25 @@ const retryFetch = () => fetchWeather(43.3183, -1.9812)
     <header class="dashboard__header">
       <h1 class="dashboard__title">VitisGuard Dashboard</h1>
       <p class="dashboard__subtitle">Monitoreo y Alerta Temprana en Tiempo Real</p>
+      <div v-if="geoState.latitude" class="dashboard__location">
+        Ubicación: {{ geoState.latitude.toFixed(4) }}, {{ geoState.longitude?.toFixed(4) }}
+      </div>
     </header>
 
     <main class="dashboard__content">
-      <!-- Loading state managed by Suspense logically, here with simple check too -->
-      <div v-if="isLoading" class="dashboard__loading">
-        Cargando datos meteorológicos...
+      <!-- Loading state -->
+      <div v-if="isWeatherLoading || geoState.isLoading" class="dashboard__loading">
+        {{ geoState.isLoading ? 'Obteniendo ubicación...' : 'Cargando datos meteorológicos...' }}
       </div>
 
-      <!-- Error Handling Scenario 4 -->
-      <div v-else-if="error" class="dashboard__error">
-        <p>{{ error }}</p>
+      <!-- Error Handling -->
+      <div v-else-if="weatherError || geoState.error" class="dashboard__error">
+        <p>{{ weatherError || geoState.error }}</p>
         <button @click="retryFetch" class="dashboard__retry-btn">Reintentar</button>
       </div>
 
       <div v-else-if="weatherData" class="dashboard__grid">
-        <!-- Metrics Cards Scenario 1 -->
+        <!-- Metrics Cards Scenario 1 + Missing Metrics -->
         <DataCard
           label="Temperatura Aire"
           :value="weatherData.temperature"
@@ -67,6 +74,24 @@ const retryFetch = () => fetchWeather(43.3183, -1.9812)
           :value="weatherData.precipitation"
           unit="mm"
           icon="🌧️"
+        />
+        <DataCard
+          label="Evapotranspiración"
+          :value="weatherData.et0.toFixed(2)"
+          unit="mm"
+          icon="☀️"
+        />
+        <DataCard
+          label="Cobertura Nubes"
+          :value="weatherData.cloudCover"
+          unit="%"
+          icon="☁️"
+        />
+        <DataCard
+          label="Horas de Sol"
+          :value="(weatherData.sunshineDuration / 3600).toFixed(1)"
+          unit="h"
+          icon="⌛"
         />
       </div>
 
@@ -102,6 +127,7 @@ const retryFetch = () => fetchWeather(43.3183, -1.9812)
   font-weight: 800;
   margin-bottom: 0.5rem;
   background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
