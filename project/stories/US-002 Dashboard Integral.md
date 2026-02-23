@@ -40,10 +40,25 @@ Cuando el componente procesa los datos
 Entonces se muestra la alerta: "Riesgo por condiciones meteorológicas adversas" y se especifica el fenómeno detectado (ej. Helada inminente o exceso de pluviosidad) y se ofrece una recomendación específica (ej. cubrir lote, activar drenaje preventivo o regar para refrescar)
 ```
 
+### Escenario 4: Gestión de errores de API
+```gherkin
+Dado que el usuario intenta acceder al Dashboard
+Cuando la API de Open-Meteo no responde o devuelve un error
+Entonces se debe mostrar un componente de error amigable indicando el problema y permitiendo al usuario reintentar la carga.
+```
+
+### Escenario 5: Accesibilidad
+```gherkin
+Dado que el Dashboard muestra métricas críticas
+Cuando el usuario interactúa con la interfaz
+Entonces todos los elementos deben tener etiquetas ARIA descriptivas y los contrastes deben cumplir WCAG AA.
+```
+
 ## Notas
 * **Lógica de Alerta:** Las alertas por enfermedad deben activarse especialmente en "años con datos historicos muy humedos".
 * **Requerimiento Técnico:** Se utilizarán las etiquetas `<suspense/>` para gestionar la espera de datos asíncronos de la API.
 * **Responsive:** El Dashboard debe adaptarse a dispositivos móviles, tablets y escritorio.
+* **Caché:** Se debe implementar una estrategia de caché simple para evitar peticiones redundantes a la API (tiempo de expiración sugerido: 15-30 minutos).
 **API Fuente:** Se utilizará https://open-meteo.com/en/docs.
 **Reactividad:** Es obligatorio el uso de ref y reactive para la actualización automática de los datos.
 **Estilo:** Se debe aplicar la metodología BEM para el diseño de las tarjetas de datos.
@@ -55,12 +70,15 @@ L (Talla Grande).
 Alta.
 
 ## Tareas
-| Código | Nombre | Responsable |
-|--------|--------|-------------|
-| **TK-002-01** | Configuración de la conexión asíncrona a la API Open-Meteo en `services/` | Equipo Dev |
-| **TK-002-02** | Implementación de peticiones a Open-Meteo para métricas de suelo y aire| Equipo Dev |
-| **TK-002-03** | Creación del Composable `useWeather.ts` para gestionar la lógica de fetching | Equipo Dev |
-| **TK-002-04** | Diseño de componentes atómicos (`DataCard`) siguiendo Atomic Design | Equipo Dev |
-| **TK-002-05** | Desarrollo de la lógica de negocio para detectar umbrales de Mildiú y Botrytis | Equipo Dev |
-| **TK-002-06** | Sistema de recomendaciones dinámicas basadas en el estado del cultivo. | Equipo Dev |
-| **TK-002-07** | Implementación de la vista `DashboardView.vue` con soporte para `<Suspense />` | Equipo Dev |
+| Código | Nombre | Responsable | Estado |
+|--------|--------|-------------|--------|
+| **TK-002-01** | Configuración de la conexión asíncrona a la API Open-Meteo en `services/` | Equipo Dev | ✅ Hecho |
+| **TK-002-02** | Implementación de peticiones a Open-Meteo para métricas de suelo y aire| Equipo Dev | ✅ Hecho |
+| **TK-002-03** | Creación del Composable `useWeather.ts` para gestionar la lógica de fetching | Equipo Dev | ✅ Hecho |
+| **TK-002-04** | Diseño de componentes atómicos (`DataCard`) siguiendo Atomic Design | Equipo Dev | ✅ Hecho |
+| **TK-002-05** | Desarrollo de la lógica de negocio para detectar umbrales de Mildiú y Botrytis | Equipo Dev | ✅ Hecho |
+| **TK-002-06** | Sistema de recomendaciones dinámicas basadas en el estado del cultivo | Equipo Dev | ✅ Hecho |
+| **TK-002-07** | Implementación de la vista `DashboardView.vue` con soporte para `<Suspense />` | Equipo Dev | ✅ Hecho |
+| **TK-002-08** | Implementación de Unit Tests para la lógica de alertas en `useWeather.ts` | Equipo Dev | ✅ Hecho |
+| **TK-002-09** | Implementación de Component Tests para `DataCard` y `DashboardView` | Equipo Dev | Pendiente |
+| **TK-002-10** | Manejo de estados de error y "no data" en la UI | Equipo Dev | ✅ Hecho |
