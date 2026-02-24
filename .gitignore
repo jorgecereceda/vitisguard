@@ -39,4 +39,4 @@ __screenshots__/
 *.timestamp-*-*.mjs
 
 #Kanban.md or files *.md
-kanban.md
+/project/kanban.md
