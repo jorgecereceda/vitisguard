@@ -1,10 +1,32 @@
 <script setup lang="ts">
+import { computed, watch } from 'vue'
 import { useNavigation } from '@/composables/useNavigation'
+import { useWeather } from '@/composables/use-weather'
+import { useGeolocation } from '@/composables/useGeolocation'
 
 const { activeTitle, activeSubtitle } = useNavigation()
 
-const threatsCount = 3
-const location = 'Getaria DO'
+const { alerts, fetchWeather } = useWeather()
+const { state: geoState } = useGeolocation()
+
+const threatsCount = computed(() => alerts.value.length)
+
+const location = computed(() => {
+  if (geoState.value.latitude && geoState.value.longitude) {
+    return `${geoState.value.latitude.toFixed(2)}, ${geoState.value.longitude.toFixed(2)}`
+  }
+  return 'Getaria DO'
+})
+
+watch(
+  () => [geoState.value.latitude, geoState.value.longitude],
+  ([lat, lon]) => {
+    if (typeof lat === 'number' && typeof lon === 'number') {
+      fetchWeather(lat, lon)
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
