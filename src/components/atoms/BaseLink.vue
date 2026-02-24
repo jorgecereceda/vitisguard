@@ -22,9 +22,9 @@ withDefaults(defineProps<Props>(), {
 
 <style scoped>
 .base-link {
-  color: #4f46e5;
+  color: #23C55F;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   transition: color 0.2s;
 }
 

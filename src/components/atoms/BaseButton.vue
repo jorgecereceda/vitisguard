@@ -51,18 +51,18 @@ withDefaults(defineProps<Props>(), {
 }
 
 .variant-primary {
-  background-color: #4f46e5;
+  background-color: #23C55F;
   color: #fff;
 }
 
 .variant-primary:hover:not(:disabled) {
-  background-color: #4338ca;
+  background-color: #388d57;
 }
 
 .variant-secondary {
   background-color: transparent;
-  color: #4f46e5;
-  border: 1px solid #4f46e5;
+  color: #23C55F;
+  border: 1px solid #23C55F;
 }
 
 .variant-secondary:hover:not(:disabled) {

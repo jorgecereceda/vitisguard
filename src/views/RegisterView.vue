@@ -28,6 +28,7 @@ async function handleRegister(data: FormData) {
   <div class="register-view">
     <AuthCard title="Create Account">
       <AuthForm mode="register" :loading="authStore.isLoading" @submit="handleRegister" />
+      <br>
       <AuthSwitch
         text="Already have an account?"
         link-text="Login"

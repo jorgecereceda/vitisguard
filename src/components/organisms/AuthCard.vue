@@ -9,10 +9,14 @@ defineProps<Props>()
 <template>
   <div class="auth-card">
     <div class="brand">
-      <h1 class="logo">🍇 VitisGuard</h1>
+      <div class="logo">🍇</div>
+      <div>
+        <h1 class="title"> VitisGuard</h1>
+        <h2 class="sub-title">Intelligent Vineyard Management</h2>
+      </div>
     </div>
     <div class="card-content">
-      <h2 class="title">{{ title }}</h2>
+      <h2 class="title2">{{ title }}</h2>
       <slot />
     </div>
   </div>
@@ -29,28 +33,48 @@ defineProps<Props>()
 }
 
 .brand {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  padding: 32px;
+  padding: 2rem 2rem 0 2rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  gap: 1rem;
 }
 
 .logo {
+  background: linear-gradient(135deg, #23C55F 0%, #23C55F 100%);
   margin: 0;
-  font-size: 28px;
+  padding: 1rem;
+  border-radius: 1rem;
+  font-size: 4rem;
   font-weight: 700;
   color: #fff;
+  box-shadow: 0rem 0.5rem 2rem 0rem rgba(83, 125, 98, 0.706);
 }
 
 .card-content {
-  padding: 32px;
+  padding: 2rem;
 }
 
 .title {
-  margin: 0 0 24px;
-  font-size: 24px;
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
   font-weight: 600;
   color: #111827;
   text-align: center;
+}
+
+.title2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #475569;
+  text-align: center;
+}
+
+.sub-title {
+  color: #475569;
+  font-size: 1rem;
 }
 
 @media (max-width: 640px) {
@@ -61,19 +85,27 @@ defineProps<Props>()
   }
 
   .brand {
-    padding: 24px;
+    padding: 1rem 1rem 0 1rem;
   }
 
   .logo {
-    font-size: 24px;
+    font-size: 3rem;
   }
 
   .card-content {
-    padding: 24px 20px;
+    padding: 1rem 1rem;
   }
 
   .title {
-    font-size: 20px;
+    font-size: 2rem;
+  }
+
+  .title2 {
+    font-size: 1.5rem;
+  }
+
+  .sub-title {
+    font-size: 1rem;
   }
 }
 </style>
