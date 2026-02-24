@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import AuthCard from '@/components/organisms/AuthCard.vue'
 import AuthForm from '@/components/organisms/AuthForm.vue'
 import AuthSwitch from '@/components/molecules/AuthSwitch.vue'
+import AuthLayout from '@/layout/AuthLayout.vue'
 
 interface FormData {
   name: string
@@ -25,17 +26,19 @@ async function handleLogin(data: FormData) {
 </script>
 
 <template>
-  <div class="login-view">
-    <AuthCard title="Welcome Back">
-      <AuthForm mode="login" :loading="authStore.isLoading" @submit="handleLogin" />
-      <br>
-      <AuthSwitch
-        text="Don't have an account?"
-        link-text="Register"
-        to="/register"
-      />
-    </AuthCard>
-  </div>
+  <AuthLayout>
+    <div class="login-view">
+      <AuthCard title="Welcome Back">
+        <AuthForm mode="login" :loading="authStore.isLoading" @submit="handleLogin" />
+        <br>
+        <AuthSwitch
+          text="Don't have an account?"
+          link-text="Register"
+          to="/register"
+        />
+      </AuthCard>
+    </div>
+  </AuthLayout>
 </template>
 
 <style scoped>
@@ -45,13 +48,11 @@ async function handleLogin(data: FormData) {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background-color: #f9fafb;
 }
 
 @media (max-width: 640px) {
   .login-view {
     padding: 0;
-    background-color: #fff;
   }
 }
 </style>

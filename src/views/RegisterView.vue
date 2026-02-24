@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import AuthCard from '@/components/organisms/AuthCard.vue'
 import AuthForm from '@/components/organisms/AuthForm.vue'
 import AuthSwitch from '@/components/molecules/AuthSwitch.vue'
+import AuthLayout from '@/layout/AuthLayout.vue'
 
 interface FormData {
   name: string
@@ -25,17 +26,19 @@ async function handleRegister(data: FormData) {
 </script>
 
 <template>
-  <div class="register-view">
-    <AuthCard title="Create Account">
-      <AuthForm mode="register" :loading="authStore.isLoading" @submit="handleRegister" />
-      <br>
-      <AuthSwitch
-        text="Already have an account?"
-        link-text="Login"
-        to="/login"
-      />
-    </AuthCard>
-  </div>
+  <AuthLayout>
+    <div class="register-view">
+      <AuthCard title="Create Account">
+        <AuthForm mode="register" :loading="authStore.isLoading" @submit="handleRegister" />
+        <br>
+        <AuthSwitch
+          text="Already have an account?"
+          link-text="Login"
+          to="/login"
+        />
+      </AuthCard>
+    </div>
+  </AuthLayout>
 </template>
 
 <style scoped>
@@ -45,13 +48,12 @@ async function handleRegister(data: FormData) {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background-color: #f9fafb;
 }
 
 @media (max-width: 640px) {
   .register-view {
     padding: 0;
-    background-color: #fff;
+
   }
 }
 </style>
