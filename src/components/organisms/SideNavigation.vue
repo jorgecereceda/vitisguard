@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useNavigation } from '@/composables/useNavigation'
 
+const router = useRouter()
+const route = useRoute()
 const { setNavigation } = useNavigation()
 
 const navItems = ref([
-  { icon: '📊', label: 'Dashboard', subtitle: 'Operational real-time overview', active: true },
-  { icon: '🔔', label: 'Alerts', subtitle: 'Hondarrabi Zuri • Txakoli DOs', active: false },
-  { icon: '📈', label: 'Analytics', subtitle: 'Detailed production metrics', active: false },
-  { icon: '🗺️', label: 'Parcel Maps', subtitle: 'Geospatial vineyard tracking', active: false },
-  { icon: '📦', label: 'Inventory', subtitle: 'Supply and resource management', active: false },
+  { icon: '📊', label: 'Dashboard', subtitle: 'Overview of your vineyard status', route: '/', active: true },
+  { icon: '🔔', label: 'Alerts', subtitle: 'Hondarrabi Zuri • Txakoli DOs', route: '/alerts', active: false },
+  { icon: '📈', label: 'Analytics', subtitle: 'Detailed production metrics', route: '/analytics', active: false },
+  { icon: '🗺️', label: 'Parcel Maps', subtitle: 'Geospatial vineyard tracking', route: '/parcels', active: false },
+  { icon: '📦', label: 'Inventory', subtitle: 'Supply and resource management', route: '/inventory', active: false },
 ])
 
 const user = ref({
@@ -21,13 +24,22 @@ const user = ref({
 const selectItem = (index: number) => {
   const item = navItems.value[index]
   if (item) {
-    navItems.value.forEach((it, i) => it.active = i === index)
-    setNavigation(item.label === 'Alerts' ? 'Alerts & Prevention' : item.label, item.subtitle)
+    router.push(item.route)
   }
 }
 
-// Initial sync
-selectItem(0)
+watch(
+  () => route.path,
+  (path) => {
+    navItems.value.forEach((item) => {
+      item.active = item.route === path
+      if (item.active) {
+        setNavigation(item.label === 'Alerts' ? 'Alerts & Prevention' : item.label, item.subtitle)
+      }
+    })
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
