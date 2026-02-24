@@ -4,7 +4,7 @@ import { useWeather } from '@/composables/use-weather'
 import { useGeolocation } from '@/composables/useGeolocation'
 import DataCard from '@/components/atoms/DataCard.vue'
 
-const { weatherData, isLoading: isWeatherLoading, error: weatherError, alerts, fetchWeather } = useWeather()
+const { weatherData, isLoading: isWeatherLoading, error: weatherError, fetchWeather } = useWeather()
 const { state: geoState, getLocation } = useGeolocation()
 
 // Watch for coordinate changes to fetch weather
@@ -28,7 +28,7 @@ const retryFetch = () => {
 </script>
 
 <template>
-  <div class="dashboard">
+    <div class="dashboard">
     <header class="dashboard__header">
       <h1 class="dashboard__title">VitisGuard Dashboard</h1>
       <p class="dashboard__subtitle">Monitoreo y Alerta Temprana en Tiempo Real</p>
@@ -94,16 +94,6 @@ const retryFetch = () => {
           icon="⌛"
         />
       </div>
-
-      <!-- Alertas Scenario 2 & 3 -->
-      <section v-if="alerts.length > 0" class="dashboard__alerts">
-        <h2 class="dashboard__alerts-title">⚠️ Alertas de Riesgo</h2>
-        <ul class="dashboard__alerts-list">
-          <li v-for="(alert, index) in alerts" :key="index" class="dashboard__alert-item">
-            {{ alert }}
-          </li>
-        </ul>
-      </section>
     </main>
   </div>
 </template>

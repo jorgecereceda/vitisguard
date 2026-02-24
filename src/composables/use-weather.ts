@@ -1,4 +1,4 @@
-import { ref, toRefs, computed, onUnmounted, getCurrentInstance } from 'vue'
+import { ref, computed, onUnmounted, getCurrentInstance } from 'vue'
 import type { WeatherLocation, WeatherOptions, WeatherData } from '@/types/weather'
 import { fetchWeatherData } from '@/services/weather-api'
 import { HOURLY_VARIABLES, DAILY_VARIABLES } from '@/types/weather'

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useNavigation } from '@/composables/useNavigation'
 import { useWeather } from '@/composables/use-weather'
 import { useGeolocation } from '@/composables/useGeolocation'
 
+const router = useRouter()
 const { activeTitle, activeSubtitle } = useNavigation()
 
 const { alerts, fetchWeather } = useWeather()
@@ -17,6 +19,10 @@ const location = computed(() => {
   }
   return 'Getaria DO'
 })
+
+const goToAlerts = () => {
+  router.push('/alerts')
+}
 
 watch(
   () => [geoState.value.latitude, geoState.value.longitude],
@@ -39,7 +45,7 @@ watch(
     </div>
 
     <div class="desktop-header__actions">
-      <div class="desktop-header__badge">
+      <div class="desktop-header__badge" @click="goToAlerts">
         <span class="badge-dot"></span>
         {{ threatsCount }} CRITICAL THREATS
       </div>
@@ -110,6 +116,12 @@ watch(
   align-items: center;
   gap: 0.5rem;
   border: 1px solid #fee2e2;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.desktop-header__badge:hover {
+  background-color: #fee2e2;
 }
 
 .badge-dot {
