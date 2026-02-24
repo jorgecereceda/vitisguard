@@ -1,4 +1,5 @@
 import { ref, onMounted } from 'vue'
+import { isMobile } from '@/utils/device'
 
 export interface GeolocationState {
   latitude: number | null
@@ -40,9 +41,11 @@ export function useGeolocation() {
       return
     }
 
+    const useHighAccuracy = isMobile()
+
     navigator.geolocation.getCurrentPosition(onSuccess, onError, {
-      enableHighAccuracy: true,
-      timeout: 5000,
+      enableHighAccuracy: useHighAccuracy,
+      timeout: 10000,
       maximumAge: 0
     })
   }
