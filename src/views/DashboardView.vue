@@ -29,83 +29,75 @@ const retryFetch = () => {
 <template>
   <PannelLauyout>
     <div class="dashboard">
-      <header class="dashboard__header">
-        <h1 class="dashboard__title">VitisGuard Dashboard</h1>
-        <p class="dashboard__subtitle">Monitoreo y Alerta Temprana en Tiempo Real</p>
-        <div class="dashboard__location">
-          Ubicación: {{ weatherStore.userLocation.name }} ({{ weatherStore.userLocation.latitude.toFixed(4) }}, {{ weatherStore.userLocation.longitude.toFixed(4) }})
+      <main class="dashboard__content">
+        <!-- Loading state -->
+        <div v-if="isWeatherLoading" class="dashboard__loading">
+          Cargando datos meteorológicos...
         </div>
-      </header>
 
-    <main class="dashboard__content">
-      <!-- Loading state -->
-      <div v-if="isWeatherLoading" class="dashboard__loading">
-        Cargando datos meteorológicos...
-      </div>
+        <!-- Error Handling -->
+        <div v-else-if="weatherError" class="dashboard__error">
+          <p>{{ weatherError.message || weatherError }}</p>
+          <button @click="retryFetch" class="dashboard__retry-btn">Reintentar</button>
+        </div>
 
-      <!-- Error Handling -->
-      <div v-else-if="weatherError" class="dashboard__error">
-        <p>{{ weatherError.message || weatherError }}</p>
-        <button @click="retryFetch" class="dashboard__retry-btn">Reintentar</button>
-      </div>
+        <div v-else-if="weatherData" class="dashboard__grid">
+          <!-- Metrics Cards Scenario 1 + Missing Metrics -->
+          <DataCard
+            label="Temperatura Aire"
+            :value="weatherData.temperature"
+            unit="°C"
+            icon="🌡️"
+          />
+          <DataCard
+            label="Humedad Aire"
+            :value="weatherData.humidity"
+            unit="%"
+            icon="💧"
+          />
+          <DataCard
+            label="Humedad Suelo"
+            :value="weatherData.soilHumidity"
+            unit="%"
+            icon="🌱"
+          />
+          <DataCard
+            label="Precipitación"
+            :value="weatherData.precipitation"
+            unit="mm"
+            icon="🌧️"
+          />
+          <DataCard
+            label="Evapotranspiración"
+            :value="weatherData.et0.toFixed(2)"
+            unit="mm"
+            icon="☀️"
+          />
+          <DataCard
+            label="Cobertura Nubes"
+            :value="weatherData.cloudCover"
+            unit="%"
+            icon="☁️"
+          />
+          <DataCard
+            label="Horas de Sol"
+            :value="(weatherData.sunshineDuration / 3600).toFixed(1)"
+            unit="h"
+            icon="⌛"
+          />
+        </div>
 
-      <div v-else-if="weatherData" class="dashboard__grid">
-        <!-- Metrics Cards Scenario 1 + Missing Metrics -->
-        <DataCard
-          label="Temperatura Aire"
-          :value="weatherData.temperature"
-          unit="°C"
-          icon="🌡️"
-        />
-        <DataCard
-          label="Humedad Aire"
-          :value="weatherData.humidity"
-          unit="%"
-          icon="💧"
-        />
-        <DataCard
-          label="Humedad Suelo"
-          :value="weatherData.soilHumidity"
-          unit="%"
-          icon="🌱"
-        />
-        <DataCard
-          label="Precipitación"
-          :value="weatherData.precipitation"
-          unit="mm"
-          icon="🌧️"
-        />
-        <DataCard
-          label="Evapotranspiración"
-          :value="weatherData.et0.toFixed(2)"
-          unit="mm"
-          icon="☀️"
-        />
-        <DataCard
-          label="Cobertura Nubes"
-          :value="weatherData.cloudCover"
-          unit="%"
-          icon="☁️"
-        />
-        <DataCard
-          label="Horas de Sol"
-          :value="(weatherData.sunshineDuration / 3600).toFixed(1)"
-          unit="h"
-          icon="⌛"
-        />
-      </div>
-
-      <!-- Alerts Section -->
-      <section v-if="alerts.length > 0" class="dashboard__alerts">
-        <h2 class="dashboard__alerts-title">Alertas Activas</h2>
-        <ul class="dashboard__alerts-list">
-          <li v-for="alert in alerts" :key="alert" class="dashboard__alert-item">
-            {{ alert }}
-          </li>
-        </ul>
-      </section>
-    </main>
-  </div>
+        <!-- Alerts Section -->
+        <section v-if="alerts.length > 0" class="dashboard__alerts">
+          <h2 class="dashboard__alerts-title">Alertas Activas</h2>
+          <ul class="dashboard__alerts-list">
+            <li v-for="alert in alerts" :key="alert" class="dashboard__alert-item">
+              {{ alert }}
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
 
   </PannelLauyout>
 
@@ -118,26 +110,6 @@ const retryFetch = () => {
   padding: 2rem;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: #2c3e50;
-}
-
-.dashboard__header {
-  margin-bottom: 3rem;
-  text-align: center;
-}
-
-.dashboard__title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.dashboard__subtitle {
-  font-size: 1.1rem;
-  color: #7f8c8d;
 }
 
 .dashboard__grid {
@@ -209,12 +181,5 @@ const retryFetch = () => {
   .dashboard__alerts {
     background: rgba(197, 48, 48, 0.1);
   }
-}
-
-.dashboard__location {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #27ae60;
-  margin-bottom: 1rem;
 }
 </style>
