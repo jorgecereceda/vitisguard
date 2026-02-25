@@ -22,8 +22,18 @@ export const useWeatherStore = defineStore('weather', () => {
   const parcels = ref<Parcel[]>(loadParcelsFromStorage())
   const weatherByParcel = ref<Map<string, WeatherData>>(new Map())
   const selectedParcelId = ref<string | null>(null)
+
+  // New location state
+  const userLocation = ref({
+    latitude: 42.8467,
+    longitude: -2.6716,
+    name: 'Vitoria-Gasteiz, España'
+  })
+
   const isLoading = ref(false)
   const error = ref<Error | null>(null)
+
+  const currentLocation = computed(() => userLocation.value)
 
   const selectedParcel = computed(() =>
     parcels.value.find(p => p.id === selectedParcelId.value) ?? null
@@ -141,6 +151,14 @@ export const useWeatherStore = defineStore('weather', () => {
     error.value = null
   }
 
+  function setLocation(lat: number, lon: number, name: string): void {
+    userLocation.value = {
+      latitude: lat,
+      longitude: lon,
+      name: name
+    }
+  }
+
   if (parcels.value.length > 0 && !selectedParcelId.value) {
     const firstParcel = parcels.value[0]
     if (firstParcel) {
@@ -166,5 +184,8 @@ export const useWeatherStore = defineStore('weather', () => {
     refreshCurrentParcel,
     clearError,
     clearAllData,
+    userLocation,
+    currentLocation,
+    setLocation,
   }
 })

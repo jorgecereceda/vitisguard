@@ -3,29 +3,22 @@ import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNavigation } from '@/composables/useNavigation'
 import { useWeather } from '@/composables/use-weather'
-import { useGeolocation } from '@/composables/useGeolocation'
+import { useWeatherStore } from '@/stores/weather'
+import LocationSelector from '@/components/molecules/LocationSelector.vue'
 
 const router = useRouter()
 const { activeTitle, activeSubtitle } = useNavigation()
-
 const { alerts, fetchWeather } = useWeather()
-const { state: geoState } = useGeolocation()
+const weatherStore = useWeatherStore()
 
 const threatsCount = computed(() => alerts.value.length)
-
-const location = computed(() => {
-  if (geoState.value.latitude && geoState.value.longitude) {
-    return `${geoState.value.latitude.toFixed(2)}, ${geoState.value.longitude.toFixed(2)}`
-  }
-  return 'Getaria DO'
-})
 
 const goToAlerts = () => {
   router.push('/alerts')
 }
 
 watch(
-  () => [geoState.value.latitude, geoState.value.longitude],
+  () => [weatherStore.userLocation.latitude, weatherStore.userLocation.longitude],
   ([lat, lon]) => {
     if (typeof lat === 'number' && typeof lon === 'number') {
       fetchWeather(lat, lon)
@@ -50,11 +43,7 @@ watch(
         {{ threatsCount }} CRITICAL THREATS
       </div>
 
-      <div class="desktop-header__location">
-        <span class="location-icon">📍</span>
-        <span class="location-text">{{ location }}</span>
-        <span class="location-arrow">▼</span>
-      </div>
+      <LocationSelector />
     </div>
   </header>
 </template>
