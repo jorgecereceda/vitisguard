@@ -1,20 +1,25 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWeather } from '@/composables/use-weather'
-import { useGeolocation } from '@/composables/useGeolocation'
+import { useWeatherStore } from '@/stores/weather'
 import PannelLauyout from '@/layout/PannelLauyout.vue'
 
 const router = useRouter()
-const { alerts, weatherData } = useWeather()
-const { state: geoState } = useGeolocation()
+const weatherStore = useWeatherStore()
+const { alerts, weatherData, fetchWeather } = useWeather()
 
-const locationName = computed(() => {
-  if (geoState.value.latitude && geoState.value.longitude) {
-    return `${geoState.value.latitude.toFixed(4)}, ${geoState.value.longitude.toFixed(4)}`
-  }
-  return 'Getaria DO'
-})
+watch(
+  () => [weatherStore.userLocation.latitude, weatherStore.userLocation.longitude],
+  ([lat, lon]) => {
+    if (typeof lat === 'number' && typeof lon === 'number') {
+      fetchWeather(lat, lon)
+    }
+  },
+  { immediate: true }
+)
+
+const locationName = computed(() => weatherStore.userLocation.name)
 
 interface AlertInfo {
   type: 'mildew' | 'botrytis' | 'frost' | 'heat'

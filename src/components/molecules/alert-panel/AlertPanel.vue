@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { AnyRecommendation } from '@/types/disease'
+import type { AnyRecommendation, DiseaseRisk, WeatherAlert, IrrigationRecommendation } from '@/types/disease'
 import { BaseBadge } from '@/components/atoms/base-badge'
 
 interface Props {
@@ -15,6 +15,46 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   dismiss: [id: string]
 }>()
+
+const getDescription = (rec: AnyRecommendation): string => {
+  if ('description' in rec) {
+    return rec.description
+  }
+  if ('conditions' in rec) {
+    return rec.conditions.join(', ')
+  }
+  if ('reason' in rec) {
+    return rec.reason
+  }
+  return ''
+}
+
+const getTitle = (rec: AnyRecommendation): string => {
+  if ('disease' in rec) {
+    return rec.disease.toUpperCase()
+  }
+  if ('title' in rec) {
+    return rec.title
+  }
+  return 'Alerta'
+}
+
+const formatDate = (date: Date): string => {
+  const d = new Date(date)
+  const now = new Date()
+  const diffMs = now.getTime() - d.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  
+  if (diffMins < 60) {
+    return `Hace ${diffMins} min`
+  }
+  const diffHours = Math.floor(diffMins / 60)
+  if (diffHours < 24) {
+    return `Hace ${diffHours} h`
+  }
+  const diffDays = Math.floor(diffHours / 24)
+  return `Hace ${diffDays} días`
+}
 
 const levelVariant = (level: string) => {
   switch (level) {
@@ -60,39 +100,40 @@ const displayedRecommendations = computed(() =>
       No hay alertas activas
     </div>
 
-    <ul v-else class="alert-panel__list">
-      <li
+    <div v-else class="alert-panel__cards">
+      <div
         v-for="rec in displayedRecommendations"
         :key="rec.id"
-        :class="['alert-panel__item', `alert-panel__item--${rec.level}`]"
+        :class="['alert-card', `alert-card--${rec.level}`]"
       >
-        <div class="alert-panel__item-header">
-          <span class="alert-panel__icon">{{ categoryIcon(rec.category) }}</span>
-          <span class="alert-panel__item-title">
-            {{ rec.category === 'disease' ? rec.disease.toUpperCase() : ('title' in rec ? rec.title : 'Alerta') }}
-          </span>
+        <div class="alert-card__header">
+          <span class="alert-card__icon">{{ categoryIcon(rec.category) }}</span>
+          <span class="alert-card__title">{{ getTitle(rec) }}</span>
           <BaseBadge :variant="levelVariant(rec.level)" size="sm">
             {{ rec.level.toUpperCase() }}
           </BaseBadge>
         </div>
 
-        <p v-if="'description' in rec" class="alert-panel__description">
-          {{ rec.description }}
+        <p v-if="getDescription(rec)" class="alert-card__description">
+          {{ getDescription(rec) }}
         </p>
 
-        <p class="alert-panel__recommendation">
+        <p class="alert-card__recommendation">
           {{ rec.recommendation }}
         </p>
 
-        <button
-          v-if="$attrs.onDismiss"
-          class="alert-panel__dismiss"
-          @click="emit('dismiss', rec.id)"
-        >
-          ✕
-        </button>
-      </li>
-    </ul>
+        <div class="alert-card__footer">
+          <span class="alert-card__time">{{ formatDate(rec.detectedAt) }}</span>
+          <button
+            v-if="$attrs.onDismiss"
+            class="alert-card__dismiss"
+            @click="emit('dismiss', rec.id)"
+          >
+            ✕ Dismiss
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div v-if="recommendations.length > maxItems" class="alert-panel__more">
       +{{ recommendations.length - maxItems }} más
@@ -109,7 +150,7 @@ const displayedRecommendations = computed(() =>
 }
 
 .alert-panel__header {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .alert-panel__title {
@@ -125,99 +166,123 @@ const displayedRecommendations = computed(() =>
 }
 
 .alert-panel__empty {
-  padding: 20px;
+  padding: 32px 20px;
   text-align: center;
   color: var(--color-text-muted, #9ca3af);
-}
-
-.alert-panel__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.alert-panel__item {
-  padding: 12px;
+  background-color: var(--color-bg-secondary, #f9fafb);
   border-radius: 8px;
-  margin-bottom: 8px;
-  position: relative;
-  border-left: 4px solid;
 }
 
-.alert-panel__item:last-child {
+.alert-panel__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.alert-card {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid;
+  border-left-width: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.alert-card:last-child {
   margin-bottom: 0;
 }
 
-.alert-panel__item--critical {
-  background-color: rgba(239, 68, 68, 0.08);
+.alert-card--critical {
+  background-color: #fef2f2;
+  border-color: #fecaca;
   border-left-color: var(--color-danger, #ef4444);
 }
 
-.alert-panel__item--high {
-  background-color: rgba(245, 158, 11, 0.08);
+.alert-card--high {
+  background-color: #fffbeb;
+  border-color: #fde68a;
   border-left-color: var(--color-warning, #f59e0b);
 }
 
-.alert-panel__item--medium {
-  background-color: rgba(14, 165, 233, 0.08);
+.alert-card--medium {
+  background-color: #f0f9ff;
+  border-color: #bae6fd;
   border-left-color: var(--color-info, #0ea5e9);
 }
 
-.alert-panel__item--low {
-  background-color: rgba(107, 114, 128, 0.08);
+.alert-card--low {
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
   border-left-color: var(--color-text-muted, #9ca3af);
 }
 
-.alert-panel__item-header {
+.alert-card__header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
-.alert-panel__icon {
-  font-size: 16px;
+.alert-card__icon {
+  font-size: 18px;
 }
 
-.alert-panel__item-title {
+.alert-card__title {
   flex: 1;
   font-weight: 600;
   font-size: 14px;
   color: var(--color-text-primary, #111827);
 }
 
-.alert-panel__description {
-  margin: 4px 0;
-  font-size: 12px;
+.alert-card__description {
+  margin: 0 0 10px;
+  font-size: 13px;
   color: var(--color-text-secondary, #6b7280);
+  line-height: 1.5;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 8px;
+  border-radius: 6px;
 }
 
-.alert-panel__recommendation {
-  margin: 8px 0 0;
+.alert-card__recommendation {
+  margin: 0;
   font-size: 13px;
   color: var(--color-text-primary, #111827);
-  line-height: 1.4;
+  line-height: 1.5;
+  font-weight: 500;
 }
 
-.alert-panel__dismiss {
-  position: absolute;
-  top: 8px;
-  right: 8px;
+.alert-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.alert-card__time {
+  font-size: 11px;
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.alert-card__dismiss {
   background: none;
   border: none;
   cursor: pointer;
   color: var(--color-text-muted, #9ca3af);
-  font-size: 12px;
-  padding: 4px;
-  line-height: 1;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
 }
 
-.alert-panel__dismiss:hover {
+.alert-card__dismiss:hover {
   color: var(--color-text-primary, #111827);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .alert-panel__more {
-  margin-top: 8px;
+  margin-top: 12px;
   text-align: center;
   font-size: 12px;
   color: var(--color-text-secondary, #6b7280);
