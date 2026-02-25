@@ -2,24 +2,10 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Parcel, WeatherData, WeatherOptions } from '@/types/weather'
 import { fetchWeatherData } from '@/services/weather-api'
-
-const STORAGE_KEY = 'vitisguard_parcels'
-
-function loadParcelsFromStorage(): Parcel[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    return stored ? JSON.parse(stored) : []
-  } catch {
-    return []
-  }
-}
-
-function saveParcelsToStorage(parcels: Parcel[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(parcels))
-}
+import * as plotApi from '@/services/plot-api'
 
 export const useWeatherStore = defineStore('weather', () => {
-  const parcels = ref<Parcel[]>(loadParcelsFromStorage())
+  const parcels = ref<Parcel[]>([])
   const weatherByParcel = ref<Map<string, WeatherData>>(new Map())
   const selectedParcelId = ref<string | null>(null)
   const isLoading = ref(false)
@@ -37,37 +23,89 @@ export const useWeatherStore = defineStore('weather', () => {
 
   const hasParcels = computed(() => parcels.value.length > 0)
 
-  function addParcel(parcel: Parcel): void {
-    if (parcels.value.some(p => p.id === parcel.id)) {
-      return
-    }
-    parcels.value.push(parcel)
-    saveParcelsToStorage(parcels.value)
-  }
+  async function loadParcels(): Promise<void> {
+    isLoading.value = true
+    error.value = null
 
-  function removeParcel(id: string): void {
-    parcels.value = parcels.value.filter(p => p.id !== id)
-    weatherByParcel.value.delete(id)
-    saveParcelsToStorage(parcels.value)
+    try {
+      const data = await plotApi.getAllPlots()
+      parcels.value = data
 
-    if (selectedParcelId.value === id) {
-      selectedParcelId.value = parcels.value[0]?.id ?? null
-    }
-  }
-
-  function updateParcel(id: string, updates: Partial<Omit<Parcel, 'id'>>): void {
-    const index = parcels.value.findIndex(p => p.id === id)
-    if (index !== -1) {
-      const current = parcels.value[index]
-      if (!current) return
-      parcels.value[index] = {
-        id: current.id,
-        name: updates.name ?? current.name,
-        latitude: updates.latitude ?? current.latitude,
-        longitude: updates.longitude ?? current.longitude,
-        denomination: updates.denomination ?? current.denomination,
+      if (data.length > 0 && !selectedParcelId.value) {
+        selectedParcelId.value = data[0]?.id ?? null
       }
-      saveParcelsToStorage(parcels.value)
+    } catch (e) {
+      error.value = e instanceof Error ? e : new Error('Failed to load parcels')
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function addParcel(parcel: Omit<Parcel, 'id'>): Promise<Parcel | null> {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const newParcel = await plotApi.createPlot(parcel)
+      parcels.value.push(newParcel)
+
+      if (!selectedParcelId.value) {
+        selectedParcelId.value = newParcel.id
+      }
+
+      return newParcel
+    } catch (e) {
+      error.value = e instanceof Error ? e : new Error('Failed to create parcel')
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function removeParcel(id: string): Promise<boolean> {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      await plotApi.deletePlot(id)
+
+      parcels.value = parcels.value.filter(p => p.id !== id)
+      weatherByParcel.value.delete(id)
+
+      if (selectedParcelId.value === id) {
+        selectedParcelId.value = parcels.value[0]?.id ?? null
+      }
+
+      return true
+    } catch (e) {
+      error.value = e instanceof Error ? e : new Error('Failed to delete parcel')
+      return false
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function updateParcel(
+    id: string,
+    updates: Partial<Omit<Parcel, 'id'>>
+  ): Promise<Parcel | null> {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const updatedParcel = await plotApi.updatePlot(id, updates)
+
+      const index = parcels.value.findIndex(p => p.id === id)
+      if (index !== -1) {
+        parcels.value[index] = updatedParcel
+      }
+
+      return updatedParcel
+    } catch (e) {
+      error.value = e instanceof Error ? e : new Error('Failed to update parcel')
+      return null
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -142,13 +180,6 @@ export const useWeatherStore = defineStore('weather', () => {
     error.value = null
   }
 
-  if (parcels.value.length > 0 && !selectedParcelId.value) {
-    const firstParcel = parcels.value[0]
-    if (firstParcel) {
-      selectedParcelId.value = firstParcel.id
-    }
-  }
-
   return {
     parcels,
     weatherByParcel,
@@ -158,6 +189,7 @@ export const useWeatherStore = defineStore('weather', () => {
     hasParcels,
     isLoading,
     error,
+    loadParcels,
     addParcel,
     removeParcel,
     updateParcel,
