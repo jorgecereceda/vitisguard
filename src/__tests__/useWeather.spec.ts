@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { useWeather } from '../composables/useWeather'
+import { useWeather } from '../composables/use-weather'
 
 describe('useWeather Composable', () => {
   it('should initialize with null data and no alerts', () => {
@@ -12,69 +12,93 @@ describe('useWeather Composable', () => {
   })
 
   const baseData = {
-    temperature: 20,
-    humidity: 60,
-    soilHumidity: 40,
-    precipitation: 0,
-    cloudCover: 10,
-    et0: 2.5,
-    sunshineDuration: 3600,
-    isFrostLikely: false,
-    isHeatWaveLikely: false
+    current: {
+      temperature_2m: 20,
+      relative_humidity_2m: 60,
+      precipitation: 0,
+      cloud_cover: 10
+    },
+    daily: {
+      temperature_2m_min: [15],
+      temperature_2m_max: [25],
+      et0_fao_evapotranspiration: [2.5],
+      sunshine_duration: [3600]
+    },
+    hourly: {
+      soil_moisture_0_to_7cm: [40]
+    }
   }
 
   it('should detect Mildew risk when conditions are met', () => {
-    const { weatherData, alerts } = useWeather()
+    const { weather, alerts } = useWeather()
 
-    weatherData.value = {
+    weather.value = {
       ...baseData,
-      temperature: 20,
-      humidity: 90
-    }
+      current: {
+        ...baseData.current,
+        temperature_2m: 20,
+        relative_humidity_2m: 90
+      }
+    } as any
 
     expect(alerts.value).toContain('Riesgo de Mildiú detectado: Humedad alta y temperaturas moderadas.')
   })
 
   it('should detect Botrytis risk in critical conditions', () => {
-    const { weatherData, alerts } = useWeather()
+    const { weather, alerts } = useWeather()
 
-    weatherData.value = {
+    weather.value = {
       ...baseData,
-      temperature: 18,
-      humidity: 95
-    }
+      current: {
+        ...baseData.current,
+        temperature_2m: 18,
+        relative_humidity_2m: 95
+      }
+    } as any
 
     expect(alerts.value).toContain('Riesgo de Botrytis detectado: Niveles de humedad críticos.')
   })
 
   it('should detect Frost risk when conditions are met', () => {
-    const { weatherData, alerts } = useWeather()
+    const { weather, alerts } = useWeather()
 
-    weatherData.value = {
+    weather.value = {
       ...baseData,
-      temperature: -2,
-      isFrostLikely: true
-    }
+      current: {
+        ...baseData.current,
+        temperature_2m: -2
+      },
+      daily: {
+        ...baseData.daily,
+        temperature_2m_min: [-2]
+      }
+    } as any
 
     expect(alerts.value).toContain('Riesgo por condiciones meteorológicas adversas: Helada inminente.')
   })
 
   it('should detect Heat Wave risk when conditions are met', () => {
-    const { weatherData, alerts } = useWeather()
+    const { weather, alerts } = useWeather()
 
-    weatherData.value = {
+    weather.value = {
       ...baseData,
-      temperature: 38,
-      isHeatWaveLikely: true
-    }
+      current: {
+        ...baseData.current,
+        temperature_2m: 38
+      },
+      daily: {
+        ...baseData.daily,
+        temperature_2m_max: [38]
+      }
+    } as any
 
     expect(alerts.value).toContain('Riesgo por condiciones meteorológicas adversas: Ola de calor.')
   })
 
   it('should return no alerts when conditions are healthy', () => {
-    const { weatherData, alerts } = useWeather()
+    const { weather, alerts } = useWeather()
 
-    weatherData.value = { ...baseData }
+    weather.value = baseData as any
 
     expect(alerts.value).toEqual([])
   })

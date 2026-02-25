@@ -6,7 +6,7 @@ import DataCard from '@/components/atoms/DataCard.vue'
 import PannelLauyout from '@/layout/PannelLauyout.vue'
 
 const weatherStore = useWeatherStore()
-const { weatherData, isLoading: isWeatherLoading, error: weatherError, fetchWeather } = useWeather()
+const { weatherData, isLoading: isWeatherLoading, error: weatherError, fetchWeather, alerts } = useWeather()
 
 // Watch for coordinate changes in the store to fetch weather
 watch(
@@ -94,6 +94,16 @@ const retryFetch = () => {
           icon="⌛"
         />
       </div>
+
+      <!-- Alerts Section -->
+      <section v-if="alerts.length > 0" class="dashboard__alerts">
+        <h2 class="dashboard__alerts-title">Alertas Activas</h2>
+        <ul class="dashboard__alerts-list">
+          <li v-for="alert in alerts" :key="alert" class="dashboard__alert-item">
+            {{ alert }}
+          </li>
+        </ul>
+      </section>
     </main>
   </div>
 

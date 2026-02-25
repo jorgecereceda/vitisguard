@@ -75,9 +75,17 @@ onUnmounted(() => {
 <template>
   <div class="location-selector" ref="selectorRef">
     <div class="location-selector__trigger" @click="toggleDropdown">
-      <span class="location-icon">📍</span>
+      <div class="location-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
       <span class="location-text">{{ weatherStore.userLocation.name }}</span>
-      <span class="location-arrow" :class="{ 'location-arrow--open': isOpen }">▼</span>
+      <span class="location-arrow" :class="{ 'location-arrow--open': isOpen }">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
+      </span>
     </div>
 
     <div v-if="isOpen" class="location-selector__dropdown">
@@ -85,7 +93,7 @@ onUnmounted(() => {
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Buscar dirección o lugar..."
+          placeholder="Search location..."
           class="search-input"
           @input="handleSearch"
         />
@@ -107,7 +115,7 @@ onUnmounted(() => {
       <div class="location-selector__actions">
         <button class="gps-btn" @click="useMyGeolocation" :disabled="geoState.isLoading">
           <span class="gps-icon">🎯</span>
-          {{ geoState.isLoading ? 'Obteniendo...' : 'Usar mi ubicación actual' }}
+          {{ geoState.isLoading ? 'Locating...' : 'Use current location' }}
         </button>
       </div>
     </div>
@@ -122,39 +130,65 @@ onUnmounted(() => {
 .location-selector__trigger {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   padding: 0.5rem 1rem;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background-color: #f9fbfc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
-  min-width: 150px;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  min-width: 180px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .location-selector__trigger:hover {
-  background-color: #f1f5f9;
-  border-color: #cbd5e1;
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.location-selector__trigger:active {
+  transform: scale(1.05);
 }
 
 .location-icon {
-  font-size: 1rem;
+  width: 18px;
+  height: 18px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.location-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .location-text {
   font-size: 0.875rem;
-  font-weight: 600;
-  color: #1e293b;
+  font-weight: 500;
+  color: #374151;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 180px;
+  max-width: 200px;
 }
 
 .location-arrow {
-  font-size: 0.75rem;
-  color: #94a3b8;
+  width: 12px;
+  height: 12px;
+  color: #9ca3af;
   transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+.location-arrow svg {
+  width: 100%;
+  height: 100%;
 }
 
 .location-arrow--open {
@@ -164,12 +198,12 @@ onUnmounted(() => {
 .location-selector__dropdown {
   position: absolute;
   top: calc(100% + 8px);
-  right: 0;
-  width: 300px;
+  left: 0;
+  width: 320px;
   background: white;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
   z-index: 1000;
   padding: 0.75rem;
   display: flex;
@@ -184,7 +218,7 @@ onUnmounted(() => {
 .search-input {
   width: 100%;
   padding: 0.625rem 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   font-size: 0.875rem;
   outline: none;
@@ -192,7 +226,7 @@ onUnmounted(() => {
 }
 
 .search-input:focus {
-  border-color: #27ae60;
+  border-color: #5eba7d;
 }
 
 .search-loader {
@@ -202,8 +236,8 @@ onUnmounted(() => {
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  border: 2px solid #e2e8f0;
-  border-top-color: #27ae60;
+  border: 2px solid #e5e7eb;
+  border-top-color: #5eba7d;
   border-radius: 50%;
   animation: rotate 0.8s linear infinite;
 }
@@ -215,7 +249,7 @@ onUnmounted(() => {
 .location-selector__results {
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid #f1f5f9;
+  border: 1px solid #f3f4f6;
   border-radius: 8px;
 }
 
@@ -229,22 +263,22 @@ onUnmounted(() => {
 }
 
 .result-item:hover {
-  background-color: #f8fafc;
+  background-color: #f9fafb;
 }
 
 .result-item:not(:last-child) {
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .result-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #1f2937;
 }
 
 .result-full {
   font-size: 0.75rem;
-  color: #64748b;
+  color: #6b7280;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -252,7 +286,7 @@ onUnmounted(() => {
 
 .location-selector__actions {
   padding-top: 0.5rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid #f3f4f6;
 }
 
 .gps-btn {
@@ -281,3 +315,4 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 </style>
+
