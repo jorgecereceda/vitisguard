@@ -29,38 +29,40 @@ defineProps<Props>()
 
 <style scoped>
 .data-card {
-  background: rgba(235, 11, 11, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #6b7280; /* Consistent slate-500/grey background */
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  color: white;
 }
 
 .data-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  background: #4b5563; /* Darken slightly on hover */
 }
 
 .data-card__header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .data-card__icon {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
 }
 
 .data-card__label {
   margin: 0;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #666;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #d1d5db; /* Light grey text for label */
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -68,31 +70,21 @@ defineProps<Props>()
 .data-card__body {
   display: flex;
   align-items: baseline;
-  gap: 0.25rem;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
 }
 
 .data-card__value {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #2c3e50;
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ffffff;
 }
 
 .data-card__unit {
-  font-size: 1rem;
-  color: #7f8c8d;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #9ca3af; /* Clear, visible grey for units */
+  opacity: 1; /* Ensure no transparency issues */
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .data-card {
-    background: rgba(30, 30, 30, 0.5);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-  .data-card__label {
-    color: #aaa;
-  }
-  .data-card__value {
-    color: #ecf0f1;
-  }
-}
 </style>
