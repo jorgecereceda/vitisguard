@@ -65,6 +65,7 @@ export const useWeatherStore = defineStore('weather', () => {
         name: updates.name ?? current.name,
         latitude: updates.latitude ?? current.latitude,
         longitude: updates.longitude ?? current.longitude,
+        denomination: updates.denomination ?? current.denomination,
       }
       saveParcelsToStorage(parcels.value)
     }

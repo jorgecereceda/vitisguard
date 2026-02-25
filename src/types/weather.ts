@@ -130,11 +130,14 @@ export interface CurrentData {
   wind_gusts_10m?: number
 }
 
+export type Denomination = 'Getaria' | 'Bizkaia' | 'Alava'
+
 export interface Parcel {
   id: string
   name: string
   latitude: number
   longitude: number
+  denomination: Denomination
 }
 
 export interface WeatherMetadata {

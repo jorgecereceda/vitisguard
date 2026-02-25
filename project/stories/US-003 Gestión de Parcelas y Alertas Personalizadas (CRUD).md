@@ -1,7 +1,7 @@
 # Historia de Usuario
 
 ## ID
-HU-003
+US-003
 
 ## Título
 Gestión de Parcelas y Alertas Personalizadas (CRUD)

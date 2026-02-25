@@ -7,5 +7,41 @@
       "password": "8a63c5ea1319f87f2201af349057221ff0ebd9e065f2a75fb72be7d559ef033c"
     }
   ],
-  "yards": []
+  "plots": [
+    {
+      "id": "p001",
+      "name": "Txakoli Eguzkibegiko",
+      "latitude": 43.2851,
+      "longitude": -2.3504,
+      "denomination": "Getaria"
+    },
+    {
+      "id": "p002",
+      "name": "Lagrein Sampedro",
+      "latitude": 43.3392,
+      "longitude": -2.9853,
+      "denomination": "Bizkaia"
+    },
+    {
+      "id": "p003",
+      "name": "Viña Monticello",
+      "latitude": 42.8465,
+      "longitude": -2.6724,
+      "denomination": "Alava"
+    },
+    {
+      "id": "p004",
+      "name": "Baserrikoa",
+      "latitude": 43.2912,
+      "longitude": -2.3456,
+      "denomination": "Getaria"
+    },
+    {
+      "id": "p005",
+      "name": "Maitenea",
+      "latitude": 43.3456,
+      "longitude": -2.9901,
+      "denomination": "Bizkaia"
+    }
+  ]
 }
