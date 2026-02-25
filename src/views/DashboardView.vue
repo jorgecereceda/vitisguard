@@ -2,11 +2,14 @@
 import { watch } from 'vue'
 import { useWeather } from '@/composables/use-weather'
 import { useWeatherStore } from '@/stores/weather'
+import { getWindDirection, getUVIndexLevel } from '@/utils/weather-mappings'
 import DataCard from '@/components/atoms/DataCard.vue'
 import PannelLauyout from '@/layout/PannelLauyout.vue'
+import WeatherCurrent from '@/components/molecules/weather-current/WeatherCurrent.vue'
+import WeatherForecast from '@/components/molecules/weather-forecast/WeatherForecast.vue'
 
 const weatherStore = useWeatherStore()
-const { weatherData, isLoading: isWeatherLoading, error: weatherError, fetchWeather, alerts } = useWeather()
+const { weather, weatherData, isLoading: isWeatherLoading, error: weatherError, fetchWeather, alerts } = useWeather()
 
 // Watch for coordinate changes in the store to fetch weather
 watch(
@@ -24,88 +27,113 @@ const retryFetch = () => {
     fetchWeather(weatherStore.userLocation.latitude, weatherStore.userLocation.longitude)
   }
 }
+
+const currentData = () => weather.value?.current ?? null
+const dailyData = () => weather.value?.daily ?? null
+
+const windSpeed = () => weather.value?.current?.wind_speed_10m?.toFixed(0) ?? '--'
+
+const windDirection = () => {
+  const dir = weather.value?.current?.wind_direction_10m
+  return dir !== undefined ? getWindDirection(dir) : 'N/A'
+}
+
+const uvIndex = () => weather.value?.daily?.uv_index_max?.[0] ?? 0
+const uvLevel = () => getUVIndexLevel(uvIndex())
 </script>
 
 <template>
   <PannelLauyout>
     <div class="dashboard">
-      <header class="dashboard__header">
-        <h1 class="dashboard__title">VitisGuard Dashboard</h1>
-        <p class="dashboard__subtitle">Monitoreo y Alerta Temprana en Tiempo Real</p>
-        <div class="dashboard__location">
-          Ubicación: {{ weatherStore.userLocation.name }} ({{ weatherStore.userLocation.latitude.toFixed(4) }}, {{ weatherStore.userLocation.longitude.toFixed(4) }})
+      <main class="dashboard__content">
+        <!-- Loading state -->
+        <div v-if="isWeatherLoading" class="dashboard__loading">
+          Cargando datos meteorológicos...
         </div>
-      </header>
 
-    <main class="dashboard__content">
-      <!-- Loading state -->
-      <div v-if="isWeatherLoading" class="dashboard__loading">
-        Cargando datos meteorológicos...
-      </div>
+        <!-- Error Handling -->
+        <div v-else-if="weatherError" class="dashboard__error">
+          <p>{{ weatherError.message || weatherError }}</p>
+          <button @click="retryFetch" class="dashboard__retry-btn">Reintentar</button>
+        </div>
 
-      <!-- Error Handling -->
-      <div v-else-if="weatherError" class="dashboard__error">
-        <p>{{ weatherError.message || weatherError }}</p>
-        <button @click="retryFetch" class="dashboard__retry-btn">Reintentar</button>
-      </div>
+        <div v-else-if="weatherData" class="dashboard__weather">
+          <!-- Weather Current & Forecast Section -->
+          <section class="dashboard__weather-main">
+            <WeatherCurrent :current="currentData()" :loading="isWeatherLoading" />
+            <WeatherForecast :daily="dailyData()" :loading="isWeatherLoading" />
+          </section>
 
-      <div v-else-if="weatherData" class="dashboard__grid">
-        <!-- Metrics Cards Scenario 1 + Missing Metrics -->
-        <DataCard
-          label="Temperatura Aire"
-          :value="weatherData.temperature"
-          unit="°C"
-          icon="🌡️"
-        />
-        <DataCard
-          label="Humedad Aire"
-          :value="weatherData.humidity"
-          unit="%"
-          icon="💧"
-        />
-        <DataCard
-          label="Humedad Suelo"
-          :value="weatherData.soilHumidity"
-          unit="%"
-          icon="🌱"
-        />
-        <DataCard
-          label="Precipitación"
-          :value="weatherData.precipitation"
-          unit="mm"
-          icon="🌧️"
-        />
-        <DataCard
-          label="Evapotranspiración"
-          :value="weatherData.et0.toFixed(2)"
-          unit="mm"
-          icon="☀️"
-        />
-        <DataCard
-          label="Cobertura Nubes"
-          :value="weatherData.cloudCover"
-          unit="%"
-          icon="☁️"
-        />
-        <DataCard
-          label="Horas de Sol"
-          :value="(weatherData.sunshineDuration / 3600).toFixed(1)"
-          unit="h"
-          icon="⌛"
-        />
-      </div>
+          <!-- Metrics Cards -->
+          <div class="dashboard__grid">
+            <DataCard
+              label="Temperatura Aire"
+              :value="weatherData.temperature"
+              unit="°C"
+              icon="🌡️"
+            />
+            <DataCard
+              label="Humedad Aire"
+              :value="weatherData.humidity"
+              unit="%"
+              icon="💧"
+            />
+            <DataCard
+              label="Humedad Suelo"
+              :value="weatherData.soilHumidity"
+              unit="%"
+              icon="🌱"
+            />
+            <DataCard
+              label="Precipitación"
+              :value="weatherData.precipitation"
+              unit="mm"
+              icon="🌧️"
+            />
+            <DataCard
+              label="Viento"
+              :value="windSpeed()"
+              unit="km/h"
+              icon="💨"
+            />
+            <DataCard
+              label="Índice UV"
+              :value="uvIndex()"
+              unit=""
+              icon="☀️"
+            />
+            <DataCard
+              label="Evapotranspiración"
+              :value="weatherData.et0.toFixed(2)"
+              unit="mm"
+              icon="☀️"
+            />
+            <DataCard
+              label="Cobertura Nubes"
+              :value="weatherData.cloudCover"
+              unit="%"
+              icon="☁️"
+            />
+            <DataCard
+              label="Horas de Sol"
+              :value="(weatherData.sunshineDuration / 3600).toFixed(1)"
+              unit="h"
+              icon="⌛"
+            />
+          </div>
+        </div>
 
-      <!-- Alerts Section -->
-      <section v-if="alerts.length > 0" class="dashboard__alerts">
-        <h2 class="dashboard__alerts-title">Alertas Activas</h2>
-        <ul class="dashboard__alerts-list">
-          <li v-for="alert in alerts" :key="alert" class="dashboard__alert-item">
-            {{ alert }}
-          </li>
-        </ul>
-      </section>
-    </main>
-  </div>
+        <!-- Alerts Section -->
+        <section v-if="alerts.length > 0" class="dashboard__alerts">
+          <h2 class="dashboard__alerts-title">Alertas Activas</h2>
+          <ul class="dashboard__alerts-list">
+            <li v-for="alert in alerts" :key="alert" class="dashboard__alert-item">
+              {{ alert }}
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
 
   </PannelLauyout>
 
@@ -120,24 +148,15 @@ const retryFetch = () => {
   color: #2c3e50;
 }
 
-.dashboard__header {
-  margin-bottom: 3rem;
-  text-align: center;
+.dashboard__weather {
+  margin-bottom: 2rem;
 }
 
-.dashboard__title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.dashboard__subtitle {
-  font-size: 1.1rem;
-  color: #7f8c8d;
+.dashboard__weather-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .dashboard__grid {
@@ -211,10 +230,10 @@ const retryFetch = () => {
   }
 }
 
-.dashboard__location {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #27ae60;
-  margin-bottom: 1rem;
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard__weather-main {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
