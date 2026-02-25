@@ -107,32 +107,52 @@ onUnmounted(() => {
 
     <div v-if="isOpen" class="location-selector__dropdown">
       <div class="location-selector__search">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Buscar ubicación o coordenadas..."
-          class="search-input"
-          @input="handleSearch"
-        />
-        <div v-if="isSearching" class="search-loader"></div>
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input
+            v-model="searchQuery"
+            type="text"
+
+            class="search-input"
+            @input="handleSearch"
+          />
+        </div>
+        <p class="search-hint">
+        </p>
       </div>
 
       <div class="location-selector__content">
         <!-- Coordinate result -->
         <div v-if="coordResult" class="location-selector__group">
-          <h4 class="group-title">Coordenadas detectadas</h4>
+          <h4 class="group-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="title-icon">
+              <circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/>
+            </svg>
+            Coordenadas
+          </h4>
           <div class="result-item result-item--highlight" @click="selectCoordinateLocation">
-            <div class="result-icon">📍</div>
+            <div class="result-icon result-icon--coords">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
+              </svg>
+            </div>
             <div class="result-info">
-              <span class="result-name">Usar coordenadas</span>
-              <span class="result-full">{{ coordResult.lat }}, {{ coordResult.lon }}</span>
+              <span class="result-name">Usar estas coordenadas</span>
+              <span class="result-full">{{ coordResult.lat.toFixed(5) }}, {{ coordResult.lon.toFixed(5) }}</span>
             </div>
           </div>
         </div>
 
         <!-- Address results -->
         <div v-if="results.length > 0" class="location-selector__group">
-          <h4 class="group-title">Direcciones</h4>
+          <h4 class="group-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="title-icon">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            Direcciones encontradas
+          </h4>
           <div class="location-selector__results">
             <div
               v-for="result in results"
@@ -150,7 +170,20 @@ onUnmounted(() => {
         </div>
 
         <div v-if="!coordResult && results.length === 0 && searchQuery.length >= 3 && !isSearching" class="no-results">
-          No se encontraron resultados
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="no-results-icon">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
+          </svg>
+          <p>No se encontraron resultados</p>
+          <span>Intenta con otros términos</span>
+        </div>
+
+        <div v-if="searchQuery.length === 0 && results.length === 0" class="search-suggestions">
+          <p class="suggestions-title">Sugerencias:</p>
+          <ul class="suggestions-list">
+            <li>"Madrid, España"</li>
+            <li>"Calle Mayor 10, Valencia"</li>
+            <li>"40.416775, -3.703790"</li>
+          </ul>
         </div>
       </div>
 
@@ -162,7 +195,8 @@ onUnmounted(() => {
              </svg>
              <span v-else class="gps-loader"></span>
           </span>
-          {{ geoState.isLoading ? 'Localizando...' : 'Usar ubicación actual' }}
+          <span v-if="geoState.isLoading">Obteniendo ubicación...</span>
+          <span v-else>Usar mi ubicación actual </span>
         </button>
       </div>
     </div>
@@ -262,9 +296,24 @@ onUnmounted(() => {
   position: relative;
 }
 
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
 .search-input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   font-size: 0.875rem;
@@ -277,6 +326,28 @@ onUnmounted(() => {
   border-color: #22c55e;
   background-color: white;
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.search-hint {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  padding: 0 0.25rem;
+}
+
+.hint-item {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.hint-item kbd {
+  background: #f3f4f6;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-family: inherit;
 }
 
 .search-loader {
@@ -317,6 +388,14 @@ onUnmounted(() => {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding-left: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.title-icon {
+  width: 12px;
+  height: 12px;
 }
 
 .result-item {
@@ -343,6 +422,15 @@ onUnmounted(() => {
 
 .result-item--highlight:hover {
   background-color: #e0f2fe;
+}
+
+.result-icon--coords {
+  color: #22c55e;
+}
+
+.result-icon--coords svg {
+  width: 18px;
+  height: 18px;
 }
 
 .result-icon {
@@ -379,9 +467,51 @@ onUnmounted(() => {
 
 .no-results {
   text-align: center;
-  padding: 1rem;
+  padding: 1.5rem 1rem;
   color: #9ca3af;
   font-size: 0.875rem;
+}
+
+.no-results-icon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+.no-results p {
+  margin: 0;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.no-results span {
+  font-size: 0.75rem;
+}
+
+.search-suggestions {
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.suggestions-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #9ca3af;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+}
+
+.suggestions-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.suggestions-list li {
+  margin-bottom: 0.25rem;
 }
 
 .location-selector__actions {
