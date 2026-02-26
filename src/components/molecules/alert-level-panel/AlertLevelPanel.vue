@@ -184,25 +184,25 @@ const levelLabel = (level: RiskLevel): string => {
 .disease-card--critical,
 .weather-card--critical {
   background: #fef2f2;
-  border-color: #fecaca;
+  border-color: #ef4444;
 }
 
 .disease-card--high,
 .weather-card--high {
-  background: #fffbeb;
-  border-color: #fde68a;
+  background: #fff7ed;
+  border-color: #f97316;
 }
 
 .disease-card--medium,
 .weather-card--medium {
-  background: #f0f9ff;
-  border-color: #bae6fd;
+  background: #fffbeb;
+  border-color: #f59e0b;
 }
 
 .disease-card--low,
 .weather-card--low {
   background: #f0fdf4;
-  border-color: #bbf7d0;
+  border-color: #22c55e;
 }
 
 .weather-card--active {
