@@ -14,5 +14,6 @@
   justify-content: center;
   min-height: 100vh;
   background-color: #E8F6ED;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 </style>
