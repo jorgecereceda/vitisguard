@@ -3,11 +3,32 @@ import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWeather } from '@/composables/use-weather'
 import { useWeatherStore } from '@/stores/weather'
+import { useDiseaseDetection } from '@/composables/use-disease-detection'
+import { generateWeatherAlerts } from '@/utils/weather-alerts'
 import PannelLauyout from '@/layout/PannelLauyout.vue'
+import AlertLevelPanel from '@/components/molecules/alert-level-panel/AlertLevelPanel.vue'
+import type { DiseaseType, WeatherAlertType, RiskLevel, WeatherConditions } from '@/types/disease'
 
 const router = useRouter()
 const weatherStore = useWeatherStore()
-const { alerts, weatherData, fetchWeather } = useWeather()
+const { alerts, weatherData, weather, fetchWeather } = useWeather()
+const { analyzeAllDiseases } = useDiseaseDetection()
+
+const diseaseNames: Record<DiseaseType, string> = {
+  mildiu: 'Mildiú',
+  botrytis: 'Botrytis',
+  oidio: 'Oídio',
+  excoriosis: 'Excoriosis',
+}
+
+const weatherRiskNames: Record<WeatherAlertType, string> = {
+  frost: 'Helada',
+  lateFrost: 'Helada Tardía',
+  heatwave: 'Ola de Calor',
+  storm: 'Tormenta',
+  drought: 'Sequía',
+  excessiveRain: 'Exceso de Lluvia',
+}
 
 watch(
   () => [weatherStore.userLocation.latitude, weatherStore.userLocation.longitude],
@@ -20,6 +41,124 @@ watch(
 )
 
 const locationName = computed(() => weatherStore.userLocation.name)
+
+const currentConditions = computed((): WeatherConditions => {
+  if (!weather.value?.current) {
+    return {
+      temperature: null,
+      humidity: null,
+      precipitation: null,
+      soilMoisture: null,
+      soilTemperature: null,
+      sunshineHours: null,
+      windSpeed: null,
+    }
+  }
+  const current = weather.value.current
+  const hourly = weather.value.hourly
+  return {
+    temperature: current.temperature_2m ?? null,
+    humidity: current.relative_humidity_2m ?? null,
+    precipitation: current.precipitation ?? null,
+    soilMoisture: hourly?.soil_moisture_0_to_7cm?.[0] ?? null,
+    soilTemperature: hourly?.soil_temperature_0_to_7cm?.[0] ?? null,
+    sunshineHours: hourly?.sunshine_duration?.[0] ?? null,
+    windSpeed: current.wind_speed_10m ?? null,
+  }
+})
+
+const diseaseRisks = computed(() => {
+  const conditions = currentConditions.value
+  return analyzeAllDiseases(conditions).map(risk => ({
+    id: `disease-${risk.disease}`,
+    type: risk.disease,
+    name: diseaseNames[risk.disease],
+    level: risk.level,
+    probability: risk.probability,
+    conditions: risk.conditions,
+  }))
+})
+
+const weatherRiskTypes: WeatherAlertType[] = ['frost', 'heatwave', 'storm', 'drought', 'excessiveRain']
+
+const weatherRisks = computed(() => {
+  const conditions = currentConditions.value
+  const weatherAlerts = generateWeatherAlerts(
+    conditions.temperature,
+    conditions.humidity,
+    conditions.precipitation,
+    conditions.windSpeed,
+    0
+  )
+
+  return weatherRiskTypes.map(type => {
+    const alert = weatherAlerts.find(a => a.type === type)
+    const current = weather.value?.current
+    const daily = weather.value?.daily
+
+    let conditionsList: string[] = []
+    let isActive = false
+    let level: RiskLevel = 'low'
+
+    if (alert) {
+      level = alert.level
+      isActive = alert.level !== 'low'
+      conditionsList = alert.description ? [alert.description] : []
+    } else {
+      switch (type) {
+        case 'frost': {
+          const minTemp = daily?.temperature_2m_min?.[0]
+          if (minTemp !== undefined && minTemp < 2) {
+            level = 'high'
+            isActive = true
+            conditionsList = [`Temp. mínima: ${minTemp.toFixed(1)}°C`]
+          }
+          break
+        }
+        case 'heatwave': {
+          const maxTemp = daily?.temperature_2m_max?.[0]
+          if (maxTemp !== undefined && maxTemp > 32) {
+            level = 'high'
+            isActive = true
+            conditionsList = [`Temp. máxima: ${maxTemp.toFixed(1)}°C`]
+          }
+          break
+        }
+        case 'storm':
+          if (current?.wind_speed_10m && current.wind_speed_10m > 50) {
+            level = 'high'
+            isActive = true
+            conditionsList = [`Viento: ${current.wind_speed_10m.toFixed(0)} km/h`]
+          }
+          break
+        case 'drought':
+          if (conditions.precipitation !== null && conditions.precipitation === 0 && 
+              conditions.soilMoisture !== null && conditions.soilMoisture < 20) {
+            level = 'medium'
+            isActive = true
+            conditionsList = ['Sin precipitación reciente', 'Humedad del suelo baja']
+          }
+          break
+        case 'excessiveRain':
+          if (conditions.precipitation !== null && conditions.precipitation > 10) {
+            level = 'medium'
+            isActive = true
+            conditionsList = [`Precipitación: ${conditions.precipitation.toFixed(1)} mm`]
+          }
+          break
+      }
+    }
+
+    return {
+      id: `weather-${type}`,
+      type,
+      name: weatherRiskNames[type],
+      level,
+      conditions: conditionsList,
+      isActive,
+    }
+  })
+})
 
 interface AlertInfo {
   type: 'mildew' | 'botrytis' | 'frost' | 'heat'
@@ -156,6 +295,12 @@ const goToDashboard = () => {
         </div>
       </div>
     </section>
+
+    <AlertLevelPanel
+      :diseases="diseaseRisks"
+      :weather-risks="weatherRisks"
+    />
+
   </div>
   </PannelLauyout>
 </template>
@@ -339,6 +484,10 @@ const goToDashboard = () => {
   font-size: 1.125rem;
   font-weight: 700;
   color: #1e293b;
+}
+
+.alerts-view__treatments {
+  margin-top: 2rem;
 }
 
 @media (max-width: 768px) {

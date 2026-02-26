@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { AnyRecommendation, DiseaseRisk, WeatherAlert, IrrigationRecommendation } from '@/types/disease'
+import { ref, computed } from 'vue'
+import type { AnyRecommendation } from '@/types/disease'
 import { BaseBadge } from '@/components/atoms/base-badge'
+
+type TabType = 'alerts' | 'treatments'
 
 interface Props {
   recommendations: AnyRecommendation[]
@@ -15,6 +17,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   dismiss: [id: string]
 }>()
+
+const activeTab = ref<TabType>('alerts')
 
 const getDescription = (rec: AnyRecommendation): string => {
   if ('description' in rec) {
@@ -91,16 +95,32 @@ const displayedRecommendations = computed(() =>
   <div class="alert-panel">
     <div class="alert-panel__header">
       <h3 class="alert-panel__title">
-        ⚠️ Alertas Activas
-        <span class="alert-panel__count">({{ recommendations.length }})</span>
+        ⚠️ Alertas y Tratamientos
       </h3>
     </div>
 
-    <div v-if="recommendations.length === 0" class="alert-panel__empty">
-      No hay alertas activas
+    <div class="alert-panel__tabs">
+      <button
+        :class="['alert-panel__tab', { 'alert-panel__tab--active': activeTab === 'alerts' }]"
+        @click="activeTab = 'alerts'"
+      >
+        📢 Alertas
+        <span class="alert-panel__tab-count">({{ recommendations.length }})</span>
+      </button>
+      <button
+        :class="['alert-panel__tab', { 'alert-panel__tab--active': activeTab === 'treatments' }]"
+        @click="activeTab = 'treatments'"
+      >
+        📋 Tratamientos
+      </button>
     </div>
 
-    <div v-else class="alert-panel__cards">
+    <div v-if="activeTab === 'alerts'" class="alert-panel__content">
+      <div v-if="recommendations.length === 0" class="alert-panel__empty">
+        No hay alertas activas
+      </div>
+
+      <div v-else class="alert-panel__cards">
       <div
         v-for="rec in displayedRecommendations"
         :key="rec.id"
@@ -134,8 +154,9 @@ const displayedRecommendations = computed(() =>
         </div>
       </div>
     </div>
+    </div>
 
-    <div v-if="recommendations.length > maxItems" class="alert-panel__more">
+    <div v-if="recommendations.length > maxItems && activeTab === 'alerts'" class="alert-panel__more">
       +{{ recommendations.length - maxItems }} más
     </div>
   </div>
@@ -286,5 +307,48 @@ const displayedRecommendations = computed(() =>
   text-align: center;
   font-size: 12px;
   color: var(--color-text-secondary, #6b7280);
+}
+
+.alert-panel__tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  padding-bottom: 12px;
+}
+
+.alert-panel__tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #6b7280);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.alert-panel__tab:hover {
+  background-color: var(--color-bg-secondary, #f9fafb);
+  color: var(--color-text-primary, #111827);
+}
+
+.alert-panel__tab--active {
+  background-color: var(--color-primary-light, #eff6ff);
+  color: var(--color-primary, #3b82f6);
+}
+
+.alert-panel__tab-count {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.alert-panel__content {
+  min-height: 200px;
 }
 </style>
