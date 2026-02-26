@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useWeather } from '@/composables/use-weather'
 import { useWeatherStore } from '@/stores/weather'
-import { getWindDirection, getUVIndexLevel } from '@/utils/weather-mappings'
+import { getWindDirection, getUVIndexLevel, getWeatherCondition } from '@/utils/weather-mappings'
 import DataCard from '@/components/atoms/DataCard.vue'
 import PannelLauyout from '@/layout/PannelLauyout.vue'
 import WeatherCurrent from '@/components/molecules/weather-current/WeatherCurrent.vue'
@@ -11,7 +11,8 @@ import WeatherForecast from '@/components/molecules/weather-forecast/WeatherFore
 const weatherStore = useWeatherStore()
 const { weather, weatherData, isLoading: isWeatherLoading, error: weatherError, fetchWeather, alerts } = useWeather()
 
-// Watch for coordinate changes in the store to fetch weather
+const selectedDayIndex = ref(0)
+
 watch(
   () => [weatherStore.userLocation.latitude, weatherStore.userLocation.longitude],
   ([lat, lon]) => {
@@ -30,6 +31,46 @@ const retryFetch = () => {
 
 const currentData = () => weather.value?.current ?? null
 const dailyData = () => weather.value?.daily ?? null
+const hourlyData = () => weather.value?.hourly ?? null
+
+const selectedDayData = computed(() => {
+  if (!weather.value?.daily) return null
+  return {
+    tempMax: weather.value.daily.temperature_2m_max?.[selectedDayIndex.value] ?? 0,
+    tempMin: weather.value.daily.temperature_2m_min?.[selectedDayIndex.value] ?? 0,
+    apparentTempMax: weather.value.daily.temperature_2m_max?.[selectedDayIndex.value] ?? 0,
+    apparentTempMin: weather.value.daily.temperature_2m_min?.[selectedDayIndex.value] ?? 0,
+    precipitation: weather.value.daily.precipitation_sum?.[selectedDayIndex.value] ?? 0,
+    windSpeedMax: weather.value.daily.wind_speed_10m_max?.[selectedDayIndex.value] ?? 0,
+    uvIndex: weather.value.daily.uv_index_max?.[selectedDayIndex.value] ?? 0,
+    cloudCover: selectedDayIndex.value === 0 
+      ? (weather.value.current?.cloud_cover ?? 0) 
+      : null,
+  }
+})
+
+const selectedDayForecast = computed(() => {
+  if (!weather.value?.hourly || !weather.value?.daily) return null
+  
+  const dayStart = selectedDayIndex.value * 24
+  const dayEnd = dayStart + 24
+  
+  return {
+    time: weather.value.hourly.time?.slice(dayStart, dayEnd) ?? [],
+    temperature_2m: weather.value.hourly.temperature_2m?.slice(dayStart, dayEnd) ?? [],
+    relative_humidity_2m: weather.value.hourly.relative_humidity_2m?.slice(dayStart, dayEnd) ?? [],
+    apparent_temperature: weather.value.hourly.apparent_temperature?.slice(dayStart, dayEnd) ?? [],
+    cloud_cover: weather.value.hourly.cloud_cover?.slice(dayStart, dayEnd) ?? [],
+    precipitation: weather.value.hourly.precipitation?.slice(dayStart, dayEnd) ?? [],
+    wind_speed_10m: weather.value.hourly.wind_speed_10m?.slice(dayStart, dayEnd) ?? [],
+    wind_direction_10m: weather.value.hourly.wind_direction_10m?.slice(dayStart, dayEnd) ?? [],
+    uv_index: weather.value.hourly.uv_index?.slice(dayStart, dayEnd) ?? [],
+  } as any
+})
+
+const handleSelectDay = (index: number) => {
+  selectedDayIndex.value = index
+}
 
 const windSpeed = () => weather.value?.current?.wind_speed_10m?.toFixed(0) ?? '--'
 
@@ -40,6 +81,10 @@ const windDirection = () => {
 
 const uvIndex = () => weather.value?.daily?.uv_index_max?.[0] ?? 0
 const uvLevel = () => getUVIndexLevel(uvIndex())
+
+const sunshineDuration = computed(() => {
+  return weather.value?.daily?.sunshine_duration?.[selectedDayIndex.value] ?? 0
+})
 </script>
 
 <template>
@@ -60,24 +105,23 @@ const uvLevel = () => getUVIndexLevel(uvIndex())
         <div v-else-if="weatherData" class="dashboard__weather">
           <!-- Weather Current & Forecast Section -->
           <section class="dashboard__weather-main">
-            <WeatherCurrent :current="currentData()" :loading="isWeatherLoading" />
-            <WeatherForecast :daily="dailyData()" :loading="isWeatherLoading" />
+            <WeatherCurrent 
+              :current="currentData()" 
+              :hourly="selectedDayIndex === 0 ? hourlyData() : selectedDayForecast" 
+              :selected-day="selectedDayData"
+              :sunshine-duration="sunshineDuration"
+              :is-today="selectedDayIndex === 0"
+              :loading="isWeatherLoading" 
+            />
+            <WeatherForecast 
+              :daily="dailyData()" 
+              :loading="isWeatherLoading"
+              @select-day="handleSelectDay"
+            />
           </section>
 
           <!-- Metrics Cards -->
           <div class="dashboard__grid">
-            <DataCard
-              label="Temperatura Aire"
-              :value="weatherData.temperature"
-              unit="°C"
-              icon="🌡️"
-            />
-            <DataCard
-              label="Humedad Aire"
-              :value="weatherData.humidity"
-              unit="%"
-              icon="💧"
-            />
             <DataCard
               label="Humedad Suelo"
               :value="weatherData.soilHumidity"
@@ -91,34 +135,10 @@ const uvLevel = () => getUVIndexLevel(uvIndex())
               icon="🌧️"
             />
             <DataCard
-              label="Viento"
-              :value="windSpeed()"
-              unit="km/h"
-              icon="💨"
-            />
-            <DataCard
-              label="Índice UV"
-              :value="uvIndex()"
-              unit=""
-              icon="☀️"
-            />
-            <DataCard
               label="Evapotranspiración"
               :value="weatherData.et0.toFixed(2)"
               unit="mm"
               icon="☀️"
-            />
-            <DataCard
-              label="Cobertura Nubes"
-              :value="weatherData.cloudCover"
-              unit="%"
-              icon="☁️"
-            />
-            <DataCard
-              label="Horas de Sol"
-              :value="(weatherData.sunshineDuration / 3600).toFixed(1)"
-              unit="h"
-              icon="⌛"
             />
           </div>
         </div>
@@ -141,7 +161,7 @@ const uvLevel = () => getUVIndexLevel(uvIndex())
 
 <style scoped>
 .dashboard {
-  max-width: 1200px;
+  max-width: 1800px;
   margin: 0 auto;
   padding: 2rem;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -153,10 +173,11 @@ const uvLevel = () => getUVIndexLevel(uvIndex())
 }
 
 .dashboard__weather-main {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   margin-bottom: 2rem;
+  width: 100%;
 }
 
 .dashboard__grid {
