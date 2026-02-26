@@ -1,0 +1,295 @@
+<script setup lang="ts">
+import type { RiskLevel, DiseaseType, WeatherAlertType } from '@/types/disease'
+import { BaseBadge } from '@/components/atoms/base-badge'
+
+interface DiseaseInfo {
+  id: string
+  type: DiseaseType
+  name: string
+  level: RiskLevel
+  probability: number
+  conditions: string[]
+}
+
+interface WeatherRiskInfo {
+  id: string
+  type: WeatherAlertType
+  name: string
+  level: RiskLevel
+  conditions: string[]
+  isActive: boolean
+}
+
+interface Props {
+  diseases: DiseaseInfo[]
+  weatherRisks: WeatherRiskInfo[]
+}
+
+defineProps<Props>()
+
+const diseaseNames: Record<DiseaseType, string> = {
+  mildiu: 'Mildiú',
+  botrytis: 'Botrytis',
+  oidio: 'Oídio',
+  excoriosis: 'Excoriosis',
+}
+
+const weatherRiskNames: Record<WeatherAlertType, string> = {
+  frost: 'Helada',
+  lateFrost: 'Helada Tardía',
+  heatwave: 'Ola de Calor',
+  storm: 'Tormenta',
+  drought: 'Sequía',
+  excessiveRain: 'Exceso de Lluvia',
+}
+
+const levelVariant = (level: RiskLevel): 'success' | 'info' | 'warning' | 'danger' => {
+  switch (level) {
+    case 'critical':
+      return 'danger'
+    case 'high':
+      return 'warning'
+    case 'medium':
+      return 'info'
+    default:
+      return 'success'
+  }
+}
+
+const levelLabel = (level: RiskLevel): string => {
+  return level.charAt(0).toUpperCase() + level.slice(1)
+}
+</script>
+
+<template>
+  <div class="alert-level-panel">
+    <div class="alert-level-panel__section">
+      <h3 class="alert-level-panel__section-title">
+        <span class="alert-level-panel__section-icon">🦠</span>
+        Riesgos por Enfermedades
+      </h3>
+      <div class="alert-level-panel__grid">
+        <div
+          v-for="disease in diseases"
+          :key="disease.id"
+          :class="['disease-card', `disease-card--${disease.level}`]"
+        >
+          <div class="disease-card__header">
+            <span class="disease-card__name">{{ diseaseNames[disease.type] }}</span>
+            <BaseBadge :variant="levelVariant(disease.level)" size="sm">
+              {{ levelLabel(disease.level) }}
+            </BaseBadge>
+          </div>
+          <div class="disease-card__probability">
+            <span class="disease-card__probability-value">{{ disease.probability }}%</span>
+            <span class="disease-card__probability-label">probabilidad</span>
+          </div>
+          <ul v-if="disease.conditions.length > 0" class="disease-card__conditions">
+            <li v-for="(condition, idx) in disease.conditions" :key="idx">
+              {{ condition }}
+            </li>
+          </ul>
+          <p v-else class="disease-card__conditions-empty">
+            Condiciones desfavorables
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-level-panel__section">
+      <h3 class="alert-level-panel__section-title">
+        <span class="alert-level-panel__section-icon">🌧️</span>
+        Riesgos Climáticos
+      </h3>
+      <div class="alert-level-panel__grid alert-level-panel__grid--weather">
+        <div
+          v-for="risk in weatherRisks"
+          :key="risk.id"
+          :class="['weather-card', `weather-card--${risk.level}`, { 'weather-card--active': risk.isActive }]"
+        >
+          <div class="weather-card__header">
+            <span class="weather-card__name">{{ weatherRiskNames[risk.type] }}</span>
+            <BaseBadge :variant="levelVariant(risk.level)" size="sm">
+              {{ levelLabel(risk.level) }}
+            </BaseBadge>
+          </div>
+          <ul v-if="risk.conditions.length > 0" class="weather-card__conditions">
+            <li v-for="(condition, idx) in risk.conditions" :key="idx">
+              {{ condition }}
+            </li>
+          </ul>
+          <p v-else class="weather-card__conditions-empty">
+            Sin riesgo activo
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.alert-level-panel {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.alert-level-panel__section {
+  margin-bottom: 2rem;
+}
+
+.alert-level-panel__section:last-child {
+  margin-bottom: 0;
+}
+
+.alert-level-panel__section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1rem;
+}
+
+.alert-level-panel__section-icon {
+  font-size: 1.25rem;
+}
+
+.alert-level-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.alert-level-panel__grid--weather {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+.disease-card,
+.weather-card {
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.disease-card:hover,
+.weather-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.disease-card--critical,
+.weather-card--critical {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.disease-card--high,
+.weather-card--high {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.disease-card--medium,
+.weather-card--medium {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+}
+
+.disease-card--low,
+.weather-card--low {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.weather-card--active {
+  animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+  }
+}
+
+.disease-card__header,
+.weather-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.disease-card__name,
+.weather-card__name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+.disease-card__probability {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.disease-card__probability-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.disease-card__probability-label {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.disease-card__conditions,
+.weather-card__conditions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.disease-card__conditions li,
+.weather-card__conditions li {
+  padding: 0.25rem 0;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.disease-card__conditions li::before,
+.weather-card__conditions li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #94a3b8;
+}
+
+.disease-card__conditions-empty,
+.weather-card__conditions-empty {
+  font-size: 0.75rem;
+  color: #22c55e;
+  font-style: italic;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .alert-level-panel {
+    padding: 1rem;
+  }
+
+  .alert-level-panel__grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
