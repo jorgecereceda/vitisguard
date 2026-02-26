@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import type { Parcel, Denomination } from '@/types/weather'
+import FormField from '@/components/molecules/FormField.vue'
+import BaseSelect from '@/components/atoms/BaseSelect.vue'
+import BaseButton from '@/components/atoms/BaseButton.vue'
 
 interface Props {
   show: boolean
@@ -14,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'update:show': [value: boolean]
   submit: [data: Omit<Parcel, 'id'>]
-  cancel: []
+  close: []
 }>()
 
 const isEditing = computed(() => !!props.initialData)
@@ -31,6 +34,12 @@ const errors = ref({
   latitude: '',
   longitude: ''
 })
+
+const denominationOptions = [
+  { label: 'Getaria', value: 'Getaria' },
+  { label: 'Bizkaia', value: 'Bizkaia' },
+  { label: 'Alava', value: 'Alava' }
+]
 
 watch(() => props.show, (newVal) => {
   if (newVal) {
@@ -84,124 +93,114 @@ function handleSubmit() {
     name: formData.value.name.trim(),
     latitude: parseFloat(formData.value.latitude),
     longitude: parseFloat(formData.value.longitude),
-    denomination: formData.value.denomination
+    denomination: formData.value.denomination,
+    userId: ''
   })
 }
 
-function handleCancel() {
-  emit('cancel')
+function handleClose() {
+  emit('close')
   emit('update:show', false)
 }
 
 function handleBackdropClick(event: MouseEvent) {
   if (event.target === event.currentTarget) {
-    handleCancel()
+    handleClose()
   }
 }
 </script>
 
 <template>
-  <Teleport to="body">
-    <dialog
-      :open="show"
-      class="modal-backdrop"
-      @click="handleBackdropClick"
-    >
-      <div class="modal-content">
+  <Transition name="modal">
+    <div v-if="show" class="modal-mask" @click="handleBackdropClick">
+      <div class="modal-container" @click.stop>
         <header class="modal-header">
           <h2>{{ isEditing ? 'Editar Parcela' : 'Nueva Parcela' }}</h2>
-          <button type="button" class="close-btn" @click="handleCancel">
+          <button type="button" class="close-btn" @click="handleClose">
             ×
           </button>
         </header>
 
         <form @submit.prevent="handleSubmit" class="modal-form">
-          <div class="form-field">
-            <label for="plot-name">Nombre de Parcela *</label>
-            <input
-              id="plot-name"
-              v-model="formData.name"
-              type="text"
-              placeholder="Ej: Txakoli Eguzkibegiko"
-              :class="{ 'has-error': errors.name }"
-            />
-            <span v-if="errors.name" class="error">{{ errors.name }}</span>
-          </div>
+          <FormField
+            id="plot-name"
+            name="name"
+            label="Nombre de Parcela"
+            v-model="formData.name"
+            placeholder="Ej: Txakoli Eguzkibegiko"
+            :error="errors.name"
+            required
+          />
 
           <div class="form-row">
-            <div class="form-field">
-              <label for="plot-lat">Latitud *</label>
-              <input
-                id="plot-lat"
-                v-model="formData.latitude"
-                type="text"
-                placeholder="43.2851"
-                :class="{ 'has-error': errors.latitude }"
-              />
-              <span v-if="errors.latitude" class="error">{{ errors.latitude }}</span>
-            </div>
+            <FormField
+              id="plot-lat"
+              name="latitude"
+              label="Latitud"
+              v-model="formData.latitude"
+              placeholder="43.2851"
+              :error="errors.latitude"
+              required
+            />
 
-            <div class="form-field">
-              <label for="plot-lng">Longitud *</label>
-              <input
-                id="plot-lng"
-                v-model="formData.longitude"
-                type="text"
-                placeholder="-2.3504"
-                :class="{ 'has-error': errors.longitude }"
-              />
-              <span v-if="errors.longitude" class="error">{{ errors.longitude }}</span>
-            </div>
+            <FormField
+              id="plot-lng"
+              name="longitude"
+              label="Longitud"
+              v-model="formData.longitude"
+              placeholder="-2.3504"
+              :error="errors.longitude"
+              required
+            />
           </div>
 
-          <div class="form-field">
-            <label for="plot-denomination">Denominación de Origen *</label>
-            <select id="plot-denomination" v-model="formData.denomination">
-              <option value="Getaria">Getaria</option>
-              <option value="Bizkaia">Bizkaia</option>
-              <option value="Alava">Alava</option>
-            </select>
-          </div>
+          <BaseSelect
+            id="plot-denomination"
+            name="denomination"
+            label="Denominación de Origen"
+            v-model="formData.denomination"
+            :options="denominationOptions"
+            required
+          />
 
           <div class="form-actions">
-            <button type="button" class="btn-cancel" @click="handleCancel">
+            <BaseButton type="button" variant="secondary" @click="handleClose">
               Cancelar
-            </button>
-            <button type="submit" class="btn-submit">
+            </BaseButton>
+            <BaseButton type="submit">
               {{ isEditing ? 'Actualizar' : 'Crear' }}
-            </button>
+            </BaseButton>
           </div>
         </form>
       </div>
-    </dialog>
-  </Teleport>
+    </div>
+  </Transition>
 </template>
 
-<style scoped>
-.modal-backdrop {
+<style>
+.modal-mask {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  border: none;
-  z-index: 1000;
+  transition: opacity 0.3s ease;
 }
 
-.modal-backdrop::backdrop {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.modal-content {
-  background: #fff;
-  border-radius: 12px;
+.modal-container {
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
   overflow-y: auto;
+  margin: auto;
+  padding: 0;
+  background-color: #fff;
+  border-radius: 12px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .modal-header {
@@ -241,57 +240,10 @@ function handleBackdropClick(event: MouseEvent) {
   gap: 20px;
 }
 
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-field label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-}
-
-.form-field input,
-.form-field select {
-  padding: 12px 16px;
-  font-size: 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: #fff;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-field input:focus,
-.form-field select:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.form-field input.has-error {
-  border-color: #ef4444;
-}
-
-.form-field input.has-error:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-}
-
-.form-field input::placeholder {
-  color: #9ca3af;
-}
-
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-}
-
-.error {
-  font-size: 12px;
-  color: #ef4444;
-  min-height: 16px;
 }
 
 .form-actions {
@@ -301,40 +253,23 @@ function handleBackdropClick(event: MouseEvent) {
   padding-top: 8px;
 }
 
-.btn-cancel,
-.btn-submit {
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
+.modal-enter-from {
+  opacity: 0;
 }
 
-.btn-cancel {
-  background: #fff;
-  border: 1px solid #d1d5db;
-  color: #374151;
+.modal-leave-to {
+  opacity: 0;
 }
 
-.btn-cancel:hover {
-  background: #f9fafb;
-  border-color: #9ca3af;
-}
-
-.btn-submit {
-  background: #4f46e5;
-  border: none;
-  color: #fff;
-}
-
-.btn-submit:hover {
-  background: #4338ca;
+.modal-enter-from .modal-container,
+.modal-leave-to .modal-container {
+  transform: scale(1.1);
 }
 
 @media (max-width: 480px) {
-  .modal-content {
+  .modal-container {
     max-width: 100%;
+    margin: 16px;
   }
 
   .form-row {
@@ -343,11 +278,6 @@ function handleBackdropClick(event: MouseEvent) {
 
   .form-actions {
     flex-direction: column-reverse;
-  }
-
-  .btn-cancel,
-  .btn-submit {
-    width: 100%;
   }
 }
 </style>

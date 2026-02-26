@@ -4,7 +4,7 @@
       "id": "b897",
       "name": "Yoandres La cruz",
       "email": "ylcruz.dev@gmail.com",
-      "password": "8a63c5ea1319f87f2201af349057221ff0ebd9e065f2a75fb72be7d559ef033c"
+      "password": "ef797ca8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
     },
     {
       "id": "9097",
@@ -15,14 +15,16 @@
   ],
   "plots": [
     {
-      "id": "p001",
       "name": "Txakoli Eguzkibegiko",
       "latitude": 43.2851,
       "longitude": -2.3504,
-      "denomination": "Getaria"
+      "denomination": "Getaria",
+      "userId": "b897",
+      "id": "p001"
     },
     {
       "id": "p002",
+      "userId": "b897",
       "name": "Lagrein Sampedro",
       "latitude": 43.3392,
       "longitude": -2.9853,
@@ -30,6 +32,7 @@
     },
     {
       "id": "p003",
+      "userId": "9097",
       "name": "Viña Monticello",
       "latitude": 42.8465,
       "longitude": -2.6724,
@@ -37,6 +40,7 @@
     },
     {
       "id": "p004",
+      "userId": "9097",
       "name": "Baserrikoa",
       "latitude": 43.2912,
       "longitude": -2.3456,
@@ -44,6 +48,7 @@
     },
     {
       "id": "p005",
+      "userId": "9097",
       "name": "Maitenea",
       "latitude": 43.3456,
       "longitude": -2.9901,

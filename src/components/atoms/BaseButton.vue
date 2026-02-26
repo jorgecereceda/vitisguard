@@ -1,7 +1,7 @@
 <script setup lang="ts">
 interface Props {
   type?: 'submit' | 'button'
-  variant?: 'primary' | 'secondary'
+  variant?: 'primary' | 'secondary' | 'danger'
   disabled?: boolean
   loading?: boolean
 }
@@ -67,6 +67,15 @@ withDefaults(defineProps<Props>(), {
 
 .variant-secondary:hover:not(:disabled) {
   background-color: #f5f3ff;
+}
+
+.variant-danger {
+  background-color: #dc2626;
+  color: #fff;
+}
+
+.variant-danger:hover:not(:disabled) {
+  background-color: #b91c1c;
 }
 
 .spinner {

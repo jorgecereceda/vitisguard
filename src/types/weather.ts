@@ -138,6 +138,7 @@ export interface Parcel {
   latitude: number
   longitude: number
   denomination: Denomination
+  userId: string
 }
 
 export interface WeatherMetadata {

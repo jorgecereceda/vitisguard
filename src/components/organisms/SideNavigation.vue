@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useNavigation } from '@/composables/useNavigation'
 
+const router = useRouter()
+const route = useRoute()
 const { setNavigation } = useNavigation()
 
 const navItems = ref([
-  { icon: '📊', label: 'Dashboard', subtitle: 'Operational real-time overview', active: true },
-  { icon: '🔔', label: 'Alerts', subtitle: 'Hondarrabi Zuri • Txakoli DOs', active: false },
-  { icon: '📈', label: 'Analytics', subtitle: 'Detailed production metrics', active: false },
-  { icon: '🗺️', label: 'Parcel Maps', subtitle: 'Geospatial vineyard tracking', active: false },
-  { icon: '📦', label: 'Inventory', subtitle: 'Supply and resource management', active: false },
+  { icon: '📊', label: 'Dashboard', subtitle: 'Overview of your vineyard status', route: 'dashboard', active: false },
+  { icon: '🔔', label: 'Alerts', subtitle: 'Hondarrabi Zuri • Txakoli DOs', route: 'alerts', active: false },
+  { icon: '📈', label: 'Analytics', subtitle: 'Detailed production metrics', route: 'analytics', active: false },
+  { icon: '🧱', label: 'Parcels', subtitle: 'Gestión de parcelas', route: 'plots', active: false },
+  { icon: '🗺️', label: 'Maps', subtitle: 'Geospatial vineyard tracking', route: 'maps', active: false },
+  { icon: '📦', label: 'Inventory', subtitle: 'Supply and resource management', route: 'inventory', active: false },
 ])
 
 const user = ref({
@@ -18,16 +22,40 @@ const user = ref({
   avatar: 'ME'
 })
 
-const selectItem = (index: number) => {
-  const item = navItems.value[index]
-  if (item) {
-    navItems.value.forEach((it, i) => it.active = i === index)
-    setNavigation(item.label === 'Alerts' ? 'Alerts & Prevention' : item.label, item.subtitle)
+function selectItem(item: typeof navItems.value[0]) {
+  navItems.value.forEach(nav => {
+    nav.active = nav.route === item.route
+  })
+  
+  if (item.route === 'plots') {
+    setNavigation('Parcels', item.subtitle)
+  } else if (item.route === 'dashboard') {
+    setNavigation('Dashboard', item.subtitle)
+  } else {
+    setNavigation(item.label, item.subtitle)
+  }
+  
+  if (item.route && item.route !== 'alerts') {
+    router.push({ name: item.route })
   }
 }
 
-// Initial sync
-selectItem(0)
+function syncActiveRoute() {
+  const currentRouteName = route.name as string
+  const item = navItems.value.find(n => n.route === currentRouteName)
+  if (item) {
+    selectItem(item)
+  } else if (route.name === 'dashboard') {
+    const firstItem = navItems.value[0]
+    if (firstItem) {
+      selectItem(firstItem)
+    }
+  }
+}
+
+onMounted(() => {
+  syncActiveRoute()
+})
 </script>
 
 <template>
@@ -41,10 +69,10 @@ selectItem(0)
 
     <nav class="side-navigation__menu">
       <ul class="side-navigation__list">
-        <li v-for="(item, index) in navItems" :key="item.label"
+        <li v-for="item in navItems" :key="item.label"
             class="side-navigation__item"
             :class="{ 'side-navigation__item--active': item.active }"
-            @click="selectItem(index)">
+            @click="selectItem(item)">
           <span class="side-navigation__icon">{{ item.icon }}</span>
           <span class="side-navigation__label">{{ item.label }}</span>
           <div v-if="item.active" class="side-navigation__active-indicator"></div>

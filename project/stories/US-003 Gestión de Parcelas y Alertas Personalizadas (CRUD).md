@@ -64,5 +64,5 @@ Alta (Requisito obligatorio de gestión de datos propios).
 |--------|--------|-------------|
 | **TK-003-01** | Configuración del archivo `db.json` con la estructura inicial de parcelas | Equipo Dev |
 | **TK-003-02** | Implementación del servicio de API para CRUD (Get, Post, Put, Delete) | Equipo Dev |
-| **TK-003-03** | Creación del componente de formulario `AddParcelForm.vue` (Molecule) | Equipo Dev |
-| **TK-003-04** | Desarrollo de la vista `VineyardsView.vue` para listar y gestionar ítems | Equipo Dev |
+| **TK-003-03** | Creación del componente de formulario `AddPlotsForm.vue` (Molecule) | Equipo Dev |
+| **TK-003-04** | Desarrollo de la vista `PlotsView.vue` para listar y gestionar parcelas | Equipo Dev |

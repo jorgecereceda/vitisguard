@@ -12,6 +12,16 @@ export async function getAllPlots(): Promise<Parcel[]> {
   return response.json()
 }
 
+export async function getPlotsByUserId(userId: string): Promise<Parcel[]> {
+  const response = await fetch(`${API_BASE_URL}/plots?userId=${userId}`)
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch plots by user')
+  }
+
+  return response.json()
+}
+
 export async function getPlotById(id: string): Promise<Parcel | null> {
   const response = await fetch(`${API_BASE_URL}/plots/${id}`)
 

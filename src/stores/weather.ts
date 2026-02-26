@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import type { Parcel, WeatherData, WeatherOptions } from '@/types/weather'
 import { fetchWeatherData } from '@/services/weather-api'
 import * as plotApi from '@/services/plot-api'
+import { useAuthStore } from './auth'
 
 export const useWeatherStore = defineStore('weather', () => {
   const parcels = ref<Parcel[]>([])
@@ -24,11 +25,20 @@ export const useWeatherStore = defineStore('weather', () => {
   const hasParcels = computed(() => parcels.value.length > 0)
 
   async function loadParcels(): Promise<void> {
+    const authStore = useAuthStore()
+    const userId = authStore.user?.id
+
+    if (!userId) {
+      error.value = new Error('User not authenticated')
+      isLoading.value = false
+      return
+    }
+
     isLoading.value = true
     error.value = null
 
     try {
-      const data = await plotApi.getAllPlots()
+      const data = await plotApi.getPlotsByUserId(userId)
       parcels.value = data
 
       if (data.length > 0 && !selectedParcelId.value) {
@@ -45,8 +55,17 @@ export const useWeatherStore = defineStore('weather', () => {
     isLoading.value = true
     error.value = null
 
+    const authStore = useAuthStore()
+    const userId = authStore.user?.id
+
+    if (!userId) {
+      error.value = new Error('User not authenticated')
+      isLoading.value = false
+      return null
+    }
+
     try {
-      const newParcel = await plotApi.createPlot(parcel)
+      const newParcel = await plotApi.createPlot({ ...parcel, userId })
       parcels.value.push(newParcel)
 
       if (!selectedParcelId.value) {

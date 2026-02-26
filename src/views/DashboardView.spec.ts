@@ -29,7 +29,14 @@ describe('DashboardView.vue', () => {
     vi.clearAllMocks()
   })
 
-  const createMockWeather = (overrides: any = {}) => {
+interface MockWeatherOptions {
+  weatherData?: ReturnType<typeof ref> | null
+  isLoading?: boolean
+  error?: string | null
+  alerts?: string[]
+}
+
+  const createMockWeather = (overrides: MockWeatherOptions = {}) => {
     const weatherData = ref(overrides.weatherData || null)
     const isLoading = ref(overrides.isLoading || false)
     const error = ref(overrides.error || null)
