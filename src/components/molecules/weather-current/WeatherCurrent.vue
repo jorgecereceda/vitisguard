@@ -130,7 +130,7 @@ const getHourRange = (data: number[], threshold: number, check: (v: number) => b
   const hours: number[] = []
   let maxVal = 0
   let maxHour = -1
-  
+
   data.forEach((val, i) => {
     if (val != null && check(val)) {
       hours.push(i)
@@ -140,24 +140,24 @@ const getHourRange = (data: number[], threshold: number, check: (v: number) => b
       }
     }
   })
-  
+
   if (hours.length === 0) return null
-  
+
   const start = hours[0]
   const end = hours[hours.length - 1]
   const range = start === end ? `${start}h` : `${start}h-${end}h`
-  
+
   return { range, peak: maxHour >= 0 ? `${maxHour}h` : '', value: maxVal }
 }
 
 const uvAlert = computed(() => {
   if (!props.hourly?.uv_index) return null
-  
+
   const uvData = props.hourly.uv_index.slice(0, 24)
   const result = getHourRange(uvData, 6, (v) => v >= 6)
-  
+
   if (!result) return null
-  
+
   if (result.value >= 8) {
     return { level: 'extremo', icon: '⚠️', range: result.range, peak: result.peak, value: result.value }
   }
@@ -169,12 +169,12 @@ const uvAlert = computed(() => {
 
 const heatAlert = computed(() => {
   if (!props.hourly?.temperature_2m) return null
-  
+
   const tempData = props.hourly.temperature_2m.slice(0, 24)
   const result = getHourRange(tempData, 35, (v) => v >= 35)
-  
+
   if (!result) return null
-  
+
   if (result.value >= 38) {
     return { level: 'extrema', icon: '🔥', range: result.range, peak: result.peak, value: result.value }
   }
@@ -186,39 +186,39 @@ const heatAlert = computed(() => {
 
 const snowAlert = computed(() => {
   if (!props.hourly?.weather_code && !props.current?.weather_code) return null
-  
+
   const weatherCodes = props.hourly?.weather_code?.slice(0, 24) ?? []
   const codes = [...Array(24)].map((_, i) => weatherCodes[i] ?? props.current?.weather_code ?? 0)
-  
+
   const SNOW_CODES = [71, 73, 75, 77, 85, 86]
   const hours: number[] = []
-  
+
   codes.forEach((code, i) => {
     if (SNOW_CODES.includes(code ?? 0)) {
       hours.push(i)
     }
   })
-  
+
   if (hours.length === 0) return null
-  
+
   const start = hours[0]
   const end = hours[hours.length - 1]
   const range = start === end ? `${start}h` : `${start}h-${end}h`
-  
+
   return { level: 'nevada', icon: '🌨️', range, peak: `${hours[0]}h`, value: hours.length }
 })
 
 const stormAlert = computed(() => {
   if (!props.hourly?.weather_code && !props.current?.weather_code) return null
-  
+
   const weatherCodes = props.hourly?.weather_code?.slice(0, 24) ?? []
   const codes = [...Array(24)].map((_, i) => weatherCodes[i] ?? props.current?.weather_code ?? 0)
-  
+
   const STORM_CODES = [95, 96, 99]
   const HAIL_CODES = [96, 99]
   const hours: number[] = []
   let hasHail = false
-  
+
   for (let i = 0; i < codes.length; i++) {
     const code = codes[i] ?? 0
     if (HAIL_CODES.includes(code)) {
@@ -228,13 +228,13 @@ const stormAlert = computed(() => {
       hours.push(i)
     }
   }
-  
+
   if (hours.length === 0) return null
-  
+
   const start = hours[0]
   const end = hours[hours.length - 1]
   const range = start === end ? `${start}h` : `${start}h-${end}h`
-  
+
   if (hasHail) {
     return { level: 'granizo', icon: '🧊', range, peak: `${hours[0]}h`, value: 0 }
   }
@@ -243,12 +243,12 @@ const stormAlert = computed(() => {
 
 const humidityAlert = computed(() => {
   if (!props.hourly?.relative_humidity_2m) return null
-  
+
   const humData = props.hourly.relative_humidity_2m.slice(0, 24)
   const result = getHourRange(humData, 90, (v) => v >= 90)
-  
+
   if (!result) return null
-  
+
   if (result.value >= 95) {
     return { level: 'extrema', icon: '💧', range: result.range, peak: result.peak, value: result.value }
   }
@@ -260,12 +260,12 @@ const humidityAlert = computed(() => {
 
 const windAlert = computed(() => {
   if (!props.hourly?.wind_speed_10m) return null
-  
+
   const windData = props.hourly.wind_speed_10m.slice(0, 24)
   const result = getHourRange(windData, 30, (v) => v >= 30)
-  
+
   if (!result) return null
-  
+
   if (result.value >= 50) {
     return { level: 'muy fuerte', icon: '🌪️', range: result.range, peak: result.peak, value: result.value }
   }
@@ -279,7 +279,7 @@ const chartData = computed(() => {
   if (!props.hourly?.time) {
     return { temp: [], precip: [], wind: [], windDirs: [], labels: [], isCurrentHour: [], isSelectedHour: [] }
   }
-  
+
   const labels = Array.from({ length: 24 }, (_, i) => `${i}h`)
   const temp = props.hourly.temperature_2m?.slice(0, 24) ?? []
   const precip = props.hourly.precipitation?.slice(0, 24) ?? []
@@ -287,7 +287,7 @@ const chartData = computed(() => {
   const windDirs = props.hourly.wind_direction_10m?.slice(0, 24) ?? []
   const isCurrentHour = Array.from({ length: 24 }, (_, i) => i === currentHourIndex.value)
   const isSelectedHour = Array.from({ length: 24 }, (_, i) => i === displayHourIndex.value)
-  
+
   return { temp, precip, wind, windDirs, labels, isCurrentHour, isSelectedHour }
 })
 
@@ -330,12 +330,12 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
             <span class="weather-current__unit">°C</span>
           </div>
         </div>
-        
+
         <div class="weather-current__meta">
           <p class="weather-current__description">
             {{ weatherCondition.description }}
           </p>
-          
+
           <div class="weather-current__stats">
             <div class="weather-current__stat">
               <span class="weather-current__stat-icon">🌡️</span>
@@ -373,21 +373,21 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
 
       <div class="weather-current__chart-section">
         <div class="weather-current__tabs">
-          <button 
+          <button
             class="weather-current__tab"
             :class="{ 'weather-current__tab--active': activeTab === 'temp' }"
             @click="activeTab = 'temp'"
           >
             🌡️ Temperatura
           </button>
-          <button 
+          <button
             class="weather-current__tab"
             :class="{ 'weather-current__tab--active': activeTab === 'precip' }"
             @click="activeTab = 'precip'"
           >
             🌧️ Precipitación
           </button>
-          <button 
+          <button
             class="weather-current__tab"
             :class="{ 'weather-current__tab--active': activeTab === 'wind' }"
             @click="activeTab = 'wind'"
@@ -395,15 +395,15 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
             💨 Viento
           </button>
         </div>
-        
+
         <div class="weather-current__chart-container">
           <div v-show="activeTab === 'temp'" class="weather-current__chart">
             <div class="weather-current__chart-bars">
-              <div 
-                v-for="(temp, i) in chartData.temp" 
+              <div
+                v-for="(temp, i) in chartData.temp"
                 :key="'t'+i"
                 class="weather-current__bar weather-current__bar--temp"
-                :class="{ 
+                :class="{
                   'weather-current__bar--current': chartData.isCurrentHour[i],
                   'weather-current__bar--selected': chartData.isSelectedHour[i]
                 }"
@@ -415,14 +415,14 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
               </div>
             </div>
           </div>
-          
+
           <div v-show="activeTab === 'precip'" class="weather-current__chart">
             <div class="weather-current__chart-bars">
-              <div 
-                v-for="(precip, i) in chartData.precip" 
+              <div
+                v-for="(precip, i) in chartData.precip"
                 :key="'p'+i"
                 class="weather-current__bar weather-current__bar--precip"
-                :class="{ 
+                :class="{
                   'weather-current__bar--current': chartData.isCurrentHour[i],
                   'weather-current__bar--selected': chartData.isSelectedHour[i]
                 }"
@@ -434,14 +434,14 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
               </div>
             </div>
           </div>
-          
+
           <div v-show="activeTab === 'wind'" class="weather-current__chart">
             <div class="weather-current__chart-bars">
-              <div 
-                v-for="(wind, i) in chartData.wind" 
+              <div
+                v-for="(wind, i) in chartData.wind"
                 :key="'w'+i"
                 class="weather-current__bar weather-current__bar--wind"
-                :class="{ 
+                :class="{
                   'weather-current__bar--current': chartData.isCurrentHour[i],
                   'weather-current__bar--selected': chartData.isSelectedHour[i]
                 }"
@@ -455,7 +455,7 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
           </div>
         </div>
       </div>
-      
+
       <p class="weather-current__time">
         <template v-if="selectedHourIndex !== null">
           Hora seleccionada: {{ chartData.labels[selectedHourIndex] }}
@@ -623,7 +623,7 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
   padding: 0.3rem 0.5rem;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.6rem;
+  font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.2s ease;
 }
@@ -702,7 +702,7 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
 }
 
 .weather-current__bar-value {
-  font-size: 0.6rem;
+  font-size: 0.8rem;
   font-weight: 600;
   position: absolute;
   top: -18px;
@@ -712,7 +712,7 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
 .weather-current__bar-label {
   position: absolute;
   bottom: -22px;
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   opacity: 0.7;
 }
 
@@ -730,25 +730,25 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
     text-align: center;
     gap: 1rem;
   }
-  
+
   .weather-current__main {
     justify-content: center;
   }
-  
+
   .weather-current__meta {
     width: 100%;
     text-align: center;
   }
-  
+
   .weather-current__description {
     text-align: center;
     margin-bottom: 0.5rem;
   }
-  
+
   .weather-current__stats {
     justify-content: center;
   }
-  
+
   .weather-current__tabs {
     position: relative;
     top: 0;
@@ -756,33 +756,33 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
     margin-bottom: 0.75rem;
     justify-content: center;
   }
-  
+
   .weather-current__chart-container {
     padding-top: 0;
   }
-  
+
   .weather-current__chart-bars,
   .weather-current__chart-wind {
     height: 100px;
   }
-  
+
   .weather-current__stat {
     min-width: 45px;
     padding: 0.3rem 0.4rem;
   }
-  
+
   .weather-current__stat-value {
     font-size: 0.75rem;
   }
-  
+
   .weather-current__icon {
     font-size: 2.5rem;
   }
-  
+
   .weather-current__value {
     font-size: 2.5rem;
   }
-  
+
   .weather-current__unit {
     font-size: 1rem;
   }
@@ -792,56 +792,56 @@ const getBarHeight = (value: number, max: number) => Math.max((value / max) * 10
   .weather-current {
     padding: 1rem;
   }
-  
+
   .weather-current__stats {
     gap: 0.35rem;
   }
-  
+
   .weather-current__stat {
     min-width: 40px;
     padding: 0.25rem 0.35rem;
   }
-  
+
   .weather-current__stat-icon {
     font-size: 0.75rem;
   }
-  
+
   .weather-current__stat-value {
     font-size: 0.7rem;
   }
-  
+
   .weather-current__stat-label {
     font-size: 0.45rem;
   }
-  
+
   .weather-current__tab {
     padding: 0.25rem 0.4rem;
     font-size: 0.55rem;
   }
-  
+
   .weather-current__chart-bars,
   .weather-current__chart-wind {
     height: 80px;
   }
-  
+
   .weather-current__bar-value {
     font-size: 0.5rem;
     top: -14px;
   }
-  
+
   .weather-current__bar-label {
     font-size: 0.4rem;
     bottom: -16px;
   }
-  
+
   .weather-current__wind-speed {
     font-size: 0.5rem;
   }
-  
+
   .weather-current__wind-label {
     font-size: 0.35rem;
   }
-  
+
   .weather-current__wind-visual {
     width: 20px;
     height: 30px;

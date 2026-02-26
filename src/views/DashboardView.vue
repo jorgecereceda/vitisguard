@@ -7,9 +7,10 @@ import DataCard from '@/components/atoms/DataCard.vue'
 import PannelLauyout from '@/layout/PannelLauyout.vue'
 import WeatherCurrent from '@/components/molecules/weather-current/WeatherCurrent.vue'
 import WeatherForecast from '@/components/molecules/weather-forecast/WeatherForecast.vue'
+import EvapotranspirationCard from '@/components/molecules/evapotranspiration-card/EvapotranspirationCard.vue'
 
 const weatherStore = useWeatherStore()
-const { weather, weatherData, isLoading: isWeatherLoading, error: weatherError, fetchWeather, alerts } = useWeather()
+const { weather, weatherData, isLoading: isWeatherLoading, error: weatherError, fetchWeather } = useWeather()
 
 const selectedDayIndex = ref(0)
 
@@ -35,6 +36,15 @@ const hourlyData = () => weather.value?.hourly ?? null
 
 const selectedDayData = computed(() => {
   if (!weather.value?.daily) return null
+  
+  const dayStart = selectedDayIndex.value * 24
+  const dayEnd = dayStart + 24
+  
+  const hourlyHumidity = weather.value.hourly.relative_humidity_2m?.slice(dayStart, dayEnd) ?? []
+  const avgHumidity = hourlyHumidity.length > 0 
+    ? hourlyHumidity.reduce((a, b) => a + b, 0) / hourlyHumidity.length 
+    : 0
+
   return {
     tempMax: weather.value.daily.temperature_2m_max?.[selectedDayIndex.value] ?? 0,
     tempMin: weather.value.daily.temperature_2m_min?.[selectedDayIndex.value] ?? 0,
@@ -46,6 +56,10 @@ const selectedDayData = computed(() => {
     cloudCover: selectedDayIndex.value === 0 
       ? (weather.value.current?.cloud_cover ?? 0) 
       : null,
+    et0: weather.value.daily.et0_fao_evapotranspiration?.[selectedDayIndex.value] ?? 0,
+    humidity: selectedDayIndex.value === 0 
+      ? (weather.value.current?.relative_humidity_2m ?? 0)
+      : avgHumidity,
   }
 })
 
@@ -128,30 +142,16 @@ const sunshineDuration = computed(() => {
               unit="%"
               icon="🌱"
             />
-            <DataCard
-              label="Precipitación"
-              :value="weatherData.precipitation"
-              unit="mm"
-              icon="🌧️"
-            />
-            <DataCard
-              label="Evapotranspiración"
-              :value="weatherData.et0.toFixed(2)"
-              unit="mm"
-              icon="☀️"
+            <EvapotranspirationCard
+              v-if="selectedDayData"
+              :et0="selectedDayData.et0"
+              :precipitation="selectedDayData.precipitation"
+              :humidity="selectedDayData.humidity"
             />
           </div>
         </div>
 
-        <!-- Alerts Section -->
-        <section v-if="alerts.length > 0" class="dashboard__alerts">
-          <h2 class="dashboard__alerts-title">Alertas Activas</h2>
-          <ul class="dashboard__alerts-list">
-            <li v-for="alert in alerts" :key="alert" class="dashboard__alert-item">
-              {{ alert }}
-            </li>
-          </ul>
-        </section>
+
       </main>
     </div>
 
@@ -182,46 +182,12 @@ const sunshineDuration = computed(() => {
 
 .dashboard__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
 
-.dashboard__alerts {
-  background: #fff5f5;
-  border-left: 5px solid #e53e3e;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
 
-.dashboard__alerts-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #c53030;
-  margin-bottom: 1rem;
-}
-
-.dashboard__alerts-list {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.dashboard__alert-item {
-  color: #9b2c2c;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.dashboard__alert-item::before {
-  content: "•";
-  font-weight: bold;
-}
 
 
 .dashboard__loading, .dashboard__error {
@@ -239,16 +205,6 @@ const sunshineDuration = computed(() => {
   cursor: pointer;
   margin-top: 1rem;
   font-weight: 600;
-}
-
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-  .dashboard {
-    color: #ecf0f1;
-  }
-  .dashboard__alerts {
-    background: rgba(197, 48, 48, 0.1);
-  }
 }
 
 /* Responsive */
