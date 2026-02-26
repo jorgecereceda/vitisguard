@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import logoUrl from '@/assets/img/Logo.png'
+
 interface Props {
   title: string
 }
@@ -9,7 +11,7 @@ defineProps<Props>()
 <template>
   <div class="auth-card">
     <div class="brand">
-      <div class="logo">🍇</div>
+      <img :src="logoUrl" alt="VitisGuard Logo" class="logo-img" />
       <div>
         <h1 class="title"> VitisGuard</h1>
         <h2 class="sub-title">Intelligent Vineyard Management</h2>
@@ -41,15 +43,10 @@ defineProps<Props>()
   gap: 1rem;
 }
 
-.logo {
-  background: linear-gradient(135deg, #23C55F 0%, #23C55F 100%);
-  margin: 0;
-  padding: 1rem;
-  border-radius: 1rem;
-  font-size: 4rem;
-  font-weight: 700;
-  color: #fff;
-  box-shadow: 0rem 0.5rem 2rem 0rem rgba(83, 125, 98, 0.706);
+.logo-img {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
 }
 
 .card-content {

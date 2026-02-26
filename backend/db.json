@@ -4,12 +4,36 @@
       "id": "b897",
       "name": "Yoandres La cruz",
       "email": "ylcruz.dev@gmail.com",
-      "password": "ef797ca8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
+      "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
     },
     {
-      "id": "9097",
+      "id": "b097",
       "name": "Juan Carlos Gil",
       "email": "juancarlos@gmail.com",
+      "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
+    },
+    {
+      "id": "ecf8",
+      "name": "patino",
+      "email": "patino@gmail.com",
+      "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
+    },
+    {
+      "id": "5f34",
+      "name": "jorge",
+      "email": "j@gmail.com",
+      "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
+    },
+    {
+      "id": "ea2b",
+      "name": "santi",
+      "email": "s@gmail.com",
+      "password": "8a63c5ea1319f87f2201af349057221ff0ebd9e065f2a75fb72be7d559ef033c"
+    },
+    {
+      "id": "1681",
+      "name": "pepe",
+      "email": "pepe@pep.es",
       "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
     }
   ],
@@ -32,7 +56,7 @@
     },
     {
       "id": "p003",
-      "userId": "9097",
+      "userId": "b097",
       "name": "Viña Monticello",
       "latitude": 42.8465,
       "longitude": -2.6724,
@@ -40,7 +64,7 @@
     },
     {
       "id": "p004",
-      "userId": "9097",
+      "userId": "b097",
       "name": "Baserrikoa",
       "latitude": 43.2912,
       "longitude": -2.3456,
@@ -48,11 +72,19 @@
     },
     {
       "id": "p005",
-      "userId": "9097",
+      "userId": "b097",
       "name": "Maitenea",
       "latitude": 43.3456,
       "longitude": -2.9901,
       "denomination": "Bizkaia"
+    },
+    {
+      "id": "fce5",
+      "name": "nueva parcela",
+      "latitude": 42.1234,
+      "longitude": -2.1234,
+      "denomination": "Bizkaia",
+      "userId": "b097"
     }
   ]
 }

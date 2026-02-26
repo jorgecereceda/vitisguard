@@ -13,6 +13,34 @@ export interface DiseaseRisk {
   conditions: string[]
   recommendation: string
   detectedAt: Date
+  completed?: boolean
+  completedAt?: Date | null
+}
+
+export interface WeatherAlert {
+  id: string
+  category: 'weather'
+  type: WeatherAlertType
+  level: RiskLevel
+  title: string
+  description: string
+  recommendation: string
+  detectedAt: Date
+  completed?: boolean
+  completedAt?: Date | null
+}
+
+export interface IrrigationRecommendation {
+  id: string
+  category: 'irrigation'
+  type: 'irrigation'
+  level: 'low' | 'medium' | 'high'
+  action: IrrigationAction
+  reason: string
+  recommendation: string
+  detectedAt: Date
+  completed?: boolean
+  completedAt?: Date | null
 }
 
 export type WeatherAlertType = 'frost' | 'lateFrost' | 'heatwave' | 'storm' | 'drought' | 'excessiveRain'

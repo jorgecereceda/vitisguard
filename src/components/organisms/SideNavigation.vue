@@ -1,95 +1,83 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useNavigation } from '@/composables/useNavigation'
+import logoUrl from '@/assets/img/Logo.png'
 
 const router = useRouter()
 const route = useRoute()
 const { setNavigation } = useNavigation()
 
 const navItems = ref([
-  { icon: '📊', label: 'Dashboard', subtitle: 'Overview of your vineyard status', route: 'dashboard', active: false },
-  { icon: '🔔', label: 'Alerts', subtitle: 'Hondarrabi Zuri • Txakoli DOs', route: 'alerts', active: false },
-  { icon: '📈', label: 'Analytics', subtitle: 'Detailed production metrics', route: 'analytics', active: false },
-  { icon: '🧱', label: 'Parcels', subtitle: 'Gestión de parcelas', route: 'plots', active: false },
-  { icon: '🗺️', label: 'Maps', subtitle: 'Geospatial vineyard tracking', route: 'maps', active: false },
-  { icon: '📦', label: 'Inventory', subtitle: 'Supply and resource management', route: 'inventory', active: false },
+  {
+    id: 'dashboard',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`,
+    label: 'Dashboard',
+    route: '/dashboard',
+    active: true
+  },
+  {
+    id: 'alerts',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+    label: 'Alerts',
+    route: '/alerts',
+    active: false
+  },
+  {
+    id: 'plots',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    label: 'Parcel',
+    route: '/plots',
+    active: false
+  }
 ])
 
-const user = ref({
-  name: 'Mikel Etxebarria',
-  role: 'Vigneron Principal',
-  avatar: 'ME'
-})
-
-function selectItem(item: typeof navItems.value[0]) {
-  navItems.value.forEach(nav => {
-    nav.active = nav.route === item.route
-  })
-  
-  if (item.route === 'plots') {
-    setNavigation('Parcels', item.subtitle)
-  } else if (item.route === 'dashboard') {
-    setNavigation('Dashboard', item.subtitle)
-  } else {
-    setNavigation(item.label, item.subtitle)
-  }
-  
-  if (item.route && item.route !== 'alerts') {
-    router.push({ name: item.route })
-  }
-}
-
-function syncActiveRoute() {
-  const currentRouteName = route.name as string
-  const item = navItems.value.find(n => n.route === currentRouteName)
+const selectItem = (index: number) => {
+  const item = navItems.value[index]
   if (item) {
-    selectItem(item)
-  } else if (route.name === 'dashboard') {
-    const firstItem = navItems.value[0]
-    if (firstItem) {
-      selectItem(firstItem)
-    }
+    router.push(item.route)
   }
 }
 
-onMounted(() => {
-  syncActiveRoute()
-})
+watch(
+  () => route.path,
+  (path) => {
+    navItems.value.forEach((item) => {
+      item.active = item.route === path
+      if (item.active) {
+        setNavigation(item.label, '')
+      }
+    })
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <aside class="side-navigation">
     <div class="side-navigation__header">
       <div class="side-navigation__logo">
-        <span class="side-navigation__logo-icon">🍇</span>
+        <img :src="logoUrl" alt="VitisGuard Logo" class="side-navigation__logo-img" />
         <h1 class="side-navigation__logo-text">VitisGuard</h1>
       </div>
     </div>
 
     <nav class="side-navigation__menu">
       <ul class="side-navigation__list">
-        <li v-for="item in navItems" :key="item.label"
+        <li v-for="(item, index) in navItems" :key="item.label"
             class="side-navigation__item"
             :class="{ 'side-navigation__item--active': item.active }"
-            @click="selectItem(item)">
-          <span class="side-navigation__icon">{{ item.icon }}</span>
+            @click="selectItem(index)">
+          <span class="side-navigation__icon" v-html="item.icon"></span>
           <span class="side-navigation__label">{{ item.label }}</span>
-          <div v-if="item.active" class="side-navigation__active-indicator"></div>
         </li>
       </ul>
     </nav>
 
     <div class="side-navigation__footer">
-      <div class="side-navigation__user">
-        <div class="side-navigation__avatar">{{ user.avatar }}</div>
-        <div class="side-navigation__user-info">
-          <p class="side-navigation__user-name">{{ user.name }}</p>
-          <p class="side-navigation__user-role">{{ user.role }}</p>
-        </div>
-        <button class="side-navigation__settings-btn" title="Configuración">
-          ⚙️
-        </button>
+      <div class="side-navigation__bottom-logo">
+        <img :src="logoUrl" alt="VitisGuard" class="side-navigation__bottom-logo-img" />
+        <span class="side-navigation__bottom-logo-text">VitisGuard</span>
       </div>
     </div>
   </aside>
@@ -97,47 +85,49 @@ onMounted(() => {
 
 <style scoped>
 .side-navigation {
-  width: 260px;
+  width: 240px;
   height: 100vh;
-  background-color: #ffffff;
-  border-right: 1px solid #f1f5f9;
+  background-color: #0e3124;
   display: flex;
   flex-direction: column;
   position: fixed;
   left: 0;
   top: 0;
   z-index: 1000;
-  padding: 1.5rem;
+  padding: 2rem 1rem;
+  color: #a1bfa1;
 }
 
 .side-navigation__header {
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
+  padding-left: 0.5rem;
 }
 
 .side-navigation__logo {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  color: #ffffff;
 }
 
-.side-navigation__logo-icon {
-  background-color: #22c55e;
-  color: white;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+.side-navigation__logo-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.side-navigation__logo-img:active {
+  transform: scale(1.08); /* Making it look bigger */
 }
 
 .side-navigation__logo-text {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #1e293b;
+  font-weight: 600;
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .side-navigation__menu {
@@ -150,109 +140,103 @@ onMounted(() => {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .side-navigation__item {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  color: #64748b;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 500;
+  font-size: 0.95rem;
   position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .side-navigation__item:hover {
-  background-color: #f8fafc;
-  color: #1e293b;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  padding-left: 1.25rem; /* Slight slide on hover */
 }
 
 .side-navigation__item--active {
-  background-color: #f0fdf4;
-  color: #22c55e;
+  background-color: #24634d; /* Brighter active state */
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
 }
 
-.side-navigation__active-indicator {
+.side-navigation__item:active {
+  transform: scale(1.05); /* Popup effect */
+}
+
+/* Active indicator line */
+.side-navigation__item::before {
+  content: '';
   position: absolute;
-  right: -1.5rem;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleX(0);
   width: 4px;
-  height: 24px;
+  height: 20px;
   background-color: #22c55e;
-  border-radius: 4px 0 0 4px;
+  border-radius: 0 4px 4px 0;
+  transition: transform 0.3s ease;
+  transform-origin: left;
+}
+
+.side-navigation__item--active::before {
+  transform: translateY(-50%) scaleX(1);
 }
 
 .side-navigation__icon {
-  font-size: 1.25rem;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.side-navigation__label {
-  font-size: 0.95rem;
+.side-navigation__icon :deep(svg) {
+  width: 100%;
+  height: 100%;
 }
 
 .side-navigation__footer {
   margin-top: auto;
-  padding-bottom: 2rem; /* Move up slightly */
+  padding-bottom: 0.5rem;
+  padding-left: 0.5rem;
 }
 
-.side-navigation__user {
-  background-color: #f8fafc;
-  padding: 0.75rem;
-  border-radius: 16px;
+.side-navigation__bottom-logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  opacity: 0.5;
+  color: #ffffff;
 }
 
-.side-navigation__avatar {
-  width: 40px;
-  height: 40px;
-  background-color: #e2e8f0;
-  color: #475569;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-
-.side-navigation__user-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.side-navigation__user-name {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.side-navigation__user-role {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin: 0;
-}
-
-.side-navigation__settings-btn {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  color: #94a3b8;
+.side-navigation__bottom-logo-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
-  padding: 0.25rem;
-  transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.side-navigation__settings-btn:hover {
-  color: #1e293b;
+.side-navigation__bottom-logo-img:active {
+  transform: scale(1.08);
+}
+
+.side-navigation__bottom-logo-text {
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 @media (max-width: 1024px) {
@@ -261,3 +245,4 @@ onMounted(() => {
   }
 }
 </style>
+

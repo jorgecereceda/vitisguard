@@ -1,6 +1,9 @@
 export const HOURLY_VARIABLES = [
   'temperature_2m',
   'relative_humidity_2m',
+  'apparent_temperature',
+  'cloud_cover',
+  'weather_code',
   'precipitation',
   'rain',
   'showers',
@@ -58,6 +61,9 @@ export interface HourlyData {
   time: string[]
   temperature_2m?: number[]
   relative_humidity_2m?: number[]
+  apparent_temperature?: number[]
+  cloud_cover?: number[]
+  weather_code?: number[]
   precipitation?: number[]
   rain?: number[]
   showers?: number[]
