@@ -80,7 +80,7 @@ const selectDay = (index: number) => {
         v-for="day in forecastDays"
         :key="day.date"
         class="weather-forecast__day"
-        :class="{ 
+        :class="{
           'weather-forecast__day--today': day.isToday,
           'weather-forecast__day--selected': day.index === selectedDayIndex
         }"
@@ -176,7 +176,7 @@ const selectDay = (index: number) => {
 .weather-forecast__day-name {
   font-weight: 600;
   color: white;
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   text-align: center;
 }
 
@@ -195,12 +195,12 @@ const selectDay = (index: number) => {
 .weather-forecast__temp-max {
   font-weight: 700;
   color: white;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .weather-forecast__temp-min {
   color: rgba(255, 255, 255, 0.65);
-  font-size: 0.7rem;
+  font-size: 0.9rem;
 }
 
 .weather-forecast__bar {
@@ -238,29 +238,29 @@ const selectDay = (index: number) => {
   .weather-forecast {
     padding: 1rem;
   }
-  
+
   .weather-forecast__list {
     grid-template-columns: repeat(4, 1fr);
     gap: 0.35rem;
   }
-  
+
   .weather-forecast__day {
     padding: 0.5rem 0.25rem;
     min-width: auto;
   }
-  
+
   .weather-forecast__day-name {
     font-size: 0.6rem;
   }
-  
+
   .weather-forecast__day-icon {
     font-size: 1rem;
   }
-  
+
   .weather-forecast__temp-max {
     font-size: 0.8rem;
   }
-  
+
   .weather-forecast__temp-min {
     font-size: 0.65rem;
   }
@@ -270,7 +270,7 @@ const selectDay = (index: number) => {
   .weather-forecast__list {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .weather-forecast__day {
     gap: 0.2rem;
   }
