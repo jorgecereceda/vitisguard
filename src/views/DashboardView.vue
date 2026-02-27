@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import { useWeather } from '@/composables/use-weather'
 import { useWeatherStore } from '@/stores/weather'
 import { getWindDirection, getUVIndexLevel, getWeatherCondition } from '@/utils/weather-mappings'
@@ -13,6 +13,10 @@ const weatherStore = useWeatherStore()
 const { weather, weatherData, isLoading: isWeatherLoading, error: weatherError, fetchWeather } = useWeather()
 
 const selectedDayIndex = ref(0)
+
+onMounted(() => {
+  weatherStore.loadParcels()
+})
 
 watch(
   () => [weatherStore.userLocation.latitude, weatherStore.userLocation.longitude],
@@ -36,13 +40,13 @@ const hourlyData = () => weather.value?.hourly ?? null
 
 const selectedDayData = computed(() => {
   if (!weather.value?.daily) return null
-  
+
   const dayStart = selectedDayIndex.value * 24
   const dayEnd = dayStart + 24
-  
+
   const hourlyHumidity = weather.value.hourly.relative_humidity_2m?.slice(dayStart, dayEnd) ?? []
-  const avgHumidity = hourlyHumidity.length > 0 
-    ? hourlyHumidity.reduce((a, b) => a + b, 0) / hourlyHumidity.length 
+  const avgHumidity = hourlyHumidity.length > 0
+    ? hourlyHumidity.reduce((a, b) => a + b, 0) / hourlyHumidity.length
     : 0
 
   return {
@@ -53,11 +57,11 @@ const selectedDayData = computed(() => {
     precipitation: weather.value.daily.precipitation_sum?.[selectedDayIndex.value] ?? 0,
     windSpeedMax: weather.value.daily.wind_speed_10m_max?.[selectedDayIndex.value] ?? 0,
     uvIndex: weather.value.daily.uv_index_max?.[selectedDayIndex.value] ?? 0,
-    cloudCover: selectedDayIndex.value === 0 
-      ? (weather.value.current?.cloud_cover ?? 0) 
+    cloudCover: selectedDayIndex.value === 0
+      ? (weather.value.current?.cloud_cover ?? 0)
       : null,
     et0: weather.value.daily.et0_fao_evapotranspiration?.[selectedDayIndex.value] ?? 0,
-    humidity: selectedDayIndex.value === 0 
+    humidity: selectedDayIndex.value === 0
       ? (weather.value.current?.relative_humidity_2m ?? 0)
       : avgHumidity,
   }
@@ -65,10 +69,10 @@ const selectedDayData = computed(() => {
 
 const selectedDayForecast = computed(() => {
   if (!weather.value?.hourly || !weather.value?.daily) return null
-  
+
   const dayStart = selectedDayIndex.value * 24
   const dayEnd = dayStart + 24
-  
+
   return {
     time: weather.value.hourly.time?.slice(dayStart, dayEnd) ?? [],
     temperature_2m: weather.value.hourly.temperature_2m?.slice(dayStart, dayEnd) ?? [],
@@ -119,16 +123,16 @@ const sunshineDuration = computed(() => {
         <div v-else-if="weatherData" class="dashboard__weather">
           <!-- Weather Current & Forecast Section -->
           <section class="dashboard__weather-main">
-            <WeatherCurrent 
-              :current="currentData()" 
-              :hourly="selectedDayIndex === 0 ? hourlyData() : selectedDayForecast" 
+            <WeatherCurrent
+              :current="currentData()"
+              :hourly="selectedDayIndex === 0 ? hourlyData() : selectedDayForecast"
               :selected-day="selectedDayData"
               :sunshine-duration="sunshineDuration"
               :is-today="selectedDayIndex === 0"
-              :loading="isWeatherLoading" 
+              :loading="isWeatherLoading"
             />
-            <WeatherForecast 
-              :daily="dailyData()" 
+            <WeatherForecast
+              :daily="dailyData()"
               :loading="isWeatherLoading"
               @select-day="handleSelectDay"
             />

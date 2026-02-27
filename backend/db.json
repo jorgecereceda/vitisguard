@@ -35,6 +35,18 @@
       "name": "pepe",
       "email": "pepe@pep.es",
       "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
+    },
+    {
+      "id": "c296",
+      "name": "SSSSS",
+      "email": "qq@gmail.com",
+      "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
+    },
+    {
+      "id": "8dba",
+      "name": "SSAA",
+      "email": "sQ@gmail.com",
+      "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
     }
   ],
   "plots": [
@@ -85,6 +97,46 @@
       "longitude": -2.1234,
       "denomination": "Bizkaia",
       "userId": "b097"
+    },
+    {
+      "id": "92cf",
+      "name": "monte everest",
+      "latitude": 27.9881,
+      "longitude": 86.925,
+      "denomination": "Bizkaia",
+      "userId": "ea2b"
+    },
+    {
+      "id": "528e",
+      "name": "Sierra Nevada",
+      "latitude": 37.095,
+      "longitude": -3.324,
+      "denomination": "Getaria",
+      "userId": "ea2b"
+    },
+    {
+      "id": "b1c5",
+      "name": "Chamonix (Alpes Franceses):",
+      "latitude": 45.9237,
+      "longitude": 6.8694,
+      "denomination": "Bizkaia",
+      "userId": "ea2b"
+    },
+    {
+      "id": "4882",
+      "name": "Monte Everest",
+      "latitude": 27.9881,
+      "longitude": 86.925,
+      "denomination": "Getaria",
+      "userId": "8dba"
+    },
+    {
+      "id": "1069",
+      "name": "Sierra Nevada",
+      "latitude": 37.095,
+      "longitude": -3.324,
+      "denomination": "Alava",
+      "userId": "8dba"
     }
   ]
 }

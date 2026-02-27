@@ -111,9 +111,6 @@ watch(
         <span class="mobile-nav__label">{{ item.label }}</span>
       </div>
 
-      <!-- FAB Spacer -->
-      <div class="mobile-nav__fab-spacer"></div>
-
       <!-- Parcel -->
       <div v-for="item in navItems.slice(2, 3)" :key="item.label"
            class="mobile-nav__item"
@@ -154,11 +151,6 @@ watch(
         </div>
       </div>
     </div>
-
-    <!-- Floating Action Button -->
-    <button class="mobile-nav__fab" aria-label="Add new">
-      <span class="mobile-nav__fab-icon">+</span>
-    </button>
   </nav>
 </template>
 
@@ -307,40 +299,9 @@ watch(
   font-weight: 500;
 }
 
-.mobile-nav__fab-spacer {
-  width: 70px;
-}
 
-.mobile-nav__fab {
-  position: absolute;
-  top: -28px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 60px;
-  background: #1a4d3c;
-  border: 4px solid #0e3124;
-  border-radius: 50%;
-  color: white;
-  font-size: 2.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  z-index: 1002;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s;
-}
 
-.mobile-nav__fab:active {
-  transform: translateX(-50%) scale(0.9) translateY(2px);
-  background-color: #24634d;
-}
 
-.mobile-nav__fab-icon {
-  line-height: 1;
-  margin-top: -2px;
-}
 
 /* User Dropdown (Upwards) */
 .user-dropdown {

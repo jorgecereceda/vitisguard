@@ -52,7 +52,11 @@ export const useWeatherStore = defineStore('weather', () => {
       parcels.value = data
 
       if (data.length > 0 && !selectedParcelId.value) {
-        selectedParcelId.value = data[0]?.id ?? null
+        const firstParcel = data[0]
+        if (firstParcel) {
+          selectedParcelId.value = firstParcel.id
+          setLocation(firstParcel.latitude, firstParcel.longitude, firstParcel.name)
+        }
       }
     } catch (e) {
       error.value = e instanceof Error ? e : new Error('Failed to load parcels')
