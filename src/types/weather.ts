@@ -101,6 +101,10 @@ export interface DailyData {
   et0_fao_evapotranspiration?: number[]
   uv_index_max?: number[]
   relative_humidity_2m_min?: number[]
+  soil_moisture_0_to_7cm_mean?: number[]
+  soil_moisture_7_to_28cm_mean?: number[]
+  soil_temperature_0_to_7cm_mean?: number[]
+  soil_temperature_7_to_28cm_mean?: number[]
 }
 
 export const CURRENT_VARIABLES = [
