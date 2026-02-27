@@ -7,19 +7,19 @@ export async function login(credentials: LoginCredentials): Promise<User> {
   const response = await fetch(`${API_BASE_URL}/users?email=${credentials.email}`)
 
   if (!response.ok) {
-    throw new Error('Failed to connect to server')
+    throw new Error('Error conectando al servidor. Intenta más tarde.')
   }
 
   const users: User[] = await response.json()
   const user = users.find((u) => u.email === credentials.email)
 
   if (!user) {
-    throw new Error('Invalid email or password')
+    throw new Error('El email no está registrado')
   }
 
   const isValid = await verifyPassword(credentials.password, user.password)
   if (!isValid) {
-    throw new Error('Invalid email or password')
+    throw new Error('Contraseña incorrecta')
   }
 
   return user

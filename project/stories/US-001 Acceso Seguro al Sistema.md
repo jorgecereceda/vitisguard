@@ -59,3 +59,5 @@ Alta (Bloqueante para el resto de funcionalidades)
 | TK-001-07 | Encriptar contraseña al registrar usuario | Equipo Dev |
 | TK-001-08 | Redirigir a login despues de un registro de usuario | Equipo Dev |
 | TK-001-09 | Redirigir a Dashboard al iniciar sesión correctamente | Equipo Dev |
+| TK-001-10 | Mostrar al usuario en pantalla los mensajes de error al hacer login, email no existe, contraseña incorrecta, error conectando al servidor | Equipo Dev |
+| TK-001-11 | Mostrar al usuario en pantalla los mensajes de error al registrar un usuario, email ya existente, error conectando al servidor  | Equipo Dev |
