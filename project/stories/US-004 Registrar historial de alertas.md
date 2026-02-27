@@ -53,8 +53,8 @@ Alta (Requisito obligatorio de gestión de datos propios).
 ## Tareas
 | Código | Nombre | Responsable |
 |--------|--------|-------------|
-| **TK-003-01** | Configuración del archivo `db.json` con la estructura inicial del historial de alertas pasadas | Equipo Dev |
-| **TK-003-02** | Implementación del servicio de API para CRUD (Get, Post, Delete) | Equipo Dev |
-| **TK-003-03** | Creación de los componentes para mostrar las estadisticas historicas en tarjetas basado en atomic design | Equipo Dev |
-| **TK-003-04** | Creación de los componentes para listar el historial de alertas en tarjetas basado en atomic design | Equipo Dev |
-| **TK-003-05** | Desarrollo de la vista `AlertHistoryView.vue` para listar y consultar historial de alertas | Equipo Dev |
+| **TK-004-01** | Configuración del archivo `db.json` con la estructura inicial del historial de alertas pasadas | Equipo Dev |
+| **TK-004-02** | Implementación del servicio de API con Open-Meteo para CRUD (Get, Post, Delete) | Equipo Dev |
+| **TK-004-03** | Creación de los componentes para mostrar las estadisticas historicas en tarjetas basado en atomic design | Equipo Dev |
+| **TK-004-04** | Creación de los componentes para listar el historial de alertas en tarjetas basado en atomic design | Equipo Dev |
+| **TK-004-05** | Desarrollo de la vista `AlertHistoryView.vue` para listar y consultar historial de alertas | Equipo Dev |
