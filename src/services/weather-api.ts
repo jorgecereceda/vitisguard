@@ -139,6 +139,7 @@ export async function fetchWeatherData(
     hourly: hourly.join(','),
     daily: daily.join(','),
     timezone: 'UTC',
+    models: 'ecmwf_ifs',
     forecast_days: forecastDays.toString(),
     past_days: pastDays.toString(),
   })

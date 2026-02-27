@@ -47,6 +47,30 @@
       "name": "SSAA",
       "email": "sQ@gmail.com",
       "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
+    },
+    {
+      "id": "e32e",
+      "name": "Test User",
+      "email": "test2hug4p@test.com",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    },
+    {
+      "id": "cf66",
+      "name": "Test User",
+      "email": "testg8o3u5@test.com",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    },
+    {
+      "id": "c122",
+      "name": "Test User",
+      "email": "testviqeyn@test.com",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    },
+    {
+      "id": "2a41",
+      "name": "Test User",
+      "email": "testuser@example.com",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
     }
   ],
   "plots": [
@@ -123,20 +147,52 @@
       "userId": "ea2b"
     },
     {
-      "id": "4882",
       "name": "Monte Everest",
       "latitude": 27.9881,
       "longitude": 86.925,
-      "denomination": "Getaria",
-      "userId": "8dba"
+      "denomination": "Bizkaia",
+      "userId": "",
+      "id": "4882"
     },
     {
-      "id": "1069",
       "name": "Sierra Nevada",
       "latitude": 37.095,
       "longitude": -3.324,
+      "denomination": "Getaria",
+      "userId": "",
+      "id": "1069"
+    },
+    {
+      "name": "Valles Secos de McMurdo, Antártida",
+      "latitude": -77.4667,
+      "longitude": 161.8833,
       "denomination": "Alava",
-      "userId": "8dba"
+      "userId": "",
+      "id": "8f27"
+    },
+    {
+      "name": "Yungay",
+      "latitude": -24.085,
+      "longitude": -70.0125,
+      "denomination": "Getaria",
+      "userId": "",
+      "id": "1f02"
+    },
+    {
+      "name": "Lloró, Colombia",
+      "latitude": 5.5,
+      "longitude": -76.5414,
+      "denomination": "Bizkaia",
+      "userId": "",
+      "id": "8bc7"
+    },
+    {
+      "name": "Mawsynram, India",
+      "latitude": 25.2975,
+      "longitude": 91.5826,
+      "denomination": "Bizkaia",
+      "userId": "",
+      "id": "7e5f"
     }
   ]
 }
