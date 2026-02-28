@@ -187,7 +187,7 @@ export function useWeather(options: UseWeatherOptions = {}) {
       conditions.soilMoisture
     )
 
-    const activeWeatherAlerts = weatherAlerts.filter(a => a.level !== 'low')
+    const activeWeatherAlerts = weatherAlerts.filter(a => a.level !== 'low' && a.level !== 'medium')
     activeWeatherAlerts.forEach(alert => {
       currentAlerts.push(`${alert.title}: ${alert.description}`)
     })

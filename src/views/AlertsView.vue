@@ -97,7 +97,7 @@ const weatherRisks = computed(() => {
   return weatherRiskTypes.map(type => {
     const alert = weatherAlerts.find(a => a.type === type)
 
-    const isActive = alert !== undefined && alert.level !== 'low'
+    const isActive = alert !== undefined && alert.level !== 'low' && alert.level !== 'medium'
     const level = alert?.level ?? 'low'
     const conditionsList = alert?.description ? [alert.description] : []
 
