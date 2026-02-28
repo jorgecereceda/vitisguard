@@ -82,71 +82,24 @@ const weatherRiskTypes: WeatherAlertType[] = ['frost', 'heatwave', 'storm', 'dro
 
 const weatherRisks = computed(() => {
   const conditions = currentConditions.value
+  const daily = weather.value?.daily
+
   const weatherAlerts = generateWeatherAlerts(
     conditions.temperature,
     conditions.humidity,
     conditions.precipitation,
     conditions.windSpeed,
-    0
+    daily?.temperature_2m_min?.[0] ?? null,
+    daily?.temperature_2m_max?.[0] ?? null,
+    conditions.soilMoisture
   )
 
   return weatherRiskTypes.map(type => {
     const alert = weatherAlerts.find(a => a.type === type)
-    const current = weather.value?.current
-    const daily = weather.value?.daily
 
-    let conditionsList: string[] = []
-    let isActive = false
-    let level: RiskLevel = 'low'
-
-    if (alert) {
-      level = alert.level
-      isActive = alert.level !== 'low'
-      conditionsList = alert.description ? [alert.description] : []
-    } else {
-      switch (type) {
-        case 'frost': {
-          const minTemp = daily?.temperature_2m_min?.[0]
-          if (minTemp !== undefined && minTemp < 2) {
-            level = 'high'
-            isActive = true
-            conditionsList = [`Temp. mínima: ${minTemp.toFixed(1)}°C`]
-          }
-          break
-        }
-        case 'heatwave': {
-          const maxTemp = daily?.temperature_2m_max?.[0]
-          if (maxTemp !== undefined && maxTemp > 32) {
-            level = 'high'
-            isActive = true
-            conditionsList = [`Temp. máxima: ${maxTemp.toFixed(1)}°C`]
-          }
-          break
-        }
-        case 'storm':
-          if (current?.wind_speed_10m && current.wind_speed_10m > 50) {
-            level = 'high'
-            isActive = true
-            conditionsList = [`Viento: ${current.wind_speed_10m.toFixed(0)} km/h`]
-          }
-          break
-        case 'drought':
-          if (conditions.precipitation !== null && conditions.precipitation === 0 && 
-              conditions.soilMoisture !== null && conditions.soilMoisture < 20) {
-            level = 'medium'
-            isActive = true
-            conditionsList = ['Sin precipitación reciente', 'Humedad del suelo baja']
-          }
-          break
-        case 'excessiveRain':
-          if (conditions.precipitation !== null && conditions.precipitation > 10) {
-            level = 'medium'
-            isActive = true
-            conditionsList = [`Precipitación: ${conditions.precipitation.toFixed(1)} mm`]
-          }
-          break
-      }
-    }
+    const isActive = alert !== undefined && alert.level !== 'low'
+    const level = alert?.level ?? 'low'
+    const conditionsList = alert?.description ? [alert.description] : []
 
     return {
       id: `weather-${type}`,

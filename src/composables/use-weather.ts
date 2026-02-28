@@ -182,7 +182,9 @@ export function useWeather(options: UseWeatherOptions = {}) {
       conditions.humidity,
       conditions.precipitation,
       conditions.windSpeed,
-      0
+      daily?.temperature_2m_min?.[0] ?? null,
+      daily?.temperature_2m_max?.[0] ?? null,
+      conditions.soilMoisture
     )
 
     const activeWeatherAlerts = weatherAlerts.filter(a => a.level !== 'low')
