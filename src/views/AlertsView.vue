@@ -3,15 +3,15 @@ import { computed, watch } from 'vue'
 import { useWeather } from '@/composables/use-weather'
 import { useWeatherStore } from '@/stores/weather'
 import { useDiseaseDetection } from '@/composables/use-disease-detection'
-import { generateWeatherAlerts } from '@/utils/weather-alerts'
+import { generateWeatherAlerts, analyzeWeatherForecastRisks } from '@/utils/weather-alerts'
 import PannelLauyout from '@/layout/PannelLauyout.vue'
 import AlertLevelPanel from '@/components/molecules/alert-level-panel/AlertLevelPanel.vue'
 import TreatmentPanel from '@/components/molecules/treatment-panel/TreatmentPanel.vue'
-import type { DiseaseType, WeatherAlertType, RiskLevel, WeatherConditions } from '@/types/disease'
+import type { DiseaseType, WeatherAlertType, RiskLevel, WeatherConditions, DailyForecastData, DiseaseForecastRisk, WeatherForecastRisk } from '@/types/disease'
 
 const weatherStore = useWeatherStore()
 const { alerts, weatherData, weather, fetchWeather } = useWeather()
-const { analyzeAllDiseases } = useDiseaseDetection()
+const { analyzeAllDiseases, analyzeForecastRisks } = useDiseaseDetection()
 
 const diseaseNames: Record<DiseaseType, string> = {
   mildiu: 'Mildiú',
@@ -111,6 +111,49 @@ const weatherRisks = computed(() => {
     }
   })
 })
+
+const forecastRisks = computed((): DiseaseForecastRisk[] => {
+  const daily = weather.value?.daily
+  const hourly = weather.value?.hourly
+
+  if (!daily?.time || !hourly?.relative_humidity_2m) {
+    return []
+  }
+
+  const forecast: DailyForecastData[] = daily.time.map((date, index) => {
+    const humidityValues = hourly.relative_humidity_2m?.slice(index * 24, (index + 1) * 24) ?? []
+    const avgHumidity = humidityValues.length > 0
+      ? humidityValues.reduce((a, b) => a + b, 0) / humidityValues.length
+      : null
+
+    return {
+      date,
+      temperature: daily.temperature_2m_mean?.[index] ?? null,
+      humidity: avgHumidity,
+      precipitation: daily.precipitation_sum?.[index] ?? null,
+    }
+  })
+
+  return analyzeForecastRisks(forecast)
+})
+
+const weatherForecastRisks = computed((): WeatherForecastRisk[] => {
+  const daily = weather.value?.daily
+
+  if (!daily?.time) {
+    return []
+  }
+
+  const forecast = daily.time.map((date, index) => ({
+    date,
+    tempMin: daily.temperature_2m_min?.[index] ?? null,
+    tempMax: daily.temperature_2m_max?.[index] ?? null,
+    precipitation: daily.precipitation_sum?.[index] ?? null,
+    windSpeed: daily.wind_speed_10m_max?.[index] ?? null,
+  }))
+
+  return analyzeWeatherForecastRisks(forecast)
+})
 </script>
 
 <template>
@@ -157,6 +200,62 @@ const weatherRisks = computed(() => {
         <div class="condition-item">
           <span class="condition-item__label">Nubosidad</span>
           <span class="condition-item__value">{{ weatherData.cloudCover.toFixed(0) }}%</span>
+        </div>
+      </div>
+    </section>
+
+    <section v-if="forecastRisks.length > 0" class="alerts-view__forecast-risks">
+      <h3 class="alerts-view__conditions-title">Enfermedades - Pronóstico 7 días</h3>
+      <div class="forecast-risks-grid">
+        <div 
+          v-for="risk in forecastRisks" 
+          :key="risk.disease"
+          class="forecast-risk-card"
+          :class="{
+            'forecast-risk-card--high': risk.highRiskDays > 0 || risk.criticalRiskDays > 0,
+            'forecast-risk-card--critical': risk.criticalRiskDays > 0
+          }"
+        >
+          <div class="forecast-risk-card__name">{{ risk.name }}</div>
+          <div class="forecast-risk-card__days">
+            <span v-if="risk.criticalRiskDays > 0" class="forecast-risk-card__count critical">
+              {{ risk.criticalRiskDays }} día{{ risk.criticalRiskDays > 1 ? 's' : '' }} crítico{{ risk.criticalRiskDays > 1 ? 's' : '' }}
+            </span>
+            <span v-if="risk.highRiskDays > 0" class="forecast-risk-card__count high">
+              {{ risk.highRiskDays }} día{{ risk.highRiskDays > 1 ? 's' : '' }} con riesgo alto
+            </span>
+            <span v-if="risk.criticalRiskDays === 0 && risk.highRiskDays === 0" class="forecast-risk-card__count low">
+              Sin riesgo
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section v-if="weatherForecastRisks.length > 0" class="alerts-view__forecast-risks">
+      <h3 class="alerts-view__conditions-title">Clima - Pronóstico 7 días</h3>
+      <div class="forecast-risks-grid">
+        <div 
+          v-for="risk in weatherForecastRisks" 
+          :key="risk.type"
+          class="forecast-risk-card"
+          :class="{
+            'forecast-risk-card--high': risk.highRiskDays > 0 || risk.criticalRiskDays > 0,
+            'forecast-risk-card--critical': risk.criticalRiskDays > 0
+          }"
+        >
+          <div class="forecast-risk-card__name">{{ risk.name }}</div>
+          <div class="forecast-risk-card__days">
+            <span v-if="risk.criticalRiskDays > 0" class="forecast-risk-card__count critical">
+              {{ risk.criticalRiskDays }} día{{ risk.criticalRiskDays > 1 ? 's' : '' }} crítico{{ risk.criticalRiskDays > 1 ? 's' : '' }}
+            </span>
+            <span v-if="risk.highRiskDays > 0" class="forecast-risk-card__count high">
+              {{ risk.highRiskDays }} día{{ risk.highRiskDays > 1 ? 's' : '' }} con riesgo alto
+            </span>
+            <span v-if="risk.criticalRiskDays === 0 && risk.highRiskDays === 0" class="forecast-risk-card__count low">
+              Sin riesgo
+            </span>
+          </div>
         </div>
       </div>
     </section>
@@ -305,6 +404,66 @@ const weatherRisks = computed(() => {
   font-size: 1.125rem;
   font-weight: 700;
   color: #1e293b;
+}
+
+.alerts-view__forecast-risks {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.forecast-risks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.forecast-risk-card {
+  padding: 1rem;
+  border-radius: 8px;
+  background: #f8fafc;
+  border-left: 4px solid #22c55e;
+}
+
+.forecast-risk-card--high {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.forecast-risk-card--critical {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+}
+
+.forecast-risk-card__name {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.forecast-risk-card__days {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.forecast-risk-card__count {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.forecast-risk-card__count.critical {
+  color: #dc2626;
+}
+
+.forecast-risk-card__count.high {
+  color: #d97706;
+}
+
+.forecast-risk-card__count.low {
+  color: #16a34a;
 }
 
 @media (max-width: 768px) {

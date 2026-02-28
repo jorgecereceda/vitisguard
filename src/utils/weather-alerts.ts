@@ -1,4 +1,4 @@
-import type { WeatherAlert, WeatherAlertType, RiskLevel } from '@/types/disease'
+import type { WeatherAlert, WeatherAlertType, RiskLevel, WeatherForecastRisk } from '@/types/disease'
 
 export interface WeatherAlertConfig {
   type: WeatherAlertType
@@ -266,6 +266,73 @@ export function generateIrrigationRecommendation(
     recommendation: 'Mantener rutina de riego actual.',
     detectedAt: now,
   }
+}
+
+export interface DailyWeatherForecast {
+  date: string
+  tempMin: number | null
+  tempMax: number | null
+  precipitation: number | null
+  windSpeed: number | null
+}
+
+const WEATHER_RISK_NAMES: Record<string, string> = {
+  frost: 'Helada',
+  lateFrost: 'Helada Tardía',
+  heatwave: 'Ola de Calor',
+  storm: 'Tormenta',
+  drought: 'Sequía',
+  excessiveRain: 'Exceso de Lluvia',
+}
+
+export function analyzeWeatherForecastRisks(
+  forecast: DailyWeatherForecast[]
+): WeatherForecastRisk[] {
+  const riskTypes: WeatherAlertType[] = [
+    'frost',
+    'heatwave',
+    'storm',
+    'drought',
+    'excessiveRain'
+  ]
+
+  return riskTypes.map(type => {
+    let highRiskDays = 0
+    let criticalRiskDays = 0
+
+    forecast.forEach(day => {
+      const alerts = generateWeatherAlerts(
+        day.tempMax ?? null,
+        null,
+        day.precipitation ?? null,
+        day.windSpeed ?? null,
+        day.tempMin ?? null,
+        day.tempMax ?? null,
+        null
+      )
+
+      const alert = alerts.find(a => a.type === type)
+      if (alert) {
+        if (alert.level === 'critical') {
+          criticalRiskDays++
+        } else if (alert.level === 'high') {
+          highRiskDays++
+        }
+      }
+
+      if (type === 'drought' && day.precipitation !== null && day.precipitation === 0) {
+        highRiskDays++
+      }
+    })
+
+    return {
+      type,
+      name: WEATHER_RISK_NAMES[type] || type,
+      highRiskDays,
+      criticalRiskDays,
+      totalDays: forecast.length,
+    }
+  })
 }
 
 export interface IrrigationRecommendation {

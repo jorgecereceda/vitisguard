@@ -101,3 +101,27 @@ export interface DiseaseConfig {
   }
   recommendations: Record<RiskLevel, string>
 }
+
+export interface DailyForecastData {
+  date: string
+  temperature: number | null
+  humidity: number | null
+  precipitation: number | null
+}
+
+export interface DiseaseForecastRisk {
+  disease: DiseaseType
+  name: string
+  highRiskDays: number
+  criticalRiskDays: number
+  totalDays: number
+  dailyRisks: DiseaseRisk[]
+}
+
+export interface WeatherForecastRisk {
+  type: WeatherAlertType
+  name: string
+  highRiskDays: number
+  criticalRiskDays: number
+  totalDays: number
+}
