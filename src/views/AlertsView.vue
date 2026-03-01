@@ -66,7 +66,25 @@ const currentConditions = computed((): WeatherConditions => {
   }
 })
 
-const diseaseRisks = computed(() => {
+interface DiseaseRisk {
+  id: string
+  type: DiseaseType
+  name: string
+  level: RiskLevel
+  probability: number
+  conditions: string[]
+}
+
+interface WeatherRisk {
+  id: string
+  type: string
+  name: string
+  level: RiskLevel
+  conditions: string[]
+  isActive: boolean
+}
+
+const diseaseRisks = computed((): DiseaseRisk[] => {
   const conditions = currentConditions.value
   return analyzeAllDiseases(conditions).map(risk => ({
     id: `disease-${risk.disease}`,
@@ -77,6 +95,12 @@ const diseaseRisks = computed(() => {
     conditions: risk.conditions,
   }))
 })
+
+const activeWeatherRisks = computed(() => {
+  return weatherRisks.value.filter(r => r.isActive)
+})
+
+const hasActiveAlerts = computed(() => alerts.value.length > 0 || activeWeatherRisks.value.length > 0)
 
 const weatherRiskTypes: WeatherAlertType[] = ['frost', 'heatwave', 'storm', 'drought', 'excessiveRain']
 
@@ -165,32 +189,17 @@ const weatherForecastRisks = computed((): WeatherForecastRisk[] => {
     </header>
 
     <!-- SECCIÓN 1: Alertas Activas y Tratamientos -->
-    <section class="alerts-view__section alerts-view__section--primary">
+    <section class="alerts-view__section">
       <h2 class="alerts-view__section-title">
         <span class="alerts-view__section-icon">🚨</span>
         Alertas Activas y Recomendaciones
       </h2>
       
-      <div v-if="alerts.length > 0" class="alerts-view__alerts">
-        <h3 class="alerts-view__alerts-subtitle">Alertas Activas ({{ alerts.length }})</h3>
-        <ul class="alerts-view__alerts-list">
-          <li v-for="(alert, index) in alerts" :key="index" class="alerts-view__alert-item">
-            {{ alert }}
-          </li>
-        </ul>
-      </div>
-
-      <div v-else class="alerts-view__empty">
-        <div class="alerts-view__empty-icon">✅</div>
-        <h3 class="alerts-view__empty-title">Sin alertas activas</h3>
-        <p class="alerts-view__empty-text">
-          Las condiciones climáticas actuales no presentan riesgos para tus viñedos.
-        </p>
-      </div>
-
       <TreatmentPanel
         :diseases="diseaseRisks"
         :weather-risks="weatherRisks"
+        :active-alerts="alerts"
+        :active-weather-risks="activeWeatherRisks"
       />
     </section>
 
@@ -337,10 +346,6 @@ const weatherForecastRisks = computed((): WeatherForecastRisk[] => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.alerts-view__section--primary {
-  border-left: 5px solid #e53e3e;
-}
-
 .alerts-view__section-title {
   display: flex;
   align-items: center;
@@ -422,7 +427,7 @@ const weatherForecastRisks = computed((): WeatherForecastRisk[] => {
 }
 
 .alerts-view__conditions {
-  background: white;
+  background: rgb(255, 255, 255);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -500,16 +505,16 @@ const weatherForecastRisks = computed((): WeatherForecastRisk[] => {
   padding: 1rem;
   border-radius: 8px;
   background: #f8fafc;
-  border-left: 4px solid #22c55e;
+  border: 1px solid #22c55e;
 }
 
 .forecast-risk-card--high {
-  border-left-color: #f59e0b;
+  border: 1px solid #f59e0b;
   background: #fffbeb;
 }
 
 .forecast-risk-card--critical {
-  border-left-color: #ef4444;
+  border: 1px solid #ef4444;
   background: #fef2f2;
 }
 
