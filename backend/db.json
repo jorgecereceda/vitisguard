@@ -35,6 +35,42 @@
       "name": "pepe",
       "email": "pepe@pep.es",
       "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
+    },
+    {
+      "id": "c296",
+      "name": "SSSSS",
+      "email": "qq@gmail.com",
+      "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
+    },
+    {
+      "id": "8dba",
+      "name": "SSAA",
+      "email": "sQ@gmail.com",
+      "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f"
+    },
+    {
+      "id": "e32e",
+      "name": "Test User",
+      "email": "test2hug4p@test.com",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    },
+    {
+      "id": "cf66",
+      "name": "Test User",
+      "email": "testg8o3u5@test.com",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    },
+    {
+      "id": "c122",
+      "name": "Test User",
+      "email": "testviqeyn@test.com",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    },
+    {
+      "id": "2a41",
+      "name": "Test User",
+      "email": "testuser@example.com",
+      "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
     }
   ],
   "plots": [
@@ -85,6 +121,94 @@
       "longitude": -2.1234,
       "denomination": "Bizkaia",
       "userId": "b097"
+    },
+    {
+      "id": "92cf",
+      "name": "monte everest",
+      "latitude": 27.9881,
+      "longitude": 86.925,
+      "denomination": "Bizkaia",
+      "userId": "ea2b"
+    },
+    {
+      "id": "528e",
+      "name": "Sierra Nevada",
+      "latitude": 37.095,
+      "longitude": -3.324,
+      "denomination": "Getaria",
+      "userId": "ea2b"
+    },
+    {
+      "id": "b1c5",
+      "name": "Chamonix (Alpes Franceses):",
+      "latitude": 45.9237,
+      "longitude": 6.8694,
+      "denomination": "Bizkaia",
+      "userId": "ea2b"
+    },
+    {
+      "name": "Monte Everest",
+      "latitude": 27.9881,
+      "longitude": 86.925,
+      "denomination": "Bizkaia",
+      "userId": "",
+      "id": "4882"
+    },
+    {
+      "name": "Sierra Nevada",
+      "latitude": 37.095,
+      "longitude": -3.324,
+      "denomination": "Getaria",
+      "userId": "",
+      "id": "1069"
+    },
+    {
+      "name": "Valles Secos de McMurdo, Antártida",
+      "latitude": -77.4667,
+      "longitude": 161.8833,
+      "denomination": "Alava",
+      "userId": "",
+      "id": "8f27"
+    },
+    {
+      "name": "Yungay",
+      "latitude": -24.085,
+      "longitude": -70.0125,
+      "denomination": "Getaria",
+      "userId": "",
+      "id": "1f02"
+    },
+    {
+      "name": "Lloró, Colombia",
+      "latitude": 5.5,
+      "longitude": -76.5414,
+      "denomination": "Bizkaia",
+      "userId": "",
+      "id": "8bc7"
+    },
+    {
+      "name": "Mawsynram, India",
+      "latitude": 25.2975,
+      "longitude": 91.5826,
+      "denomination": "Bizkaia",
+      "userId": "",
+      "id": "7e5f"
+    },
+    {
+      "name": "Getxo",
+      "latitude": 43.3571,
+      "longitude": -3.324,
+      "denomination": "Alava",
+      "userId": "",
+      "id": "22a8"
+    },
+    {
+      "name": "vn  n n",
+      "latitude": 43.263,
+      "longitude": -3.324,
+      "denomination": "Alava",
+      "userId": "8dba",
+      "id": "d42d"
     }
   ]
 }

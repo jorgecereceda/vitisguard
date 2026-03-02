@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useWeatherStore } from '@/stores/weather'
 import { searchAddress, reverseGeocode, parseCoordinates, type GeocodingResult } from '@/services/geocoding'
 import { useGeolocation } from '@/composables/useGeolocation'
+import type { Parcel } from '@/types/weather'
 
 const weatherStore = useWeatherStore()
 const { state: geoState, getLocation } = useGeolocation()
+const parcels = computed(() => weatherStore.parcels)
 
 const isOpen = ref(false)
 const searchQuery = ref('')
@@ -51,6 +53,14 @@ const selectLocation = (result: GeocodingResult) => {
   coordResult.value = null
 }
 
+const selectParcel = (parcel: Parcel) => {
+  weatherStore.setLocation(parcel.latitude, parcel.longitude, parcel.name)
+  isOpen.value = false
+  searchQuery.value = ''
+  results.value = []
+  coordResult.value = null
+}
+
 const useMyGeolocation = async () => {
   getLocation()
   // Wait for geoState to update
@@ -82,6 +92,9 @@ const handleClickOutside = (event: MouseEvent) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  if (weatherStore.parcels.length === 0) {
+    weatherStore.loadParcels()
+  }
 })
 
 onUnmounted(() => {
@@ -141,6 +154,30 @@ onUnmounted(() => {
             <div class="result-info">
               <span class="result-name">Usar estas coordenadas</span>
               <span class="result-full">{{ coordResult.lat.toFixed(5) }}, {{ coordResult.lon.toFixed(5) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Saved Parcels -->
+        <div v-if="parcels.length > 0 && searchQuery.length === 0" class="location-selector__group">
+          <h4 class="group-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="title-icon">
+              <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/>
+            </svg>
+            Mis Parcelas
+          </h4>
+          <div class="location-selector__results">
+            <div
+              v-for="parcel in parcels"
+              :key="parcel.id"
+              class="result-item result-item--parcel"
+              @click="selectParcel(parcel)"
+            >
+              <div class="result-icon result-icon--parcel">🍇</div>
+              <div class="result-info">
+                <span class="result-name">{{ parcel.name }}</span>
+                <span class="result-full">{{ parcel.latitude.toFixed(4) }}, {{ parcel.longitude.toFixed(4) }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -431,6 +468,20 @@ onUnmounted(() => {
 .result-icon--coords svg {
   width: 18px;
   height: 18px;
+}
+
+.result-item--parcel {
+  background-color: #f0fdf4;
+  border-color: #dcfce7;
+}
+
+.result-item--parcel:hover {
+  background-color: #dcfce7;
+}
+
+.result-icon--parcel {
+  background: white;
+  border: 1px solid #dcfce7;
 }
 
 .result-icon {

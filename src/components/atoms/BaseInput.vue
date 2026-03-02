@@ -48,38 +48,48 @@ function handleInput(event: Event) {
 <style scoped>
 .base-input {
   width: 100%;
-  padding: 12px 16px;
-  font-size: 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background-color: #fff;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  padding: 0.8rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   box-sizing: border-box;
+  backdrop-filter: blur(5px);
+}
+
+.base-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .base-input:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
+  transform: translateY(-1px);
 }
 
 .base-input:disabled {
-  background-color: #f3f4f6;
+  opacity: 0.5;
   cursor: not-allowed;
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 .base-input.has-error {
-  border-color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.6);
+  background-color: rgba(239, 68, 68, 0.05);
 }
 
 .base-input.has-error:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
 }
 
 @media (max-width: 640px) {
   .base-input {
-    padding: 14px 12px;
-    font-size: 16px;
+    padding: 0.9rem 1.1rem;
   }
 }
 </style>

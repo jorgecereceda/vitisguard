@@ -208,10 +208,42 @@ export function useWeather(options: UseWeatherOptions = {}) {
 
     if (!current) return null
 
+    const now = new Date()
+    const currentHour = now.getUTCHours()
+
+    // Helper to calculate moisture levels for a specific day index
+    const getSoilMoistureForDay = (dayIdx: number) => {
+      const start = dayIdx * 24
+      const end = start + 24
+
+      const dayMoisture0to7 = hourly?.soil_moisture_0_to_7cm?.slice(start, end) ?? []
+      const dayMoisture7to28 = hourly?.soil_moisture_7_to_28cm?.slice(start, end) ?? []
+      const dayMoisture28to100 = hourly?.soil_moisture_28_to_100cm?.slice(start, end) ?? []
+      const dayMoisture100to255 = hourly?.soil_moisture_100_to_255cm?.slice(start, end) ?? []
+
+      const average = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
+
+      // Normalization: raw data is m3/m3 (0-0.5 typical).
+      // We normalize so 0.45 m3/m3 = 100% (Saturation reference for these soils)
+      const toPercent = (val: number) => Math.round(Math.min((val / 0.45) * 100, 100))
+
+      return {
+        current: toPercent(average(dayMoisture0to7)),
+        depth20: toPercent(average(dayMoisture7to28)),
+        depth40: toPercent(average(dayMoisture28to100)),
+        depth60: toPercent(average(dayMoisture100to255)),
+      }
+    }
+
+    // Pre-calculate daily moisture for all 7 days
+    const dailyMoisture = Array.from({ length: 7 }, (_, i) => getSoilMoistureForDay(i))
+
     return {
       temperature: current.temperature_2m ?? 0,
       humidity: current.relative_humidity_2m ?? 0,
-      soilHumidity: hourly?.soil_moisture_0_to_7cm?.[0] ?? 0,
+      soilHumidity: dailyMoisture[0].current,
+      soilMoistureLevels: dailyMoisture[0], // Default to today
+      allDaysSoilMoisture: dailyMoisture,
       precipitation: current.precipitation ?? 0,
       cloudCover: current.cloud_cover ?? 0,
       et0: daily?.et0_fao_evapotranspiration?.[0] ?? 0,

@@ -129,10 +129,9 @@ const levelLabel = (level: RiskLevel): string => {
 
 <style scoped>
 .alert-level-panel {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
 }
 
 .alert-level-panel__section {
@@ -146,11 +145,15 @@ const levelLabel = (level: RiskLevel): string => {
 .alert-level-panel__section-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0 0 1rem;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #94a3b8;
+  margin: 0 0 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .alert-level-panel__section-icon {
@@ -159,50 +162,56 @@ const levelLabel = (level: RiskLevel): string => {
 
 .alert-level-panel__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
 }
 
 .alert-level-panel__grid--weather {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
 .disease-card,
 .weather-card {
-  padding: 1rem;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left-width: 5px; /* Semaforo style */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
 .disease-card:hover,
 .weather-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.6);
 }
 
 .disease-card--critical,
 .weather-card--critical {
-  background: #fef2f2;
-  border-color: #ef4444;
+  border-left-color: #ef4444; /* Red */
+  background: linear-gradient(145deg, rgba(239, 68, 68, 0.15) 0%, rgba(15, 23, 42, 0.4) 100%);
 }
 
 .disease-card--high,
 .weather-card--high {
-  background: #fff7ed;
-  border-color: #f97316;
+  border-left-color: #f97316; /* Orange */
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.15) 0%, rgba(15, 23, 42, 0.4) 100%);
 }
 
 .disease-card--medium,
 .weather-card--medium {
-  background: #fffbeb;
-  border-color: #f59e0b;
+  border-left-color: #f59e0b; /* Yellow/Amber */
+  background: linear-gradient(145deg, rgba(245, 158, 11, 0.15) 0%, rgba(15, 23, 42, 0.4) 100%);
 }
 
 .disease-card--low,
 .weather-card--low {
-  background: #f0fdf4;
-  border-color: #22c55e;
+  border-left-color: #22c55e; /* Green */
+  background: linear-gradient(145deg, rgba(34, 197, 94, 0.15) 0%, rgba(15, 23, 42, 0.4) 100%);
 }
 
 .weather-card--active {
@@ -211,10 +220,10 @@ const levelLabel = (level: RiskLevel): string => {
 
 @keyframes pulse-border {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3);
   }
   50% {
-    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
   }
 }
 
@@ -223,32 +232,37 @@ const levelLabel = (level: RiskLevel): string => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .disease-card__name,
 .weather-card__name {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
-  color: #1e293b;
+  color: #ffffff;
+  letter-spacing: 0.02em;
 }
 
 .disease-card__probability {
   display: flex;
   align-items: baseline;
-  gap: 0.25rem;
-  margin-bottom: 0.75rem;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
 }
 
 .disease-card__probability-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1;
 }
 
 .disease-card__probability-label {
-  font-size: 0.7rem;
-  color: #64748b;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .disease-card__conditions,
@@ -257,30 +271,40 @@ const levelLabel = (level: RiskLevel): string => {
   padding: 0;
   margin: 0;
   font-size: 0.75rem;
-  color: #475569;
+  color: #cbd5e1;
+  font-weight: 500;
 }
 
 .disease-card__conditions li,
 .weather-card__conditions li {
-  padding: 0.25rem 0;
-  padding-left: 1rem;
+  padding: 0.35rem 0;
+  padding-left: 1.25rem;
   position: relative;
+  line-height: 1.4;
 }
 
 .disease-card__conditions li::before,
 .weather-card__conditions li::before {
   content: '•';
   position: absolute;
-  left: 0;
+  left: 0.25rem;
   color: #94a3b8;
+  font-weight: 900;
 }
 
 .disease-card__conditions-empty,
 .weather-card__conditions-empty {
   font-size: 0.75rem;
-  color: #22c55e;
+  color: #4ade80;
   font-style: italic;
   margin: 0;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .alert-level-panel__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {

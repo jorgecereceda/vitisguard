@@ -205,7 +205,14 @@ const humidityAlert = computed(() => {
   const humData = props.hourly.relative_humidity_2m.slice(0, 24)
   const result = getHourRange(humData, 90, (v) => v >= 90)
   if (!result) return null
-  return { level: result.value >= 95 ? 'extrema' : 'alta', icon: result.value >= 95 ? '💧' : '💦', range: result.range, peak: result.peak, value: result.value }
+  return {
+    label: 'Humedad',
+    level: result.value >= 95 ? 'extrema' : 'alta',
+    icon: '💧',
+    range: result.range,
+    peak: result.peak,
+    value: result.value
+  }
 })
 
 const windAlert = computed(() => {
@@ -265,21 +272,35 @@ const getWindHeight = (value: number) => Math.max((value / maxWind.value) * 100,
         <div class="weather-current__main">
           <div class="weather-current__icons">
             <span class="weather-current__icon">{{ weatherCondition.icon }}</span>
-            <div v-if="snowAlert" class="weather-current__alert" :title="`${snowAlert.level}`">
+            <div v-if="snowAlert" class="weather-current__alert status-red" :title="snowAlert.level">
               <span class="weather-current__alert-icon">{{ snowAlert.icon }}</span>
+              <span class="weather-current__alert-label">Nieve</span>
               <span class="weather-current__alert-time">{{ snowAlert.range }}</span>
             </div>
-            <div v-if="stormAlert" class="weather-current__alert" :title="`${stormAlert.level === 'granizo' ? 'Granizo' : 'Tormenta'}`">
+            <div v-if="stormAlert" class="weather-current__alert status-red" :title="stormAlert.level === 'granizo' ? 'Granizo' : 'Tormenta'">
               <span class="weather-current__alert-icon">{{ stormAlert.icon }}</span>
+              <span class="weather-current__alert-label">{{ stormAlert.level === 'granizo' ? 'Granizo' : 'Tormenta' }}</span>
               <span class="weather-current__alert-time">{{ stormAlert.range }}</span>
             </div>
-            <div v-if="heatAlert" class="weather-current__alert" :title="`Temperatura ${heatAlert.level} (${heatAlert.value}°C)`">
+            <div v-if="heatAlert" class="weather-current__alert" :class="heatAlert.level === 'extrema' ? 'status-red' : 'status-yellow'" :title="`Temperatura ${heatAlert.level} (${heatAlert.value}°C)`">
               <span class="weather-current__alert-icon">{{ heatAlert.icon }}</span>
+              <span class="weather-current__alert-label">Calor</span>
               <span class="weather-current__alert-time">{{ heatAlert.range }}</span>
             </div>
-            <div v-if="windAlert" class="weather-current__alert" :title="`Viento ${windAlert.level} (${windAlert.value} km/h)`">
+            <div v-if="windAlert" class="weather-current__alert status-yellow" :title="`Viento ${windAlert.level} (${windAlert.value} km/h)`">
               <span class="weather-current__alert-icon">{{ windAlert.icon }}</span>
+              <span class="weather-current__alert-label">Viento</span>
               <span class="weather-current__alert-time">{{ windAlert.range }}</span>
+            </div>
+            <div v-if="uvAlert" class="weather-current__alert status-red" :title="`Índice UV ${uvAlert.level} (${uvAlert.value})`">
+              <span class="weather-current__alert-icon">{{ uvAlert.icon }}</span>
+              <span class="weather-current__alert-label">Índice UV</span>
+              <span class="weather-current__alert-time">{{ uvAlert.range }}</span>
+            </div>
+            <div v-if="humidityAlert" class="weather-current__alert status-yellow" :title="`Humedad ${humidityAlert.level} (${humidityAlert.value}%)`">
+              <span class="weather-current__alert-icon">{{ humidityAlert.icon }}</span>
+              <span class="weather-current__alert-label">Humedad</span>
+              <span class="weather-current__alert-time">{{ humidityAlert.range }}</span>
             </div>
           </div>
           <div class="weather-current__temp-wrapper">
@@ -304,12 +325,12 @@ const getWindHeight = (value: number) => Math.max((value / maxWind.value) * 100,
               <span class="weather-current__stat-value">{{ sunshineHours }}</span>
               <span class="weather-current__stat-label">h sol</span>
             </div>
-            <div class="weather-current__stat">
+            <div class="weather-current__stat" :title="cloudDescription">
               <span class="weather-current__stat-icon">☁️</span>
               <span class="weather-current__stat-value">{{ cloudCover }}</span>
               <span class="weather-current__stat-label">%</span>
             </div>
-            <div class="weather-current__stat">
+            <div class="weather-current__stat" :title="`Dirección: ${windDirection}`">
               <span class="weather-current__stat-icon">💨</span>
               <span class="weather-current__stat-value">{{ displayWindSpeed.toFixed(1) }}</span>
               <span class="weather-current__stat-label">km/h</span>
@@ -319,7 +340,7 @@ const getWindHeight = (value: number) => Math.max((value / maxWind.value) * 100,
               <span class="weather-current__stat-value">{{ displayHumidity.toFixed(1) }}</span>
               <span class="weather-current__stat-label">%</span>
             </div>
-            <div class="weather-current__stat">
+            <div class="weather-current__stat" :title="`Nivel: ${uvLevel.level}`">
               <span class="weather-current__stat-icon">☀️</span>
               <span class="weather-current__stat-value">{{ displayUV.toFixed(1) }}</span>
               <span class="weather-current__stat-label">UV</span>
@@ -470,13 +491,22 @@ const getWindHeight = (value: number) => Math.max((value / maxWind.value) * 100,
   animation: pulse 1.5s ease-in-out infinite;
 }
 
+.weather-current__alert-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: -0.2rem;
+}
+
 .weather-current__alert-time {
-  font-size: 1rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  background: rgba(255, 100, 100, 0.4);
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-top: 0.1rem;
 }
 
 @keyframes pulse {

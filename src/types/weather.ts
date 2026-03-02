@@ -9,8 +9,12 @@ export const HOURLY_VARIABLES = [
   'showers',
   'soil_moisture_0_to_7cm',
   'soil_moisture_7_to_28cm',
+  'soil_moisture_28_to_100cm',
+  'soil_moisture_100_to_255cm',
   'soil_temperature_0_to_7cm',
   'soil_temperature_7_to_28cm',
+  'soil_temperature_28_to_100cm',
+  'soil_temperature_100_to_255cm',
   'wind_speed_10m',
   'wind_gusts_10m',
   'wind_direction_10m',
@@ -71,8 +75,12 @@ export interface HourlyData {
   snow_depth?: number[]
   soil_moisture_0_to_7cm?: number[]
   soil_moisture_7_to_28cm?: number[]
+  soil_moisture_28_to_100cm?: number[]
+  soil_moisture_100_to_255cm?: number[]
   soil_temperature_0_to_7cm?: number[]
   soil_temperature_7_to_28cm?: number[]
+  soil_temperature_28_to_100cm?: number[]
+  soil_temperature_100_to_255cm?: number[]
   wind_speed_10m?: number[]
   wind_gusts_10m?: number[]
   wind_direction_10m?: number[]

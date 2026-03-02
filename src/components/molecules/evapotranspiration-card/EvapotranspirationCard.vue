@@ -1,24 +1,74 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { Denomination } from '@/types/weather'
 
 interface Props {
   et0: number
   precipitation: number
-  humidity: number
+  humidity: number // Air humidity
+  soilMoisture40_60: number // For context
+  selectedDO: Denomination // 'Getaria', 'Bizkaia', 'Alava'
 }
 
 const props = defineProps<Props>()
 
-const humidityBenefit = computed(() => {
-  if (props.humidity < 50) return 0
-  const factor = (props.humidity - 50) / 50
-  return props.et0 * factor * 0.5
+// 1. AGRONOMIC PARAMETERS
+const KC_TXAKOLI = 0.75
+
+// Determine soil profile based on D.O. (used for absorption matrix)
+// Bizkaia/Araba: Franco-Arcilloso | Getaria: Franco-Limoso
+const isClayLoam = computed(() => {
+  const zone = props.selectedDO?.toLowerCase()
+  return zone === 'bizkaia' || zone === 'alava' || zone === 'araba'
 })
 
-const gain = computed(() => props.precipitation)
-const totalGain = computed(() => gain.value + humidityBenefit.value)
-const effectiveLoss = computed(() => props.et0 - humidityBenefit.value)
-const balance = computed(() => totalGain.value - effectiveLoss.value)
+// 2. INGRESOS (GAINS)
+const irrigation = 0 // Placeholder
+
+// ROCÍO: Estimación basada en humedad ambiental (común en costa vasca)
+const dew = computed(() => {
+  if (props.humidity > 90) return 0.3
+  if (props.humidity > 80) return 0.1
+  return 0
+})
+
+// ABSORCIÓN: Aporte de zona profunda (40-60cm) según matriz técnica
+const absorptionGain = computed(() => {
+  const val = props.soilMoisture40_60
+  if (isClayLoam.value) { // Franco-Arcilloso (Bizkaia/Araba)
+    if (val > 90) return 3.5 // Rango corregido (promedio 3-4)
+    if (val >= 70) return 2.0 // Rango corregido (promedio 1.5-2.5)
+    if (val >= 50) return 0.7 // Rango corregido (promedio 0.5-1.0)
+    return 0
+  } else { // Franco-Limoso (Getaria)
+    if (val > 90) return 2.2 // Rango corregido (promedio 2-2.5)
+    if (val >= 70) return 1.2 // Rango corregido (promedio 1-1.5)
+    if (val >= 50) return 0.3 // Rango corregido (promedio 0.2-0.5)
+    return 0
+  }
+})
+
+const totalIngress = computed(() => props.precipitation + irrigation + dew.value + absorptionGain.value)
+
+// 3. EGRESOS (LOSSES)
+const etc = computed(() => props.et0 * KC_TXAKOLI)
+
+// Drainage estimation based on soil type per D.O.
+const drainage = computed(() => {
+  const zone = props.selectedDO?.toLowerCase()
+  if (zone === 'getaria') return 0.8 // High drainage (arenisca/laderas)
+  if (zone === 'alava' || zone === 'araba') return 0.5   // Medium (caliza)
+  return 0.3 // Low (bizkaia - franco arcillosa)
+})
+
+// Final derived values
+const totalEgress = computed(() => etc.value + drainage.value)
+const balance = computed(() => totalIngress.value - totalEgress.value)
+
+// GAIN/LOSS PERCENTS FOR PROGRESS BARS (Increased for total gains)
+const MAX_BAR_VALUE = 8
+const gainPercent = computed(() => Math.min((totalIngress.value / MAX_BAR_VALUE) * 100, 100))
+const lossPercent = computed(() => Math.min((totalEgress.value / MAX_BAR_VALUE) * 100, 100))
 
 interface EvapStatus {
   label: string
@@ -28,58 +78,44 @@ interface EvapStatus {
   icon: string
 }
 
-const getStatus = (et0: number): EvapStatus => {
-  if (et0 < 1.5) {
+const getStatus = (balanceVal: number): EvapStatus => {
+  if (balanceVal > 1.5) {
     return {
-      label: 'Saturación / Parada',
-      color: '#ef4444',
-      bgColor: 'rgba(239, 68, 68, 0.1)',
-      description: 'Máximo riesgo de Mildiú y Botrytis',
-      icon: '💧',
+      label: 'Acumulación Hídrica',
+      color: '#3b82f6',
+      bgColor: 'rgba(59, 130, 246, 0.1)',
+      description: 'Crecimiento vigoroso. Vigilancia Mildiú.',
+      icon: '🌿',
     }
   }
-  if (et0 < 2.5) {
+  if (balanceVal >= -1.0) {
     return {
-      label: 'Actividad lenta',
-      color: '#f97316',
-      bgColor: 'rgba(249, 115, 22, 0.1)',
-      description: 'Maduración muy lenta. Acidez excesiva.',
-      icon: '🐢',
-    }
-  }
-  if (et0 <= 4.0) {
-    return {
-      label: 'Óptimo',
+      label: 'Equilibrio Óptimo',
       color: '#22c55e',
       bgColor: 'rgba(34, 197, 94, 0.1)',
-      description: 'Desarrollo ideal de precursores aromáticos',
+      description: 'Desarrollo ideal de la canopia y fruto.',
       icon: '✨',
     }
   }
-  if (et0 <= 5.5) {
+  if (balanceVal >= -3.0) {
     return {
-      label: 'Actividad intensa',
-      color: '#eab308',
-      bgColor: 'rgba(234, 179, 8, 0.1)',
-      description: 'Buen ritmo, vigilar reservas de agua',
-      icon: '⚡',
+      label: 'Estrés Moderado',
+      color: '#f97316',
+      bgColor: 'rgba(249, 115, 22, 0.1)',
+      description: 'Lento engorde. Posible riego de apoyo.',
+      icon: '🐢',
     }
   }
   return {
-    label: 'Estrés Térmico',
+    label: 'Déficit Crítico',
     color: '#ef4444',
     bgColor: 'rgba(239, 68, 68, 0.1)',
-    description: 'Cierre estomático. Riesgo de parada.',
+    description: 'Riesgo de parada vegetativa inminente.',
     icon: '🔥',
   }
 }
 
-const MAX_BAR_VALUE = 6
-
-const gainPercent = computed(() => Math.min((totalGain.value / MAX_BAR_VALUE) * 100, 100))
-const lossPercent = computed(() => Math.min((effectiveLoss.value / MAX_BAR_VALUE) * 100, 100))
-
-const status = computed(() => getStatus(props.et0))
+const status = computed(() => getStatus(balance.value))
 </script>
 
 <template>
@@ -87,15 +123,15 @@ const status = computed(() => getStatus(props.et0))
     <div class="evap-card__header">
       <div class="evap-card__title-group">
         <span class="evap-card__icon">☀️</span>
-        <h3 class="evap-card__title">Balance Hídrico</h3>
+        <h3 class="evap-card__title">Balance Hídrico ({{ selectedDO }})</h3>
       </div>
     </div>
 
     <div class="evap-card__content">
       <div class="evap-card__stats-grid">
-        <!-- GANANCIA -->
+        <!-- INGRESOS -->
         <div class="evap-card__stat-column">
-          <div class="evap-card__label">GANANCIA</div>
+          <div class="evap-card__label">INGRESOS (SUMA)</div>
           <div class="evap-card__progress-wrapper">
             <div class="evap-card__progress-bg">
               <div
@@ -103,11 +139,9 @@ const status = computed(() => getStatus(props.et0))
                 :style="{ width: `${gainPercent}%` }"
               ></div>
             </div>
-            <span class="evap-card__value-text">{{ totalGain.toFixed(1) }} mm</span>
+            <span class="evap-card__value-text">{{ totalIngress.toFixed(1) }} mm</span>
           </div>
-          <div class="evap-card__detail-text">
-            Lluvia: {{ precipitation.toFixed(1) }} + Humedad: {{ humidityBenefit.toFixed(1) }}
-          </div>
+          <div class="evap-card__detail-text">Rain: {{ precipitation.toFixed(1) }} | Abs: {{ absorptionGain.toFixed(1) }} | Dew: {{ dew.toFixed(1) }}</div>
         </div>
 
         <!-- BALANCE CIRCLE -->
@@ -122,9 +156,9 @@ const status = computed(() => getStatus(props.et0))
           </div>
         </div>
 
-        <!-- PÉRDIDA -->
+        <!-- EGRESOS -->
         <div class="evap-card__stat-column">
-          <div class="evap-card__label">EVAPOTRANSPIRACIÓN (ET0)</div>
+          <div class="evap-card__label">EGRESOS (PÉRDIDA)</div>
           <div class="evap-card__progress-wrapper">
             <div class="evap-card__progress-bg">
               <div
@@ -132,9 +166,9 @@ const status = computed(() => getStatus(props.et0))
                 :style="{ width: `${lossPercent}%` }"
               ></div>
             </div>
-            <span class="evap-card__value-text">{{ effectiveLoss.toFixed(1) }} mm</span>
+            <span class="evap-card__value-text">{{ totalEgress.toFixed(1) }} mm</span>
           </div>
-          <div class="evap-card__detail-text">ET0 - Beneficio humedad: {{ humidityBenefit.toFixed(1) }}</div>
+          <div class="evap-card__detail-text">Evapotranspiración + Drenaje</div>
         </div>
       </div>
     </div>
@@ -155,13 +189,14 @@ const status = computed(() => getStatus(props.et0))
   background: linear-gradient(135deg, #1e3a5f 0%, #0c4a6e 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
   color: white;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  height: 100%;
 }
 
 .evap-card:hover {
@@ -181,7 +216,7 @@ const status = computed(() => getStatus(props.et0))
 }
 
 .evap-card__header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .evap-card__title-group {
@@ -204,12 +239,22 @@ const status = computed(() => getStatus(props.et0))
   letter-spacing: 0.1em;
 }
 
+.evap-card__reserve-badge {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
 .evap-card__stats-grid {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .evap-card__stat-column {
@@ -280,8 +325,8 @@ const status = computed(() => getStatus(props.et0))
 }
 
 .evap-card__circle {
-  width: 90px;
-  height: 90px;
+  width: 75px;
+  height: 75px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
