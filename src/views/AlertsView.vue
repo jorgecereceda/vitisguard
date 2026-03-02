@@ -39,7 +39,6 @@ watch(
   { immediate: true }
 )
 
-const locationName = computed(() => weatherStore.userLocation.name)
 
 const currentConditions = computed((): WeatherConditions => {
   if (!weather.value?.current) {
@@ -75,15 +74,6 @@ interface DiseaseRisk {
   conditions: string[]
 }
 
-interface WeatherRisk {
-  id: string
-  type: string
-  name: string
-  level: RiskLevel
-  conditions: string[]
-  isActive: boolean
-}
-
 const diseaseRisks = computed((): DiseaseRisk[] => {
   const conditions = currentConditions.value
   return analyzeAllDiseases(conditions).map(risk => ({
@@ -100,7 +90,6 @@ const activeWeatherRisks = computed(() => {
   return weatherRisks.value.filter(r => r.isActive)
 })
 
-const hasActiveAlerts = computed(() => alerts.value.length > 0 || activeWeatherRisks.value.length > 0)
 
 const weatherRiskTypes: WeatherAlertType[] = ['frost', 'heatwave', 'storm', 'drought', 'excessiveRain']
 
@@ -182,131 +171,128 @@ const weatherForecastRisks = computed((): WeatherForecastRisk[] => {
 
 <template>
   <PannelLauyout>
-  <div class="alerts-view">
-    <header class="alerts-view__header">
-      <h1 class="alerts-view__title">⚠️ Panel de Alertas</h1>
-      <p class="alerts-view__location">📍 {{ locationName }}</p>
-    </header>
+    <div class="alerts-view">
 
-    <!-- SECCIÓN 1: Alertas Activas y Tratamientos -->
-    <section class="alerts-view__section">
-      <h2 class="alerts-view__section-title">
-        <span class="alerts-view__section-icon">🚨</span>
-        Alertas Activas y Recomendaciones
-      </h2>
-      
-      <TreatmentPanel
-        :diseases="diseaseRisks"
-        :weather-risks="weatherRisks"
-        :active-alerts="alerts"
-        :active-weather-risks="activeWeatherRisks"
-      />
-    </section>
+      <div class="alerts-view__content-grid">
+        <!-- SECCIÓN 1: Alertas Activas y Tratamientos -->
+        <section class="alerts-view__section alerts-view__section--main">
+          <h2 class="alerts-view__section-title">
+            <span class="alerts-view__section-icon">🚨</span>
+            Alertas Activas y Recomendaciones
+          </h2>
 
-    <!-- SECCIÓN 2: Pronóstico 7 Días -->
-    <section class="alerts-view__section">
-      <h2 class="alerts-view__section-title">
-        <span class="alerts-view__section-icon">📅</span>
-        Pronóstico 7 Días
-      </h2>
-      
-      <div v-if="forecastRisks.length > 0 || weatherForecastRisks.length > 0" class="alerts-view__forecast-panel">
-        <div class="forecast-panel__sections">
-          <div v-if="forecastRisks.length > 0" class="forecast-panel__section">
-            <h4 class="forecast-panel__subtitle">Enfermedades</h4>
-            <div class="forecast-risks-grid">
-              <div 
-                v-for="risk in forecastRisks" 
-                :key="risk.disease"
-                class="forecast-risk-card"
-                :class="{
-                  'forecast-risk-card--high': risk.highRiskDays > 0 || risk.criticalRiskDays > 0,
-                  'forecast-risk-card--critical': risk.criticalRiskDays > 0
-                }"
-              >
-                <div class="forecast-risk-card__name">{{ risk.name }}</div>
-                <div class="forecast-risk-card__days">
-                  <span v-if="risk.criticalRiskDays > 0" class="forecast-risk-card__count critical">
-                    {{ risk.criticalRiskDays }} día{{ risk.criticalRiskDays > 1 ? 's' : '' }} crítico{{ risk.criticalRiskDays > 1 ? 's' : '' }}
-                  </span>
-                  <span v-if="risk.highRiskDays > 0" class="forecast-risk-card__count high">
-                    {{ risk.highRiskDays }} día{{ risk.highRiskDays > 1 ? 's' : '' }} con riesgo alto
-                  </span>
-                  <span v-if="risk.criticalRiskDays === 0 && risk.highRiskDays === 0" class="forecast-risk-card__count low">
-                    Sin riesgo
-                  </span>
+          <TreatmentPanel
+            :diseases="diseaseRisks"
+            :weather-risks="weatherRisks"
+            :active-alerts="alerts"
+            :active-weather-risks="activeWeatherRisks"
+          />
+        </section>
+
+        <!-- SECCIÓN 3: Condiciones Actuales y Riesgos -->
+        <section class="alerts-view__section alerts-view__section--side">
+          <h2 class="alerts-view__section-title">
+            <span class="alerts-view__section-icon">🌡️</span>
+            Condiciones Actuales
+          </h2>
+
+          <div v-if="weatherData" class="alerts-view__conditions">
+            <h3 class="alerts-view__conditions-title">Metodología Actual</h3>
+            <div class="alerts-view__conditions-grid">
+              <div class="condition-item">
+                <span class="condition-item__label">Temperatura</span>
+                <span class="condition-item__value">{{ weatherData.temperature.toFixed(1) }}°C</span>
+              </div>
+              <div class="condition-item">
+                <span class="condition-item__label">Humedad</span>
+                <span class="condition-item__value">{{ weatherData.humidity.toFixed(0) }}%</span>
+              </div>
+              <div class="condition-item">
+                <span class="condition-item__label">Lluvia</span>
+                <span class="condition-item__value">{{ weatherData.precipitation.toFixed(1) }}mm</span>
+              </div>
+              <div class="condition-item">
+                <span class="condition-item__label">Nubes</span>
+                <span class="condition-item__value">{{ weatherData.cloudCover.toFixed(0) }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <AlertLevelPanel
+            :diseases="diseaseRisks"
+            :weather-risks="weatherRisks"
+          />
+        </section>
+
+        <!-- SECCIÓN 2: Pronóstico 7 Días -->
+        <section class="alerts-view__section alerts-view__section--forecast">
+          <h2 class="alerts-view__section-title">
+            <span class="alerts-view__section-icon">📅</span>
+            Pronóstico 7 Días
+          </h2>
+
+          <div v-if="forecastRisks.length > 0 || weatherForecastRisks.length > 0" class="alerts-view__forecast-panel">
+            <div class="forecast-panel__sections">
+              <div v-if="forecastRisks.length > 0" class="forecast-panel__section">
+                <h4 class="forecast-panel__subtitle">Enfermedades</h4>
+                <div class="forecast-risks-grid">
+                  <div
+                    v-for="risk in forecastRisks"
+                    :key="risk.disease"
+                    class="forecast-risk-card"
+                    :class="{
+                      'forecast-risk-card--high': risk.highRiskDays > 0 || risk.criticalRiskDays > 0,
+                      'forecast-risk-card--critical': risk.criticalRiskDays > 0
+                    }"
+                  >
+                    <div class="forecast-risk-card__name">{{ risk.name }}</div>
+                    <div class="forecast-risk-card__days">
+                      <span v-if="risk.criticalRiskDays > 0" class="forecast-risk-card__count critical">
+                        {{ risk.criticalRiskDays }} día{{ risk.criticalRiskDays > 1 ? 's' : '' }} crítico{{ risk.criticalRiskDays > 1 ? 's' : '' }}
+                      </span>
+                      <span v-if="risk.highRiskDays > 0" class="forecast-risk-card__count high">
+                        {{ risk.highRiskDays }} día{{ risk.highRiskDays > 1 ? 's' : '' }} con riesgo alto
+                      </span>
+                      <span v-if="risk.criticalRiskDays === 0 && risk.highRiskDays === 0" class="forecast-risk-card__count low">
+                        Sin riesgo
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="weatherForecastRisks.length > 0" class="forecast-panel__section">
+                <h4 class="forecast-panel__subtitle">Riesgos Climáticos</h4>
+                <div class="forecast-risks-grid">
+                  <div
+                    v-for="risk in weatherForecastRisks"
+                    :key="risk.type"
+                    class="forecast-risk-card"
+                    :class="{
+                      'forecast-risk-card--high': risk.highRiskDays > 0 || risk.criticalRiskDays > 0,
+                      'forecast-risk-card--critical': risk.criticalRiskDays > 0
+                    }"
+                  >
+                    <div class="forecast-risk-card__name">{{ risk.name }}</div>
+                    <div class="forecast-risk-card__days">
+                      <span v-if="risk.criticalRiskDays > 0" class="forecast-risk-card__count critical">
+                        {{ risk.criticalRiskDays }} día{{ risk.criticalRiskDays > 1 ? 's' : '' }} crítico{{ risk.criticalRiskDays > 1 ? 's' : '' }}
+                      </span>
+                      <span v-if="risk.highRiskDays > 0" class="forecast-risk-card__count high">
+                        {{ risk.highRiskDays > 0 ? risk.highRiskDays : 0 }} día{{ risk.highRiskDays > 1 ? 's' : '' }} con riesgo alto
+                      </span>
+                      <span v-if="risk.criticalRiskDays === 0 && risk.highRiskDays === 0" class="forecast-risk-card__count low">
+                        Sin riesgo
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          
-          <div v-if="weatherForecastRisks.length > 0" class="forecast-panel__section">
-            <h4 class="forecast-panel__subtitle">Riesgos Climáticos</h4>
-            <div class="forecast-risks-grid">
-              <div 
-                v-for="risk in weatherForecastRisks" 
-                :key="risk.type"
-                class="forecast-risk-card"
-                :class="{
-                  'forecast-risk-card--high': risk.highRiskDays > 0 || risk.criticalRiskDays > 0,
-                  'forecast-risk-card--critical': risk.criticalRiskDays > 0
-                }"
-              >
-                <div class="forecast-risk-card__name">{{ risk.name }}</div>
-                <div class="forecast-risk-card__days">
-                  <span v-if="risk.criticalRiskDays > 0" class="forecast-risk-card__count critical">
-                    {{ risk.criticalRiskDays }} día{{ risk.criticalRiskDays > 1 ? 's' : '' }} crítico{{ risk.criticalRiskDays > 1 ? 's' : '' }}
-                  </span>
-                  <span v-if="risk.highRiskDays > 0" class="forecast-risk-card__count high">
-                    {{ risk.highRiskDays }} día{{ risk.highRiskDays > 1 ? 's' : '' }} con riesgo alto
-                  </span>
-                  <span v-if="risk.criticalRiskDays === 0 && risk.highRiskDays === 0" class="forecast-risk-card__count low">
-                    Sin riesgo
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        </section>
       </div>
-    </section>
-
-    <!-- SECCIÓN 3: Condiciones Actuales y Riesgos -->
-    <section class="alerts-view__section">
-      <h2 class="alerts-view__section-title">
-        <span class="alerts-view__section-icon">🌡️</span>
-        Condiciones Actuales
-      </h2>
-      
-      <div v-if="weatherData" class="alerts-view__conditions">
-        <h3 class="alerts-view__conditions-title">Condiciones Meteorológicas</h3>
-        <div class="alerts-view__conditions-grid">
-          <div class="condition-item">
-            <span class="condition-item__label">Temperatura</span>
-            <span class="condition-item__value">{{ weatherData.temperature.toFixed(1) }}°C</span>
-          </div>
-          <div class="condition-item">
-            <span class="condition-item__label">Humedad</span>
-            <span class="condition-item__value">{{ weatherData.humidity.toFixed(0) }}%</span>
-          </div>
-          <div class="condition-item">
-            <span class="condition-item__label">Precipitación</span>
-            <span class="condition-item__value">{{ weatherData.precipitation.toFixed(1) }} mm</span>
-          </div>
-          <div class="condition-item">
-            <span class="condition-item__label">Nubosidad</span>
-            <span class="condition-item__value">{{ weatherData.cloudCover.toFixed(0) }}%</span>
-          </div>
-        </div>
-      </div>
-
-      <AlertLevelPanel
-        :diseases="diseaseRisks"
-        :weather-risks="weatherRisks"
-      />
-    </section>
-
-  </div>
+    </div>
   </PannelLauyout>
 </template>
 
@@ -316,235 +302,219 @@ const weatherForecastRisks = computed((): WeatherForecastRisk[] => {
   margin: 0 auto;
   padding: 2rem;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: #2c3e50;
+  color: #e2e8f0;
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
-.alerts-view__header {
-  margin-bottom: 0;
-}
 
-.alerts-view__title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 0.5rem;
-}
-
-.alerts-view__location {
-  font-size: 0.875rem;
-  color: #64748b;
-  margin: 0;
+.alerts-view__content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
 }
 
 .alerts-view__section {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #1e3a5f 0%, #0c4a6e 100%);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* Semaforo Colors Planos */
+.status-green {
+  background-color: rgba(34, 197, 94, 0.15) !important;
+  border-color: rgba(34, 197, 94, 0.4) !important;
+}
+
+.status-yellow {
+  background-color: rgba(234, 179, 8, 0.2) !important;
+  border-color: rgba(234, 179, 8, 0.5) !important;
+}
+
+.status-red {
+  background-color: rgba(239, 68, 68, 0.25) !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+}
+
+.alerts-view__section--main {
+  grid-column: 1 / -1;
+}
+
+.alerts-view__section--side {
+  grid-column: 1;
+}
+
+.alerts-view__section--forecast {
+  grid-column: 2;
 }
 
 .alerts-view__section-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   font-size: 1.25rem;
-  font-weight: 600;
-  color: #1e293b;
+  font-weight: 700;
+  color: #ffffff;
   margin: 0 0 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .alerts-view__section-icon {
   font-size: 1.5rem;
 }
 
-.alerts-view__alerts {
-  background: #fff5f5;
-  border-left: 5px solid #e53e3e;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  margin-bottom: 1.5rem;
-}
-
-.alerts-view__alerts-subtitle {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #c53030;
-  margin-bottom: 1rem;
-}
-
-.alerts-view__alerts-list {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.alerts-view__alert-item {
-  color: #9b2c2c;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.alerts-view__alert-item::before {
-  content: "•";
-  font-weight: bold;
-}
-
-.alerts-view__empty {
-  text-align: center;
-  padding: 3rem;
-  background: #f0fdf4;
-  border-left: 5px solid #22c55e;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-}
-
-.alerts-view__empty-icon {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
-}
-
-.alerts-view__empty-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #16a34a;
-  margin: 0 0 0.5rem;
-}
-
-.alerts-view__empty-text {
-  font-size: 1rem;
-  color: #64748b;
-  margin: 0;
-}
-
 .alerts-view__conditions {
-  background: rgb(255, 255, 255);
+  background: rgba(15, 23, 42, 0.4);
   border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.25rem;
   margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .alerts-view__conditions-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1e293b;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #94a3b8;
   margin: 0 0 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .alerts-view__conditions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
 }
 
 .condition-item {
-  text-align: center;
-  padding: 1rem;
-  background: #f8fafc;
-  border-radius: 8px;
+  text-align: left;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .condition-item__label {
   display: block;
-  font-size: 0.75rem;
-  color: #64748b;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #94a3b8;
   margin-bottom: 0.25rem;
+  text-transform: uppercase;
 }
 
 .condition-item__value {
   display: block;
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
 }
 
 .alerts-view__forecast-panel {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
+  background: transparent;
 }
 
 .forecast-panel__sections {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-}
-
-.forecast-panel__section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  gap: 2rem;
 }
 
 .forecast-panel__subtitle {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #475569;
-  margin: 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #94a3b8;
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .forecast-risks-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1rem;
 }
 
 .forecast-risk-card {
-  padding: 1rem;
-  border-radius: 8px;
-  background: #f8fafc;
-  border: 1px solid #22c55e;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  transition: all 0.3s ease;
+}
+
+.forecast-risk-card:hover {
+  transform: translateY(-3px);
+  background: rgba(15, 23, 42, 0.6);
 }
 
 .forecast-risk-card--high {
-  border: 1px solid #f59e0b;
-  background: #fffbeb;
+  border-color: rgba(245, 158, 11, 0.4);
 }
 
 .forecast-risk-card--critical {
-  border: 1px solid #ef4444;
-  background: #fef2f2;
+  border-color: rgba(239, 68, 68, 0.4);
 }
 
 .forecast-risk-card__name {
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 0.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
 }
 
 .forecast-risk-card__days {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.4rem;
 }
 
 .forecast-risk-card__count {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  width: fit-content;
 }
 
 .forecast-risk-card__count.critical {
-  color: #dc2626;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
 }
 
 .forecast-risk-card__count.high {
-  color: #d97706;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
 }
 
 .forecast-risk-card__count.low {
-  color: #16a34a;
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1200px) {
+  .alerts-view__content-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .alerts-view__section--main,
+  .alerts-view__section--side,
+  .alerts-view__section--forecast {
+    grid-column: 1;
+  }
 }
 
 @media (max-width: 768px) {
@@ -553,8 +523,16 @@ const weatherForecastRisks = computed((): WeatherForecastRisk[] => {
     gap: 1rem;
   }
 
-  .alerts-view__title {
-    font-size: 1.5rem;
+  .alerts-view__section {
+    padding: 1.25rem;
+  }
+
+  .forecast-risks-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .alerts-view__conditions-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

@@ -11,6 +11,7 @@ interface Props {
   name: string
   required?: boolean
   disabled?: boolean
+  icon?: string
 }
 
 withDefaults(defineProps<Props>(), {
@@ -18,7 +19,8 @@ withDefaults(defineProps<Props>(), {
   placeholder: '',
   error: '',
   required: false,
-  disabled: false
+  disabled: false,
+  icon: ''
 })
 
 const emit = defineEmits<{
@@ -52,23 +54,27 @@ const emit = defineEmits<{
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.75rem;
 }
 
 .label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #a1bfa1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .required {
   color: #ef4444;
-  margin-left: 2px;
+  margin-left: 4px;
 }
 
 .error-message {
-  font-size: 12px;
-  color: #ef4444;
-  min-height: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #f87171;
+  min-height: 18px;
+  padding-left: 0.25rem;
 }
 </style>

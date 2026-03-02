@@ -90,22 +90,8 @@ export function generateWeatherAlerts(
   const month = now.getMonth() + 1
 
   if (minDailyTemp !== null) {
-    if (minDailyTemp < 2) {
-      alerts.push({
-        id: `frost-${now.getTime()}`,
-        category: 'weather',
-        type: 'frost',
-        level: minDailyTemp < 0 ? 'critical' : 'high',
-        title: WEATHER_ALERT_CONFIGS.frost.title,
-        description: `Temperatura mínima: ${minDailyTemp.toFixed(1)}°C`,
-        recommendation: WEATHER_ALERT_CONFIGS.frost.recommendations[
-          minDailyTemp < 0 ? 'critical' : 'high'
-        ],
-        detectedAt: now,
-      })
-    }
-
     if (minDailyTemp < 3 && month >= 3 && month <= 5) {
+      // Prioritize Late Frost in spring
       alerts.push({
         id: `lateFrost-${now.getTime()}`,
         category: 'weather',
@@ -114,6 +100,20 @@ export function generateWeatherAlerts(
         title: WEATHER_ALERT_CONFIGS.lateFrost.title,
         description: `Temperatura mínima: ${minDailyTemp.toFixed(1)}°C en primavera`,
         recommendation: WEATHER_ALERT_CONFIGS.lateFrost.recommendations[
+          minDailyTemp < 0 ? 'critical' : 'high'
+        ],
+        detectedAt: now,
+      })
+    } else if (minDailyTemp < 2) {
+      // Regular Frost
+      alerts.push({
+        id: `frost-${now.getTime()}`,
+        category: 'weather',
+        type: 'frost',
+        level: minDailyTemp < 0 ? 'critical' : 'high',
+        title: WEATHER_ALERT_CONFIGS.frost.title,
+        description: `Temperatura mínima: ${minDailyTemp.toFixed(1)}°C`,
+        recommendation: WEATHER_ALERT_CONFIGS.frost.recommendations[
           minDailyTemp < 0 ? 'critical' : 'high'
         ],
         detectedAt: now,

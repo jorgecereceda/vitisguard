@@ -32,140 +32,130 @@ const props = withDefaults(defineProps<Props>(), {
   activeWeatherRisks: () => [],
 })
 
-interface Treatment {
+interface Phenomenon {
   id: string
-  category: 'disease' | 'weather' | 'alert'
-  title: string
-  description: string
+  name: string
+  category: 'weather' | 'disease' | 'alert'
   priority: RiskLevel
+  alertTitle: string
+  alertContent: string
+  recTitle: string
+  recContent: string
 }
 
-const hasActiveContent = computed(() => {
-  return props.activeAlerts.length > 0 || props.activeWeatherRisks.length > 0
-})
+const treatments = computed<Phenomenon[]>(() => {
+  const phenomenonMap = new Map<string, Phenomenon>()
 
-const treatments = computed<Treatment[]>(() => {
-  const result: Treatment[] = []
-
-  props.activeAlerts.forEach((alert, index) => {
-    const isDiseaseAlert = alert.includes('Riesgo') && alert.includes('probabilidad')
-    const title = isDiseaseAlert ? 'Alerta de Enfermedad' : 'Alerta Meteorológica'
-    
-    result.push({
-      id: `alert-${index}`,
-      category: 'alert',
-      title,
-      description: alert,
-      priority: 'critical',
-    })
-  })
-
+  // 1. Procesar Riesgos Climáticos Estructurados
   props.activeWeatherRisks
     .filter(r => r.level === 'high' || r.level === 'critical')
     .forEach(risk => {
       const config = WEATHER_ALERT_CONFIGS[risk.type as keyof typeof WEATHER_ALERT_CONFIGS]
       if (config) {
-        result.push({
+        phenomenonMap.set(risk.name.toLowerCase(), {
           id: risk.id,
+          name: risk.name,
           category: 'weather',
-          title: `Protección contra ${risk.name}`,
-          description: config.recommendations[risk.level],
           priority: risk.level,
+          alertTitle: `Alerta: ${risk.name}`,
+          alertContent: config.description,
+          recTitle: `Recomendación de Protección`,
+          recContent: (config.recommendations as Record<RiskLevel, string>)[risk.level] || config.description || ''
         })
       }
     })
 
+  // 2. Procesar Enfermedades
   props.diseases
     .filter(d => d.level === 'high' || d.level === 'critical')
     .forEach(disease => {
       const config = DISEASE_CONFIGS[disease.type]
       if (config) {
-        result.push({
+        phenomenonMap.set(disease.name.toLowerCase(), {
           id: disease.id,
+          name: disease.name,
           category: 'disease',
-          title: `Tratamiento para ${disease.name}`,
-          description: config.recommendations[disease.level],
           priority: disease.level,
+          alertTitle: `Riesgo de ${disease.name}`,
+          alertContent: `Detección: ${disease.probability}% de probabilidad de infección.`,
+          recTitle: `Tratamiento Recomendado`,
+          recContent: (config.recommendations as Record<RiskLevel, string>)[disease.level] || ''
         })
       }
     })
 
-  const priorityOrder: Record<RiskLevel, number> = {
-    critical: 0,
-    high: 1,
-    medium: 2,
-    low: 3,
-  }
+  // 3. Procesar Alertas de Texto (Fusión o nuevas)
+  props.activeAlerts.forEach((alert, index) => {
+    if (!alert || typeof alert !== 'string') return
+    const segments = alert.split(':')
+    const name = (segments[0] || '').trim().toLowerCase()
 
-  return result.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+    const existing = Array.from(phenomenonMap.values()).find(p =>
+      p.name.toLowerCase().includes(name) || name.includes(p.name.toLowerCase())
+    )
+
+    if (existing) {
+      if (segments.length > 1) {
+        existing.alertContent = segments.slice(1).join(':').trim()
+      }
+    } else {
+      phenomenonMap.set(`text-${index}`, {
+        id: `text-${index}`,
+        name: segments[0] || 'Alerta',
+        category: 'alert',
+        priority: 'critical',
+        alertTitle: 'Alerta Detectada',
+        alertContent: alert,
+        recTitle: 'Acción Sugerida',
+        recContent: 'Se recomienda monitoreo inmediato de la zona afectada y preparar medidas preventivas.'
+      })
+    }
+  })
+
+  return Array.from(phenomenonMap.values()).sort((a, b) => {
+    const order: Record<RiskLevel, number> = { critical: 0, high: 1, medium: 2, low: 3 }
+    return order[a.priority] - order[b.priority]
+  })
 })
 
-const alertsList = computed(() => 
-  treatments.value.filter(t => t.category === 'alert')
-)
-
-const recommendationsList = computed(() => 
-  treatments.value.filter(t => t.category === 'disease' || t.category === 'weather')
-)
-
-const hasTreatments = computed(() => treatments.value.length > 0)
-
-const getCategoryIcon = (category: 'disease' | 'weather' | 'alert') => {
-  if (category === 'alert') return '🚨'
-  return category === 'disease' ? '🦠' : '🌧️'
-}
+const hasPhenomena = computed(() => treatments.value.length > 0)
 </script>
 
 <template>
   <div class="treatment-panel">
-    <template v-if="hasTreatments">
-      
-      <!-- Sección Alertas -->
-      <div v-if="alertsList.length > 0" class="treatment-panel__section">
-        <h4 class="treatment-panel__subtitle">
-          <span>🚨</span> Alertas
-        </h4>
-        <div class="treatment-panel__list">
-          <div
-            v-for="alert in alertsList"
-            :key="alert.id"
-            :class="['treatment-card', `treatment-card--${alert.priority}`]"
-          >
+    <template v-if="hasPhenomena">
+      <div class="treatment-panel__grid">
+        <div
+          v-for="p in treatments"
+          :key="p.id"
+          class="phenomenon-group"
+        >
+          <!-- TARJETA DE ALERTA -->
+          <div :class="['treatment-card', 'treatment-card--alert', `treatment-card--${p.priority}`]">
             <div class="treatment-card__header">
-              <span class="treatment-card__icon">{{ getCategoryIcon(alert.category) }}</span>
-              <span class="treatment-card__title">{{ alert.title }}</span>
+              <span class="treatment-card__icon">🚨</span>
+              <span class="treatment-card__title">{{ p.alertTitle }}</span>
             </div>
-            <p class="treatment-card__description">{{ alert.description }}</p>
+            <p class="treatment-card__description">{{ p.alertContent }}</p>
           </div>
-        </div>
-      </div>
 
-      <!-- Sección Recomendaciones -->
-      <div v-if="recommendationsList.length > 0" class="treatment-panel__section">
-        <h4 class="treatment-panel__subtitle">
-          <span>💊</span> Recomendaciones
-        </h4>
-        <div class="treatment-panel__list">
-          <div
-            v-for="rec in recommendationsList"
-            :key="rec.id"
-            :class="['treatment-card', `treatment-card--${rec.priority}`]"
-          >
+          <!-- TARJETA DE RECOMENDACIÓN -->
+          <div :class="['treatment-card', 'treatment-card--rec', `treatment-card--${p.priority}`]">
             <div class="treatment-card__header">
-              <span class="treatment-card__icon">{{ getCategoryIcon(rec.category) }}</span>
-              <span class="treatment-card__title">{{ rec.title }}</span>
+              <span class="treatment-card__icon">💡</span>
+              <span class="treatment-card__title">{{ p.recTitle }}</span>
             </div>
-            <p class="treatment-card__description">{{ rec.description }}</p>
+            <p class="treatment-card__description">{{ p.recContent }}</p>
           </div>
         </div>
       </div>
     </template>
 
     <div v-else class="treatment-panel__empty">
-      <div class="treatment-panel__empty-icon">✅</div>
-      <h3 class="treatment-panel__empty-title">Sin alertas activas</h3>
+      <div class="treatment-panel__empty-icon">🌿</div>
+      <h3 class="treatment-panel__empty-title">Todo Bajo Control</h3>
       <p class="treatment-panel__empty-text">
-        Las condiciones climáticas actuales no presentan riesgos para tus viñedos.
+        No se han detectado riesgos activos en este momento. El viñedo se encuentra en condiciones óptimas.
       </p>
     </div>
   </div>
@@ -173,116 +163,190 @@ const getCategoryIcon = (category: 'disease' | 'weather' | 'alert') => {
 
 <style scoped>
 .treatment-panel {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  width: 100%;
 }
 
-.treatment-panel__title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0 0 1rem;
+.treatment-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 3rem;
+  justify-content: center;
 }
 
-.treatment-panel__section {
-  margin-bottom: 1.5rem;
-}
-
-.treatment-panel__section:last-child {
-  margin-bottom: 0;
-}
-
-.treatment-panel__subtitle {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #475569;
-  margin: 0 0 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.treatment-panel__icon {
-  font-size: 1.25rem;
-}
-
-.treatment-panel__list {
+.phenomenon-group {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .treatment-card {
-  padding: 1rem;
-  border-radius: 12px;
-  border: 1px solid;
+  padding: 1.75rem 2rem;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Estilo para la Alerta */
+.treatment-card--alert {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.treatment-card--alert .treatment-card__title {
+  color: #fca5a5;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+}
+
+/* Estilo para la Recomendación */
+.treatment-card--rec {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background: rgba(30, 41, 59, 0.3);
+}
+
+.treatment-card--rec .treatment-card__title {
+  color: #6ee7b7;
+}
+
+.treatment-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(15, 23, 42, 0.7);
 }
 
 .treatment-card--critical {
-  background: #fef2f2;
-  border-color: #ef4444;
+  border-left: 8px solid #ef4444;
 }
 
 .treatment-card--high {
-  background: #fff7ed;
-  border-color: #f97316;
+  border-left: 8px solid #f97316;
 }
 
 .treatment-card__header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .treatment-card__icon {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
 }
 
 .treatment-card__title {
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: #1e293b;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #ffffff;
+  letter-spacing: -0.01em;
 }
 
 .treatment-card__description {
   margin: 0;
-  font-size: 0.875rem;
-  color: #475569;
-  line-height: 1.5;
+  font-size: 1rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  font-weight: 500;
 }
 
 .treatment-panel__empty {
   text-align: center;
-  padding: 3rem;
-  background: #f0fdf4;
-  border: 1px solid #22c55e;
-  border-radius: 8px;
+  padding: 5rem 3rem;
+  background: rgba(34, 197, 94, 0.05);
+  border: 2px dashed rgba(34, 197, 94, 0.2);
+  border-radius: 30px;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .treatment-panel__empty-icon {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
 }
 
 .treatment-panel__empty-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #16a34a;
-  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  color: #4ade80;
+  margin-bottom: 0.75rem;
 }
 
 .treatment-panel__empty-text {
-  font-size: 1rem;
-  color: #64748b;
-  margin: 0;
+  color: #94a3b8;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 600px) {
+  .treatment-panel__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.treatment-panel__empty {
+  text-align: center;
+  padding: 5rem 3rem;
+  background: rgba(34, 197, 94, 0.08);
+  border: 2px dashed rgba(34, 197, 94, 0.4);
+  border-radius: 30px;
+  animation: pulse-subtle 4s infinite ease-in-out;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+.treatment-panel__empty-icon {
+  font-size: 4.5rem;
+  margin-bottom: 2rem;
+  filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.5));
+}
+
+.treatment-panel__empty-title {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #4ade80;
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+}
+
+.treatment-panel__empty-text {
+  font-size: 1.15rem;
+  color: #cbd5e1;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+@media (max-width: 850px) {
+  .treatment-panel__list {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .treatment-card {
+    padding: 1.5rem;
+  }
+  .treatment-card__title {
+    font-size: 1.1rem;
+  }
+  .treatment-card__description {
+    font-size: 0.95rem;
+  }
 }
 </style>

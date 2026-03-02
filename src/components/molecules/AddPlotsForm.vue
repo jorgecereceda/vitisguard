@@ -115,9 +115,9 @@ function handleBackdropClick(event: MouseEvent) {
     <div v-if="show" class="modal-mask" @click="handleBackdropClick">
       <div class="modal-container" @click.stop>
         <header class="modal-header">
-          <h2>{{ isEditing ? 'Editar Parcela' : 'Nueva Parcela' }}</h2>
-          <button type="button" class="close-btn" @click="handleClose">
-            ×
+          <h2 class="modal-title">{{ isEditing ? 'Editar Parcela' : 'Nueva Parcela' }}</h2>
+          <button type="button" class="close-btn" @click="handleClose" aria-label="Cerrar">
+            <span class="close-icon">×</span>
           </button>
         </header>
 
@@ -177,7 +177,7 @@ function handleBackdropClick(event: MouseEvent) {
   </Transition>
 </template>
 
-<style>
+<style scoped>
 .modal-mask {
   position: fixed;
   z-index: 9998;
@@ -185,99 +185,151 @@ function handleBackdropClick(event: MouseEvent) {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
   display: flex;
   transition: opacity 0.3s ease;
+  padding: 1.5rem;
 }
 
 .modal-container {
   width: 100%;
-  max-width: 480px;
+  max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
   margin: auto;
-  padding: 0;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  background-color: #0e3124;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+  position: relative;
+  color: #ffffff;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 2rem 2.5rem 1rem;
 }
 
-.modal-header h2 {
+.modal-header h2.modal-title {
   margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #111827;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
 }
 
 .close-btn {
-  background: none;
+  background: rgba(255, 255, 255, 0.05);
   border: none;
-  font-size: 28px;
-  color: #6b7280;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 20px;
+  color: #a1bfa1;
   cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
 .close-btn:hover {
-  color: #111827;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: rotate(90deg);
 }
 
 .modal-form {
-  padding: 24px;
+  padding: 1.5rem 2.5rem 2.5rem;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1.25rem;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 1.25rem;
 }
 
 .form-actions {
   display: flex;
-  gap: 12px;
+  gap: 1rem;
   justify-content: flex-end;
-  padding-top: 8px;
+  padding-top: 1.5rem;
 }
 
-.modal-enter-from {
-  opacity: 0;
+/* Customizing BaseButton classes if they were provided, otherwise using internal button styles */
+.action-btn {
+  padding: 0.8rem 1.75rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
 }
 
-.modal-leave-to {
-  opacity: 0;
+.action-btn--primary {
+  background-color: #24634d;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+.action-btn--primary:hover {
+  transform: translateY(-1px);
+  background-color: #2c7a5f;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.action-btn--secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: #a1bfa1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Modal Transitions */
+.modal-enter-from { opacity: 0; }
+.modal-leave-to { opacity: 0; }
 .modal-enter-from .modal-container,
 .modal-leave-to .modal-container {
-  transform: scale(1.1);
+  transform: scale(0.9) translateY(20px);
+  opacity: 0;
 }
 
 @media (max-width: 480px) {
   .modal-container {
     max-width: 100%;
-    margin: 16px;
+  }
+
+  .modal-form {
+    padding: 1.5rem;
+  }
+
+  .modal-header {
+    padding: 1.5rem 1.5rem 0.5rem;
   }
 
   .form-row {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .form-actions {
     flex-direction: column-reverse;
+  }
+
+  .action-btn {
+    width: 100%;
   }
 }
 </style>

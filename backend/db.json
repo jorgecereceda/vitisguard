@@ -193,6 +193,22 @@
       "denomination": "Bizkaia",
       "userId": "",
       "id": "7e5f"
+    },
+    {
+      "name": "LAS ARENAS",
+      "latitude": 43.326,
+      "longitude": -3.007,
+      "denomination": "Alava",
+      "userId": "",
+      "id": "236a"
+    },
+    {
+      "name": "Getxo",
+      "latitude": 43.3571,
+      "longitude": -3.0116,
+      "denomination": "Bizkaia",
+      "userId": "",
+      "id": "2c0e"
     }
   ]
 }
