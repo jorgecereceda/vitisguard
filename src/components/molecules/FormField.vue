@@ -12,6 +12,7 @@ interface Props {
   required?: boolean
   disabled?: boolean
   icon?: string
+  classNameInput?: string
 }
 
 withDefaults(defineProps<Props>(), {
@@ -43,6 +44,7 @@ const emit = defineEmits<{
       :error="error"
       :required="required"
       :disabled="disabled"
+      :className="classNameInput"
       @update:model-value="emit('update:modelValue', $event)"
       @blur="emit('blur', $event)"
     />

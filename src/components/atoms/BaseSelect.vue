@@ -30,7 +30,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="base-select" :class="{ 'has-error': error }">
-    <label v-if="label" :for="id" :class="['base-select__label', className]">
+    <label v-if="label" :for="id" class="base-select__label">
       {{ label }}<span v-if="required" class="required">*</span>
     </label>
     <select
@@ -39,7 +39,8 @@ const emit = defineEmits<{
       :value="modelValue"
       :required="required"
       :disabled="disabled"
-      :class="['base-select__input', className]"
+      class="base-select__input"
+      :class="className"
       @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
     >
       <option v-for="option in options" :key="option.value" :value="option.value">
@@ -88,6 +89,16 @@ const emit = defineEmits<{
   background-size: 18px;
   padding-right: 45px;
   backdrop-filter: blur(5px);
+}
+
+.select-claro{
+  color: rgb(104, 104, 104);
+  border: 1px solid rgb(104, 104, 104);
+  background-size: 18px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgb(104, 104, 104)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
 }
 
 .base-select__input:focus {

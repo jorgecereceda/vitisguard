@@ -37,6 +37,7 @@ watch(selectedPeriod, (newPeriod) => {
         v-model="selectedPeriod"
         :options="periods"
         :disabled="alertsStore.isLoading"
+        :class-name="'select-claro'"
       />
     </div>
     <div v-if="alertsStore.isLoading" class="alert-stats-section__loading">
