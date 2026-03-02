@@ -13,6 +13,7 @@ interface Props {
   error?: string
   required?: boolean
   disabled?: boolean
+  className?: string
 }
 
 withDefaults(defineProps<Props>(), {
@@ -29,7 +30,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="base-select" :class="{ 'has-error': error }">
-    <label v-if="label" :for="id" class="base-select__label">
+    <label v-if="label" :for="id" :class="['base-select__label', className]">
       {{ label }}<span v-if="required" class="required">*</span>
     </label>
     <select
@@ -38,7 +39,7 @@ const emit = defineEmits<{
       :value="modelValue"
       :required="required"
       :disabled="disabled"
-      class="base-select__input"
+      :class="['base-select__input', className]"
       @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
     >
       <option v-for="option in options" :key="option.value" :value="option.value">

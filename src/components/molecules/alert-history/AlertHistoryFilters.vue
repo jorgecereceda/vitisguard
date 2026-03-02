@@ -49,6 +49,7 @@ watch(selectedPeriod, (value) => {
       v-model="selectedCategory"
       :options="categories"
       :disabled="disabled"
+      :className="'select-claro'"
     />
     <BaseSelect
       id="period-filter"
@@ -56,6 +57,7 @@ watch(selectedPeriod, (value) => {
       v-model="selectedPeriod"
       :options="periods"
       :disabled="disabled"
+      :className="'select-claro'"
     />
   </div>
 </template>
@@ -69,5 +71,9 @@ watch(selectedPeriod, (value) => {
 
 .alert-history-filters > * {
   min-width: 180px;
+}
+
+.select-claro{
+  color: gray;
 }
 </style>
