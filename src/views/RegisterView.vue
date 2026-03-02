@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import AuthCard from '@/components/organisms/AuthCard.vue'
 import AuthForm from '@/components/organisms/AuthForm.vue'
 import AuthSwitch from '@/components/molecules/AuthSwitch.vue'
@@ -14,13 +15,17 @@ interface FormData {
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { showError } = useToast()
 
 async function handleRegister(data: FormData) {
   try {
     await authStore.register(data.name, data.email, data.password)
     router.push('/login')
   } catch {
-    // Error handled by store
+    if (authStore.error) {
+      showError(authStore.error)
+      authStore.clearError()
+    }
   }
 }
 </script>
