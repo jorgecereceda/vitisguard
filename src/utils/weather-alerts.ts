@@ -1,4 +1,4 @@
-import type { WeatherAlert, WeatherAlertType, RiskLevel } from '@/types/disease'
+import type { WeatherAlert, WeatherAlertType, RiskLevel, WeatherForecastRisk } from '@/types/disease'
 
 export interface WeatherAlertConfig {
   type: WeatherAlertType
@@ -81,98 +81,99 @@ export function generateWeatherAlerts(
   humidity: number | null,
   precipitation: number | null,
   windSpeed: number | null,
-  daysWithoutRain: number = 0
+  minDailyTemp: number | null = null,
+  maxDailyTemp: number | null = null,
+  soilMoisture: number | null = null
 ): WeatherAlert[] {
   const alerts: WeatherAlert[] = []
   const now = new Date()
   const month = now.getMonth() + 1
 
-  if (temperature !== null) {
-    if (temperature < 0) {
+  if (minDailyTemp !== null) {
+    if (minDailyTemp < 2) {
       alerts.push({
         id: `frost-${now.getTime()}`,
         category: 'weather',
         type: 'frost',
-        level: temperature < -5 ? 'critical' : 'high',
+        level: minDailyTemp < 0 ? 'critical' : 'high',
         title: WEATHER_ALERT_CONFIGS.frost.title,
-        description: `Temperatura actual: ${temperature}°C`,
+        description: `Temperatura mínima: ${minDailyTemp.toFixed(1)}°C`,
         recommendation: WEATHER_ALERT_CONFIGS.frost.recommendations[
-          temperature < -5 ? 'critical' : 'high'
+          minDailyTemp < 0 ? 'critical' : 'high'
         ],
         detectedAt: now,
       })
     }
 
-    if (temperature < 3 && month >= 3 && month <= 5) {
+    if (minDailyTemp < 3 && month >= 3 && month <= 5) {
       alerts.push({
         id: `lateFrost-${now.getTime()}`,
         category: 'weather',
         type: 'lateFrost',
-        level: temperature < 0 ? 'critical' : 'high',
+        level: minDailyTemp < 0 ? 'critical' : 'high',
         title: WEATHER_ALERT_CONFIGS.lateFrost.title,
-        description: `Temperatura: ${temperature}°C en primavera`,
+        description: `Temperatura mínima: ${minDailyTemp.toFixed(1)}°C en primavera`,
         recommendation: WEATHER_ALERT_CONFIGS.lateFrost.recommendations[
-          temperature < 0 ? 'critical' : 'high'
+          minDailyTemp < 0 ? 'critical' : 'high'
         ],
         detectedAt: now,
       })
     }
+  }
 
-    if (temperature > 35) {
+  if (maxDailyTemp !== null) {
+    if (maxDailyTemp > 32) {
       alerts.push({
         id: `heatwave-${now.getTime()}`,
         category: 'weather',
         type: 'heatwave',
-        level: temperature > 40 ? 'critical' : 'high',
+        level: maxDailyTemp > 40 ? 'critical' : 'high',
         title: WEATHER_ALERT_CONFIGS.heatwave.title,
-        description: `Temperatura: ${temperature}°C`,
+        description: `Temperatura máxima: ${maxDailyTemp.toFixed(1)}°C`,
         recommendation: WEATHER_ALERT_CONFIGS.heatwave.recommendations[
-          temperature > 40 ? 'critical' : 'high'
+          maxDailyTemp > 40 ? 'critical' : 'high'
         ],
         detectedAt: now,
       })
     }
   }
 
-  if (precipitation !== null && windSpeed !== null) {
-    if (precipitation > 50 && windSpeed > 50) {
-      alerts.push({
-        id: `storm-${now.getTime()}`,
-        category: 'weather',
-        type: 'storm',
-        level: 'critical',
-        title: WEATHER_ALERT_CONFIGS.storm.title,
-        description: `Precipitación: ${precipitation}mm/h, Viento: ${windSpeed}km/h`,
-        recommendation: WEATHER_ALERT_CONFIGS.storm.recommendations.critical,
-        detectedAt: now,
-      })
-    }
-  }
-
-  if (daysWithoutRain >= 7) {
-    const level = daysWithoutRain >= 14 ? 'critical' : daysWithoutRain >= 10 ? 'high' : 'medium'
+  if (windSpeed !== null && windSpeed > 50) {
     alerts.push({
-      id: `drought-${now.getTime()}`,
+      id: `storm-${now.getTime()}`,
       category: 'weather',
-      type: 'drought',
-      level,
-      title: WEATHER_ALERT_CONFIGS.drought.title,
-      description: `${daysWithoutRain} días sin lluvia`,
-      recommendation: WEATHER_ALERT_CONFIGS.drought.recommendations[level],
+      type: 'storm',
+      level: 'high',
+      title: WEATHER_ALERT_CONFIGS.storm.title,
+      description: `Viento: ${windSpeed.toFixed(0)} km/h`,
+      recommendation: WEATHER_ALERT_CONFIGS.storm.recommendations.high,
       detectedAt: now,
     })
   }
 
-  if (precipitation !== null && precipitation > 100) {
+  if (precipitation !== null && precipitation === 0 && soilMoisture !== null && soilMoisture < 20) {
+    alerts.push({
+      id: `drought-${now.getTime()}`,
+      category: 'weather',
+      type: 'drought',
+      level: 'medium',
+      title: WEATHER_ALERT_CONFIGS.drought.title,
+      description: 'Sin precipitación y humedad del suelo baja',
+      recommendation: WEATHER_ALERT_CONFIGS.drought.recommendations.medium,
+      detectedAt: now,
+    })
+  }
+
+  if (precipitation !== null && precipitation > 10) {
     alerts.push({
       id: `excessiveRain-${now.getTime()}`,
       category: 'weather',
       type: 'excessiveRain',
-      level: precipitation > 150 ? 'critical' : 'high',
+      level: precipitation > 100 ? 'critical' : precipitation > 50 ? 'high' : 'medium',
       title: WEATHER_ALERT_CONFIGS.excessiveRain.title,
-      description: `Precipitación: ${precipitation}mm en las últimas horas`,
+      description: `Precipitación: ${precipitation.toFixed(1)}mm`,
       recommendation: WEATHER_ALERT_CONFIGS.excessiveRain.recommendations[
-        precipitation > 150 ? 'critical' : 'high'
+        precipitation > 100 ? 'critical' : precipitation > 50 ? 'high' : 'medium'
       ],
       detectedAt: now,
     })
@@ -265,6 +266,73 @@ export function generateIrrigationRecommendation(
     recommendation: 'Mantener rutina de riego actual.',
     detectedAt: now,
   }
+}
+
+export interface DailyWeatherForecast {
+  date: string
+  tempMin: number | null
+  tempMax: number | null
+  precipitation: number | null
+  windSpeed: number | null
+}
+
+const WEATHER_RISK_NAMES: Record<string, string> = {
+  frost: 'Helada',
+  lateFrost: 'Helada Tardía',
+  heatwave: 'Ola de Calor',
+  storm: 'Tormenta',
+  drought: 'Sequía',
+  excessiveRain: 'Exceso de Lluvia',
+}
+
+export function analyzeWeatherForecastRisks(
+  forecast: DailyWeatherForecast[]
+): WeatherForecastRisk[] {
+  const riskTypes: WeatherAlertType[] = [
+    'frost',
+    'heatwave',
+    'storm',
+    'drought',
+    'excessiveRain'
+  ]
+
+  return riskTypes.map(type => {
+    let highRiskDays = 0
+    let criticalRiskDays = 0
+
+    forecast.forEach(day => {
+      const alerts = generateWeatherAlerts(
+        day.tempMax ?? null,
+        null,
+        day.precipitation ?? null,
+        day.windSpeed ?? null,
+        day.tempMin ?? null,
+        day.tempMax ?? null,
+        null
+      )
+
+      const alert = alerts.find(a => a.type === type)
+      if (alert) {
+        if (alert.level === 'critical') {
+          criticalRiskDays++
+        } else if (alert.level === 'high') {
+          highRiskDays++
+        }
+      }
+
+      if (type === 'drought' && day.precipitation !== null && day.precipitation === 0) {
+        highRiskDays++
+      }
+    })
+
+    return {
+      type,
+      name: WEATHER_RISK_NAMES[type] || type,
+      highRiskDays,
+      criticalRiskDays,
+      totalDays: forecast.length,
+    }
+  })
 }
 
 export interface IrrigationRecommendation {

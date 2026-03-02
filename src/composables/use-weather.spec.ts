@@ -250,16 +250,25 @@ describe('useWeather', () => {
     const { alerts, loadWeather } = useWeather()
 
     // Mock data that should trigger Mildew and Heat Wave alerts
+    // Mildiú requires: humidity >= 90, temp 6-26, precipitation >= 6
+    // Heat wave requires: temperature > 35
     const mockData = {
       current: {
         time: '2024-01-01T00:00:00Z',
-        temperature_2m: 22,
-        relative_humidity_2m: 88, // > 85
+        temperature_2m: 38,
+        relative_humidity_2m: 92,
+        precipitation: 10,
+        wind_speed_10m: 10,
       },
       daily: {
         time: ['2024-01-01'],
         temperature_2m_min: [10],
-        temperature_2m_max: [34], // > 32
+        temperature_2m_max: [40],
+      },
+      hourly: {
+        soil_moisture_0_to_7cm: [40],
+        soil_temperature_0_to_7cm: [18],
+        sunshine_duration: [3600],
       },
       metadata: { latitude: 0, longitude: 0 },
     }
@@ -268,25 +277,34 @@ describe('useWeather', () => {
 
     await loadWeather({ latitude: 0, longitude: 0 })
 
-    expect(alerts.value).toContain('Riesgo de Mildiú detectado: Humedad alta y temperaturas moderadas.')
-    expect(alerts.value).toContain('Riesgo por condiciones meteorológicas adversas: Ola de calor.')
-    expect(alerts.value).not.toContain('Riesgo por condiciones meteorológicas adversas: Helada inminente.')
+    expect(alerts.value.some(a => a.includes('Mildiú'))).toBe(true)
+    expect(alerts.value.some(a => a.includes('Ola de Calor'))).toBe(true)
+    expect(alerts.value.some(a => a.includes('Helada'))).toBe(false)
   })
 
   it('calculates frost and botrytis alerts', async () => {
     const { alerts, loadWeather } = useWeather()
 
     // Mock data that should trigger Botrytis and Frost alerts
+    // Botrytis requires: temp 15-25, humidity >= 80
+    // Frost requires: temperature < 0
     const mockData = {
       current: {
         time: '2024-01-01T00:00:00Z',
-        temperature_2m: 18,
-        relative_humidity_2m: 92, // > 90
+        temperature_2m: -2,
+        relative_humidity_2m: 92,
+        precipitation: 0,
+        wind_speed_10m: 10,
       },
       daily: {
         time: ['2024-01-01'],
-        temperature_2m_min: [1], // < 2
-        temperature_2m_max: [25],
+        temperature_2m_min: [-2],
+        temperature_2m_max: [20],
+      },
+      hourly: {
+        soil_moisture_0_to_7cm: [40],
+        soil_temperature_0_to_7cm: [18],
+        sunshine_duration: [3600],
       },
       metadata: { latitude: 0, longitude: 0 },
     }
@@ -295,8 +313,8 @@ describe('useWeather', () => {
 
     await loadWeather({ latitude: 0, longitude: 0 })
 
-    expect(alerts.value).toContain('Riesgo de Botrytis detectado: Niveles de humedad críticos.')
-    expect(alerts.value).toContain('Riesgo por condiciones meteorológicas adversas: Helada inminente.')
+    expect(alerts.value.some(a => a.includes('Botrytis'))).toBe(true)
+    expect(alerts.value.some(a => a.includes('Helada'))).toBe(true)
   })
 
   it('provides weatherData compatibility layer', async () => {

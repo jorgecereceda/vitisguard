@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import type { DiseaseType, DiseaseRisk, WeatherConditions } from '@/types/disease'
+import type { DiseaseType, DiseaseRisk, WeatherConditions, DailyForecastData, DiseaseForecastRisk } from '@/types/disease'
 import { DISEASE_CONFIGS, calculateRiskLevel } from '@/utils/disease-thresholds'
 
 export function useDiseaseDetection() {
@@ -137,11 +137,52 @@ export function useDiseaseDetection() {
       risks.some(r => r.level === 'high' || r.level === 'critical')
   })
 
+  function analyzeForecastRisks(forecast: DailyForecastData[]): DiseaseForecastRisk[] {
+    const diseases: DiseaseType[] = ['mildiu', 'botrytis', 'oidio', 'excoriosis']
+    const diseaseNames: Record<DiseaseType, string> = {
+      mildiu: 'Mildiú',
+      botrytis: 'Botrytis',
+      oidio: 'Oídio',
+      excoriosis: 'Excoriosis',
+    }
+
+    return diseases.map(disease => {
+      const dailyRisks: DiseaseRisk[] = forecast.map((day, index) => {
+        const conditions: WeatherConditions = {
+          temperature: day.temperature,
+          humidity: day.humidity,
+          precipitation: day.precipitation,
+          soilMoisture: null,
+          soilTemperature: null,
+          sunshineHours: null,
+          windSpeed: null,
+        }
+        return {
+          ...analyzeDisease(disease, conditions),
+          id: `disease-${disease}-day-${index}`,
+        }
+      })
+
+      const highRiskDays = dailyRisks.filter(r => r.level === 'high').length
+      const criticalRiskDays = dailyRisks.filter(r => r.level === 'critical').length
+
+      return {
+        disease,
+        name: diseaseNames[disease],
+        highRiskDays,
+        criticalRiskDays,
+        totalDays: forecast.length,
+        dailyRisks,
+      }
+    })
+  }
+
   return {
     analyzeDisease,
     analyzeAllDiseases,
     getHighRiskDiseases,
     getRecommendations,
     hasHighRisk,
+    analyzeForecastRisks,
   }
 }
