@@ -5,6 +5,7 @@ import RegisterView from '@/views/RegisterView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import PlotsView from '@/views/PlotsView.vue'
 import AlertsView from '@/views/AlertsView.vue'
+import AlertHistoryView from '@/views/AlertHistoryView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,12 @@ const router = createRouter({
       path: '/alerts',
       name: 'alerts',
       component: AlertsView
+    },
+    {
+      path: '/alert-history',
+      name: 'alert-history',
+      component: AlertHistoryView,
+      meta: { requiresAuth: true }
     }
   ]
 })
