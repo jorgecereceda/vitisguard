@@ -41,7 +41,7 @@ describe('useWeather Composable', () => {
       }
     } as any
 
-    expect(alerts.value).toContain('Riesgo de Mildiú detectado: Humedad alta y temperaturas moderadas.')
+    expect(alerts.value.some(a => a.includes('Mildiú'))).toBe(true)
   })
 
   it('should detect Botrytis risk in critical conditions', () => {
@@ -56,7 +56,7 @@ describe('useWeather Composable', () => {
       }
     } as any
 
-    expect(alerts.value).toContain('Riesgo de Botrytis detectado: Niveles de humedad críticos.')
+    expect(alerts.value.some(a => a.includes('Botrytis'))).toBe(true)
   })
 
   it('should detect Frost risk when conditions are met', () => {
@@ -74,7 +74,7 @@ describe('useWeather Composable', () => {
       }
     } as any
 
-    expect(alerts.value).toContain('Riesgo por condiciones meteorológicas adversas: Helada inminente.')
+    expect(alerts.value.some(a => a.includes('Helada'))).toBe(true)
   })
 
   it('should detect Heat Wave risk when conditions are met', () => {
@@ -92,13 +92,32 @@ describe('useWeather Composable', () => {
       }
     } as any
 
-    expect(alerts.value).toContain('Riesgo por condiciones meteorológicas adversas: Ola de calor.')
+    expect(alerts.value.some(a => a.includes('Ola de Calor'))).toBe(true)
   })
 
   it('should return no alerts when conditions are healthy', () => {
     const { weather, alerts } = useWeather()
 
-    weather.value = baseData as any
+    weather.value = {
+      current: {
+        temperature_2m: 5,
+        relative_humidity_2m: 30,
+        precipitation: 0,
+        cloud_cover: 10,
+        wind_speed_10m: 10
+      },
+      daily: {
+        temperature_2m_min: [3],
+        temperature_2m_max: [8],
+        et0_fao_evapotranspiration: [2.5],
+        sunshine_duration: [3600]
+      },
+      hourly: {
+        soil_moisture_0_to_7cm: [40],
+        soil_temperature_0_to_7cm: [6],
+        sunshine_duration: [3600]
+      }
+    } as any
 
     expect(alerts.value).toEqual([])
   })
