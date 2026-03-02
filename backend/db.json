@@ -195,20 +195,20 @@
       "id": "7e5f"
     },
     {
-      "name": "LAS ARENAS",
-      "latitude": 43.326,
-      "longitude": -3.007,
-      "denomination": "Alava",
-      "userId": "",
-      "id": "236a"
-    },
-    {
       "name": "Getxo",
       "latitude": 43.3571,
-      "longitude": -3.0116,
-      "denomination": "Bizkaia",
+      "longitude": -3.324,
+      "denomination": "Alava",
       "userId": "",
-      "id": "2c0e"
+      "id": "22a8"
+    },
+    {
+      "name": "vn  n n",
+      "latitude": 43.263,
+      "longitude": -3.324,
+      "denomination": "Alava",
+      "userId": "8dba",
+      "id": "d42d"
     }
   ]
 }

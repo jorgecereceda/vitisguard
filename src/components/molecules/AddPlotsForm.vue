@@ -94,7 +94,7 @@ function handleSubmit() {
     latitude: parseFloat(formData.value.latitude),
     longitude: parseFloat(formData.value.longitude),
     denomination: formData.value.denomination,
-    userId: ''
+    userId: props.initialData?.userId ?? ''
   })
 }
 
