@@ -1,4 +1,4 @@
-import type { Alert, AlertStats, HistoricalAlertOptions } from '@/types/alert'
+import type { Alert, AlertStats } from '@/types/alert'
 import type { Parcel, WeatherLocation, DailyData } from '@/types/weather'
 import { processHistoricalData } from './alert-processor'
 
@@ -93,6 +93,24 @@ export async function deleteAlert(id: string): Promise<void> {
   }
 }
 
+export async function deleteAllAlerts(): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/alerts`, {
+    method: 'GET'
+  })
+
+  if (!response.ok) {
+    return
+  }
+
+  const alerts: Alert[] = await response.json()
+
+  for (const alert of alerts) {
+    await fetch(`${API_BASE_URL}/alerts/${alert.id}`, {
+      method: 'DELETE'
+    })
+  }
+}
+
 export async function getAlertStats(): Promise<AlertStats[]> {
   const response = await fetch(`${API_BASE_URL}/alertStats`)
 
@@ -151,12 +169,9 @@ export async function updateAlertStats(
 
 async function fetchHistoricalWeatherFromOpenMeteo(
   location: WeatherLocation,
-  year: number,
-  _pastDays: number = 365
+  startDate: string,
+  endDate: string
 ): Promise<DailyData> {
-  const startDate = `${year - 1}-01-01`
-  const endDate = `${year - 1}-12-31`
-
   const params = new URLSearchParams({
     latitude: location.latitude.toString(),
     longitude: location.longitude.toString(),
@@ -207,33 +222,36 @@ async function fetchHistoricalWeatherFromOpenMeteo(
 
 export async function generateHistoricalAlertsForPlot(
   plot: Parcel,
-  options: HistoricalAlertOptions
+  startDate: string,
+  endDate: string,
+  year: number
 ): Promise<Alert[]> {
-  const { year } = options
   const location: WeatherLocation = {
     latitude: plot.latitude,
     longitude: plot.longitude
   }
 
-  const historicalData = await fetchHistoricalWeatherFromOpenMeteo(location, year)
+  const historicalData = await fetchHistoricalWeatherFromOpenMeteo(
+    location,
+    startDate,
+    endDate
+  )
 
   const alerts = processHistoricalData(
     historicalData,
     plot.id,
     plot.userId,
-    year - 1
+    year
   )
-
-  if (alerts.length > 0) {
-    await createAlerts(alerts)
-  }
 
   return alerts
 }
 
 export async function generateHistoricalAlertsForUser(
   userId: string,
-  options: HistoricalAlertOptions
+  startDate: string,
+  endDate: string,
+  year: number
 ): Promise<Alert[]> {
   const userPlotsResponse = await fetch(`${API_BASE_URL}/plots?userId=${userId}`)
 
@@ -245,8 +263,17 @@ export async function generateHistoricalAlertsForUser(
   const allAlerts: Alert[] = []
 
   for (const plot of plots) {
-    const plotAlerts = await generateHistoricalAlertsForPlot(plot, options)
+    const plotAlerts = await generateHistoricalAlertsForPlot(
+      plot,
+      startDate,
+      endDate,
+      year
+    )
     allAlerts.push(...plotAlerts)
+  }
+
+  if (allAlerts.length > 0) {
+    await createAlerts(allAlerts)
   }
 
   return allAlerts

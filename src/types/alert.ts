@@ -61,3 +61,9 @@ export interface HistoricalAlertOptions {
   year: number
   pastDays?: number
 }
+
+export interface AlertLogApi {
+  id: string
+  lastQueryDate: string
+  yearGenerated: number
+}

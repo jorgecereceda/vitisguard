@@ -6,10 +6,10 @@ import {
   getAlertStats,
   getAlertStatsByPeriod,
   deleteAlert,
+  deleteAllAlerts,
   createAlert,
   generateHistoricalAlertsForUser
 } from '@/services/alert-api'
-import type { HistoricalAlertOptions } from '@/types/alert'
 
 export const useAlertsStore = defineStore('alerts', () => {
   const alerts = ref<Alert[]>([])
@@ -82,14 +82,38 @@ export const useAlertsStore = defineStore('alerts', () => {
     }
   }
 
-  async function generateHistoricalAlerts(userId: string, options: HistoricalAlertOptions) {
+  async function generateHistoricalAlerts(
+    userId: string,
+    startDate: string,
+    endDate: string,
+    year: number
+  ) {
     isLoading.value = true
     error.value = null
     try {
-      const generatedAlerts = await generateHistoricalAlertsForUser(userId, options)
+      const generatedAlerts = await generateHistoricalAlertsForUser(
+        userId,
+        startDate,
+        endDate,
+        year
+      )
       return generatedAlerts
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to generate historical alerts'
+      throw e
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function clearAllAlerts() {
+    isLoading.value = true
+    error.value = null
+    try {
+      await deleteAllAlerts()
+      alerts.value = []
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Failed to clear alerts'
       throw e
     } finally {
       isLoading.value = false
@@ -112,6 +136,7 @@ export const useAlertsStore = defineStore('alerts', () => {
     removeAlert,
     addAlert,
     generateHistoricalAlerts,
+    clearAllAlerts,
     clearError
   }
 })
