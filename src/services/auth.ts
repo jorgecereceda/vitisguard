@@ -7,19 +7,19 @@ export async function login(credentials: LoginCredentials): Promise<User> {
   const response = await fetch(`${API_BASE_URL}/users?email=${credentials.email}`)
 
   if (!response.ok) {
-    throw new Error('Failed to connect to server')
+    throw new Error('Error conectando al servidor. Intenta más tarde.')
   }
 
   const users: User[] = await response.json()
   const user = users.find((u) => u.email === credentials.email)
 
   if (!user) {
-    throw new Error('Invalid email or password')
+    throw new Error('El email no está registrado')
   }
 
   const isValid = await verifyPassword(credentials.password, user.password)
   if (!isValid) {
-    throw new Error('Invalid email or password')
+    throw new Error('Contraseña incorrecta')
   }
 
   return user
@@ -29,13 +29,13 @@ export async function register(data: RegisterData): Promise<User> {
   const checkResponse = await fetch(`${API_BASE_URL}/users?email=${data.email}`)
 
   if (!checkResponse.ok) {
-    throw new Error('Failed to connect to server')
+    throw new Error('Error conectando al servidor. Intenta más tarde.')
   }
 
   const existingUsers: User[] = await checkResponse.json()
 
   if (existingUsers.length > 0) {
-    throw new Error('Email already registered')
+    throw new Error('El email ya está registrado')
   }
 
   const hashedPassword = await hashPassword(data.password)
@@ -53,7 +53,7 @@ export async function register(data: RegisterData): Promise<User> {
   })
 
   if (!createResponse.ok) {
-    throw new Error('Failed to create user')
+    throw new Error('Error al crear el usuario. Intenta más tarde.')
   }
 
   const newUser: User = await createResponse.json()

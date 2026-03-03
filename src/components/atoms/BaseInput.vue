@@ -8,6 +8,7 @@ interface Props {
   name: string
   required?: boolean
   disabled?: boolean
+  className?: string
 }
 
 withDefaults(defineProps<Props>(), {
@@ -38,7 +39,10 @@ function handleInput(event: Event) {
     :placeholder="placeholder"
     :required="required"
     :disabled="disabled"
-    :class="{ 'has-error': error }"
+    :class="[
+      { 'has-error': error}, 
+      className
+    ]"
     class="base-input"
     @input="handleInput"
     @blur="emit('blur', $event)"
@@ -85,6 +89,11 @@ function handleInput(event: Event) {
 
 .base-input.has-error:focus {
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+}
+
+.input-claro{
+  color: rgb(104, 104, 104);
+  border: 1px solid rgb(104, 104, 104);
 }
 
 @media (max-width: 640px) {

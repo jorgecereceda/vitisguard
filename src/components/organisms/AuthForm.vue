@@ -134,6 +134,7 @@ function getFieldError(field: 'name' | 'email' | 'password'): string {
       type="text"
       placeholder="Enter your name"
       required
+      :classNameInput="'input-claro'"
       :error="getFieldError('name')"
       :disabled="loading"
       @blur="validateField('name')"
@@ -147,6 +148,7 @@ function getFieldError(field: 'name' | 'email' | 'password'): string {
       type="email"
       placeholder="Enter your email"
       required
+      :classNameInput="'input-claro'"
       :error="getFieldError('email')"
       :disabled="loading"
       @blur="validateField('email')"
@@ -160,6 +162,7 @@ function getFieldError(field: 'name' | 'email' | 'password'): string {
       type="password"
       placeholder="Enter your password"
       required
+      :classNameInput="'input-claro'"
       :error="getFieldError('password')"
       :disabled="loading"
       @blur="validateField('password')"

@@ -218,5 +218,145 @@
       "userId": "8dba",
       "id": "2369"
     }
+  ],
+  "alerts": [
+    {
+      "id": "a001",
+      "category": "disease",
+      "type": "mildiu",
+      "level": "high",
+      "title": "Riesgo de Mildiu detectado",
+      "description": "Temperatura entre 10-25°C y humedad relativa superior al 85% durante 6+ horas. Condiciones favorables para desarrollo de mildiu.",
+      "recommendation": "Aplicar fungicida preventivo y aumentar aireación en espalderas. Revisar hojas inferiores.",
+      "detectedAt": "2025-04-12T09:00:00.000Z",
+      "plotId": "p001",
+      "userId": "b897"
+    },
+    {
+      "id": "a002",
+      "category": "weather",
+      "type": "frost",
+      "level": "critical",
+      "title": "Alerta de Helada",
+      "description": "Temperatura minima prevista de -2°C en las proximas 6 horas. Riesgo de daño en brotaciones recientes.",
+      "recommendation": "Cubrir parcelas con manta térmica. Activar sistemas de riego por aspersión antes del amanecer.",
+      "detectedAt": "2025-03-08T22:00:00.000Z",
+      "plotId": "p001",
+      "userId": "b897"
+    },
+    {
+      "id": "a003",
+      "category": "disease",
+      "type": "botrytis",
+      "level": "medium",
+      "title": "Riesgo de Botrytis",
+      "description": "Humedad muy alta (90%+) y temperaturas moderadas (15-20°C). Favorables para podredumbre gris.",
+      "recommendation": "Eliminar racimos afectados. Mejorar ventilación. Aplicar tratamiento fungicida.",
+      "detectedAt": "2025-05-20T14:30:00.000Z",
+      "plotId": "p002",
+      "userId": "b897"
+    },
+    {
+      "id": "a004",
+      "category": "weather",
+      "type": "heatwave",
+      "level": "high",
+      "title": "Ola de Calor",
+      "description": "Temperaturas maximas superiores a 35°C durante 3 dias consecutivos. Estrés térmico en viñedos.",
+      "recommendation": "Activar riego por goteo al amanecer. Evitar podas en estas condiciones. Sombrear racimos expuestos.",
+      "detectedAt": "2025-07-15T11:00:00.000Z",
+      "plotId": "p003",
+      "userId": "b097"
+    },
+    {
+      "id": "a005",
+      "category": "irrigation",
+      "type": "irrigation",
+      "level": "high",
+      "title": "Deficit de Riego",
+      "description": "Soil moisture muy bajo (15%). Estrés hídrico detectado en las ultimas 48 horas.",
+      "recommendation": "Incrementar frecuencia de riego. Aplicar 20% más de agua en horario nocturno.",
+      "detectedAt": "2025-08-03T08:00:00.000Z",
+      "plotId": "p004",
+      "userId": "b097"
+    },
+    {
+      "id": "a006",
+      "category": "weather",
+      "type": "excessiveRain",
+      "level": "medium",
+      "title": "Exceso de Precipitación",
+      "description": "Precipitacion acumulada de 80mm en 24 horas. Riesgo de lavado de tratamientos y enfermedades fúngicas.",
+      "recommendation": "Verificar drenaje. Re-aplicar tratamientos fitosanitarios tras estabilización.",
+      "detectedAt": "2025-06-10T16:00:00.000Z",
+      "plotId": "p005",
+      "userId": "b097"
+    },
+    {
+      "id": "a007",
+      "category": "disease",
+      "type": "oidio",
+      "level": "low",
+      "title": "Riesgo de Oidio",
+      "description": "Condiciones moderadas para oidio. Temperaturas 20-28°C con humedad variable.",
+      "recommendation": "Monitorear hojas. Tratamiento preventivo recomendado en 7 dias.",
+      "detectedAt": "2025-04-28T10:00:00.000Z",
+      "plotId": "p001",
+      "userId": "b897"
+    },
+    {
+      "id": "a008",
+      "category": "weather",
+      "type": "drought",
+      "level": "high",
+      "title": "Sequía Prolongada",
+      "description": "30 dias sin precipitacion significativa. Reserves de agua en suelo agotadas.",
+      "recommendation": "Riego de emergencia necesario. Considerarmulching para retener humedad.",
+      "detectedAt": "2025-09-01T09:30:00.000Z",
+      "plotId": "p002",
+      "userId": "b897"
+    },
+    {
+      "id": "a009",
+      "category": "disease",
+      "type": "excoriosis",
+      "level": "medium",
+      "title": "Riesgo de Excoriosis",
+      "description": "Condiciones favorables para excoriosis. Humedad alta y temperaturas frias en primavera.",
+      "recommendation": "Aplicar tratamiento preventivo. Eliminar restos de poda.",
+      "detectedAt": "2025-03-25T13:00:00.000Z",
+      "plotId": "p004",
+      "userId": "b097"
+    },
+    {
+      "id": "a010",
+      "category": "weather",
+      "type": "lateFrost",
+      "level": "critical",
+      "title": "Helada Tardía",
+      "description": "Helada inesperada en temporada de brotación. Temperatura -3°C registrada.",
+      "recommendation": "Aplicar bioestimulantes para recuperación. No podar daños hasta evaluar tejido muerto.",
+      "detectedAt": "2025-05-02T05:30:00.000Z",
+      "plotId": "p001",
+      "userId": "b897"
+    }
+  ],
+  "alertStats": [
+    {
+      "id": "s001",
+      "period": "2025",
+      "diseaseAlerts": 4,
+      "weatherAlerts": 5,
+      "irrigationAlerts": 1,
+      "heatwaves": 2,
+      "frosts": 1,
+      "lateFrosts": 1,
+      "droughts": 1,
+      "excessiveRain": 1,
+      "mildiu": 1,
+      "botrytis": 1,
+      "oidio": 1,
+      "excoriosis": 1
+    }
   ]
 }

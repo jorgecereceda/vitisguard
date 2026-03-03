@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import AuthCard from '@/components/organisms/AuthCard.vue'
 import AuthForm from '@/components/organisms/AuthForm.vue'
 import AuthSwitch from '@/components/molecules/AuthSwitch.vue'
@@ -14,13 +15,15 @@ interface FormData {
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { showError } = useToast()
 
 async function handleLogin(data: FormData) {
   try {
     await authStore.login(data.email, data.password)
     router.push('/dashboard')
-  } catch {
-    // Error handled by store
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Error al iniciar sesión'
+    showError(message)
   }
 }
 </script>
