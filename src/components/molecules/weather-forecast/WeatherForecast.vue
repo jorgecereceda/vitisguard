@@ -119,6 +119,7 @@ const selectDay = (index: number) => {
   padding: 1.25rem;
   color: white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: 2rem;
 }
 
 .weather-forecast__title {
