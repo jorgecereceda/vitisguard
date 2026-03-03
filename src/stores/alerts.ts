@@ -42,13 +42,75 @@ export const useAlertsStore = defineStore('alerts', () => {
     }
   }
 
+  function calculateStatsLocally(period: string): AlertStats {
+    const now = new Date()
+    const startDate = new Date()
+
+    if (period === '30d') {
+      startDate.setDate(now.getDate() - 30)
+    } else if (period === '6m') {
+      startDate.setMonth(now.getMonth() - 6)
+    } else if (period === '1y') {
+      startDate.setFullYear(now.getFullYear() - 1)
+    }
+
+    const filteredAlerts = alerts.value.filter((alert) => {
+      const alertDate = new Date(alert.detectedAt)
+      return alertDate >= startDate && alertDate <= now
+    })
+
+    const initialStats: AlertStats = {
+      id: `local-${period}`,
+      period,
+      diseaseAlerts: 0,
+      weatherAlerts: 0,
+      irrigationAlerts: 0,
+      mildiu: 0,
+      botrytis: 0,
+      oidio: 0,
+      excoriosis: 0,
+      frosts: 0,
+      lateFrosts: 0,
+      heatwaves: 0,
+      droughts: 0,
+      excessiveRain: 0
+    }
+
+    return filteredAlerts.reduce((acc, alert) => {
+      if (alert.category === 'disease') {
+        acc.diseaseAlerts++
+        const disease = alert.disease as keyof AlertStats
+        if (Object.prototype.hasOwnProperty.call(acc, disease)) {
+          ; (acc[disease] as number)++
+        }
+      } else if (alert.category === 'weather') {
+        acc.weatherAlerts++
+        const typeMap: Record<string, keyof AlertStats> = {
+          frost: 'frosts',
+          lateFrost: 'lateFrosts',
+          heatwave: 'heatwaves',
+          drought: 'droughts',
+          excessiveRain: 'excessiveRain'
+        }
+        const key = typeMap[alert.type]
+        if (key && Object.prototype.hasOwnProperty.call(acc, key)) {
+          ; (acc[key] as number)++
+        }
+      } else if (alert.category === 'irrigation') {
+        acc.irrigationAlerts++
+      }
+      return acc
+    }, initialStats)
+  }
+
   async function fetchStatsByPeriod(period: string) {
     isLoading.value = true
     error.value = null
     try {
-      currentStats.value = await getAlertStatsByPeriod(period)
+      // En lugar de fetch, calculamos localmente para mayor precisión con datos simulados
+      currentStats.value = calculateStatsLocally(period)
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Failed to fetch stats'
+      error.value = e instanceof Error ? e.message : 'Failed to calculate stats'
     } finally {
       isLoading.value = false
     }

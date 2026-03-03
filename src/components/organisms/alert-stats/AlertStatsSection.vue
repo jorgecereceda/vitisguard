@@ -25,6 +25,14 @@ onMounted(() => {
 watch(selectedPeriod, (newPeriod) => {
   loadStats(newPeriod)
 })
+
+watch(
+  () => alertsStore.alerts,
+  () => {
+    loadStats(selectedPeriod.value)
+  },
+  { deep: true }
+)
 </script>
 
 <template>
