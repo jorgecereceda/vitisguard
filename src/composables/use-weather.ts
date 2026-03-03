@@ -241,8 +241,8 @@ export function useWeather(options: UseWeatherOptions = {}) {
     return {
       temperature: current.temperature_2m ?? 0,
       humidity: current.relative_humidity_2m ?? 0,
-      soilHumidity: dailyMoisture[0].current,
-      soilMoistureLevels: dailyMoisture[0], // Default to today
+      soilHumidity: dailyMoisture[0]?.current ?? 0,
+      soilMoistureLevels: dailyMoisture[0] ?? { current: 0, depth20: 0, depth40: 0, depth60: 0 },
       allDaysSoilMoisture: dailyMoisture,
       precipitation: current.precipitation ?? 0,
       cloudCover: current.cloud_cover ?? 0,

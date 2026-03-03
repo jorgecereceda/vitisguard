@@ -107,7 +107,7 @@ watch(
 
 <style scoped>
 .desktop-header {
-  height: 64px;
+  height: 80px;
   background: white;
   display: flex;
   align-items: center;
@@ -122,7 +122,7 @@ watch(
 .desktop-header__right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2rem;
   flex-direction: row-reverse;
 }
 
@@ -156,8 +156,8 @@ watch(
 }
 
 .user-initial-avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background-color: #0e3124;
   color: white;
@@ -165,11 +165,11 @@ watch(
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 1rem;
 }
 
 .user-arrow {
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   color: #9ca3af;
   transition: transform 0.2s;
 }
@@ -182,7 +182,7 @@ watch(
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  width: 220px;
+  width: 260px;
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -252,7 +252,7 @@ watch(
 .header-icon-btn {
   background: none;
   border: none;
-  padding: 0.5rem;
+  padding: 0.75rem;
   color: #4b5563;
   cursor: pointer;
   position: relative;
@@ -272,8 +272,8 @@ watch(
 }
 
 .header-icon-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
 }
 
 .header-icon-btn--has-alerts {
@@ -285,7 +285,7 @@ watch(
 }
 
 .notification-count {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #ef4444;
   margin-left: 0.25rem;
