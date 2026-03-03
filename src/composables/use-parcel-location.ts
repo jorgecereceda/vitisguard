@@ -17,27 +17,24 @@ export function useParcelLocation() {
     ) ?? null
   })
 
-  const locationName = computed(() => weatherStore.userLocation.name)
+  const locationName = computed(() => weatherStore.userLocationName)
 
   const alertsCount = computed(() => alerts.value.length)
 
   async function selectParcel(parcel: Parcel) {
     const displayName = `${parcel.name} (${parcel.denomination})`
-    weatherStore.setLocation(parcel.latitude, parcel.longitude, displayName)
+    weatherStore.setLocation(parcel.latitude, parcel.longitude, displayName, parcel.id)
     await fetchWeather(parcel.latitude, parcel.longitude)
   }
 
   async function initializeParcelLocation() {
-    if (weatherStore.isLocationInitialized) return
-    
     await weatherStore.loadParcels()
-    weatherStore.setLocationInitialized(true)
     
     if (weatherStore.parcels.length > 0) {
       const firstParcel = weatherStore.parcels[0]
       if (firstParcel) {
         const displayName = `${firstParcel.name} (${firstParcel.denomination})`
-        weatherStore.setLocation(firstParcel.latitude, firstParcel.longitude, displayName)
+        weatherStore.setLocation(firstParcel.latitude, firstParcel.longitude, displayName, firstParcel.id)
         await fetchWeather(firstParcel.latitude, firstParcel.longitude)
       }
     } else {

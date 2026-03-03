@@ -203,12 +203,20 @@
       "id": "22a8"
     },
     {
-      "name": "vn  n n",
-      "latitude": 43.263,
-      "longitude": -3.324,
-      "denomination": "Alava",
+      "name": "x",
+      "latitude": 43.3571,
+      "longitude": -2.9348,
+      "denomination": "Bizkaia",
       "userId": "8dba",
-      "id": "d42d"
+      "id": "9369"
+    },
+    {
+      "name": "xxx",
+      "latitude": 27.9881,
+      "longitude": -3.007,
+      "denomination": "Getaria",
+      "userId": "8dba",
+      "id": "2369"
     }
   ],
   "alerts": [

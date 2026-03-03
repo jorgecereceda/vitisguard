@@ -9,18 +9,30 @@ export const useWeatherStore = defineStore('weather', () => {
   const parcels = ref<Parcel[]>([])
   const weatherByParcel = ref<Map<string, WeatherData>>(new Map())
   const selectedParcelId = ref<string | null>(null)
+  const parcelsVersion = ref(0)
 
   // New location state
   const userLocation = ref({
     latitude: 42.8467,
     longitude: -2.6716,
-    name: 'Vitoria-Gasteiz, España'
+    name: 'Vitoria-Gasteiz, España',
+    parcelId: null as string | null
   })
 
   const isLoading = ref(false)
   const error = ref<Error | null>(null)
 
   const currentLocation = computed(() => userLocation.value)
+
+  const userLocationName = computed(() => {
+    if (userLocation.value.parcelId) {
+      const parcel = parcels.value.find(p => p.id === userLocation.value.parcelId)
+      if (parcel) {
+        return `${parcel.name} (${parcel.denomination})`
+      }
+    }
+    return userLocation.value.name
+  })
 
   const selectedParcel = computed(() =>
     parcels.value.find(p => p.id === selectedParcelId.value) ?? null
@@ -55,7 +67,7 @@ export const useWeatherStore = defineStore('weather', () => {
         const firstParcel = data[0]
         if (firstParcel) {
           selectedParcelId.value = firstParcel.id
-          setLocation(firstParcel.latitude, firstParcel.longitude, firstParcel.name)
+          setLocation(firstParcel.latitude, firstParcel.longitude, firstParcel.name, firstParcel.id)
         }
       }
     } catch (e) {
@@ -130,7 +142,16 @@ export const useWeatherStore = defineStore('weather', () => {
 
       const index = parcels.value.findIndex(p => p.id === id)
       if (index !== -1) {
-        parcels.value[index] = updatedParcel
+        parcels.value = [
+          ...parcels.value.slice(0, index),
+          updatedParcel,
+          ...parcels.value.slice(index + 1)
+        ]
+        parcelsVersion.value++
+      }
+
+      if (userLocation.value.parcelId === id) {
+        userLocation.value.name = `${updatedParcel.name} (${updatedParcel.denomination})`
       }
 
       return updatedParcel
@@ -213,11 +234,12 @@ export const useWeatherStore = defineStore('weather', () => {
     error.value = null
   }
 
-  function setLocation(lat: number, lon: number, name: string): void {
+  function setLocation(lat: number, lon: number, name: string, parcelId?: string | null): void {
     userLocation.value = {
       latitude: lat,
       longitude: lon,
-      name: name
+      name: name,
+      parcelId: parcelId ?? null
     }
   }
 
@@ -249,6 +271,7 @@ export const useWeatherStore = defineStore('weather', () => {
     clearAllData,
     userLocation,
     currentLocation,
+    userLocationName,
     setLocation,
   }
 })
