@@ -15,8 +15,10 @@ export async function getAlertLog(): Promise<AlertLogApi | null> {
 
   if (!response.ok) {
     if (response.status === 404) {
+      console.warn('Alert log not found (404) at /alertLogApi/global')
       return null
     }
+    console.error(`Failed to fetch alert log: ${response.status} ${response.statusText}`)
     throw new AlertLogApiError('Failed to fetch alert log')
   }
 
@@ -54,12 +56,14 @@ export async function updateAlertLog(
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
+      id: 'global',
       lastQueryDate: new Date().toISOString(),
       yearGenerated
     })
   })
 
   if (!response.ok) {
+    console.error(`Failed to update alert log: ${response.status} ${response.statusText}`)
     throw new AlertLogApiError('Failed to update alert log')
   }
 
@@ -82,19 +86,14 @@ export function calculateHistoricalDateRange(): {
   year: number
 } {
   const now = new Date()
-  const currentYear = now.getFullYear()
-  const currentMonth = now.getMonth()
-  const currentDay = now.getDate()
+  const fiveDaysAgo = new Date(now.setDate(now.getDate() - 5))
+  const currentYear = fiveDaysAgo.getFullYear()
+  const currentMonth = fiveDaysAgo.getMonth()
+  const currentDay = fiveDaysAgo.getDate()
 
   let startYear = currentYear - 1
   let startMonth = currentMonth
   let startDay = currentDay
-
-  if (currentMonth === 0 && currentDay < 31) {
-    startYear = currentYear - 2
-    startMonth = 11
-    startDay = currentDay
-  }
 
   const startDate = `${startYear}-${String(startMonth + 1).padStart(2, '0')}-${String(startDay).padStart(2, '0')}`
   const endDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`

@@ -53,7 +53,11 @@ async function generateNewAlerts() {
 
     await alertsStore.clearAllAlerts()
 
-    await alertsStore.generateHistoricalAlerts(userId, startDate, endDate, year)
+    const generatedAlerts = await alertsStore.generateHistoricalAlerts(userId, startDate, endDate, year)
+
+    if (generatedAlerts.length === 0) {
+      console.warn('No se generaron alertas. Compruebe si el usuario tiene parcelas asociadas.')
+    }
 
     const existingLog = await getAlertLog()
     if (existingLog) {

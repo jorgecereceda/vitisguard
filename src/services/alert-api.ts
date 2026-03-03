@@ -3,7 +3,7 @@ import type { Parcel, WeatherLocation, DailyData } from '@/types/weather'
 import { processHistoricalData } from './alert-processor'
 
 const API_BASE_URL = 'http://localhost:3000'
-const OPEN_METEO_BASE_URL = 'https://api.open-meteo.com/v1/forecast'
+const OPEN_METEO_BASE_URL = 'https://archive-api.open-meteo.com/v1/archive'
 const API_TIMEOUT_MS = 10000
 
 export class AlertApiError extends Error {
@@ -194,15 +194,17 @@ async function fetchHistoricalWeatherFromOpenMeteo(
   const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS)
 
   try {
-    const response = await fetch(`${OPEN_METEO_BASE_URL}?${params}`, {
+    const url = `${OPEN_METEO_BASE_URL}?${params}`
+    console.log(`Fetching weather data from: ${url}`)
+    const response = await fetch(url, {
       signal: controller.signal
     })
 
     if (!response.ok) {
-      throw new AlertApiError(
-        `HTTP error: ${response.status} ${response.statusText}`,
-        response.status
-      )
+      const errorBody = await response.text()
+      const errorMessage = `Open-Meteo Error: ${response.status} ${response.statusText} - ${errorBody}`
+      console.error(errorMessage)
+      throw new AlertApiError(errorMessage, response.status)
     }
 
     const data = await response.json()
@@ -260,6 +262,7 @@ export async function generateHistoricalAlertsForUser(
   }
 
   const plots: Parcel[] = await userPlotsResponse.json()
+  console.log(`Found ${plots.length} plots for user ${userId}`)
   const allAlerts: Alert[] = []
 
   for (const plot of plots) {
