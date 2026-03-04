@@ -151,7 +151,7 @@
       "latitude": 27.9881,
       "longitude": 86.925,
       "denomination": "Bizkaia",
-      "userId": "b897",
+      "userId": "",
       "id": "4882"
     },
     {
@@ -159,7 +159,7 @@
       "latitude": 37.095,
       "longitude": -3.324,
       "denomination": "Getaria",
-      "userId": "b897",
+      "userId": "",
       "id": "1069"
     },
     {
@@ -167,7 +167,7 @@
       "latitude": -77.4667,
       "longitude": 161.8833,
       "denomination": "Alava",
-      "userId": "b897",
+      "userId": "",
       "id": "8f27"
     },
     {
@@ -175,7 +175,7 @@
       "latitude": -24.085,
       "longitude": -70.0125,
       "denomination": "Getaria",
-      "userId": "b897",
+      "userId": "",
       "id": "1f02"
     },
     {
@@ -183,7 +183,7 @@
       "latitude": 5.5,
       "longitude": -76.5414,
       "denomination": "Bizkaia",
-      "userId": "b897",
+      "userId": "",
       "id": "8bc7"
     },
     {
@@ -191,7 +191,7 @@
       "latitude": 25.2975,
       "longitude": 91.5826,
       "denomination": "Bizkaia",
-      "userId": "b897",
+      "userId": "",
       "id": "7e5f"
     },
     {
@@ -199,7 +199,7 @@
       "latitude": 43.3571,
       "longitude": -3.324,
       "denomination": "Alava",
-      "userId": "b897",
+      "userId": "",
       "id": "22a8"
     },
     {
@@ -221,7 +221,7 @@
   ],
   "alerts": [
     {
-      "id": "vfxn",
+      "id": "orek",
       "category": "disease",
       "disease": "mildiu",
       "level": "high",
@@ -237,7 +237,7 @@
       "userId": "b897"
     },
     {
-      "id": "wzli",
+      "id": "kozk",
       "category": "disease",
       "disease": "botrytis",
       "level": "medium",
@@ -253,7 +253,7 @@
       "userId": "b897"
     },
     {
-      "id": "uchn",
+      "id": "bkxj",
       "category": "disease",
       "disease": "oidio",
       "level": "medium",
@@ -268,7 +268,7 @@
       "userId": "b897"
     },
     {
-      "id": "yyaq",
+      "id": "imrz",
       "category": "disease",
       "disease": "excoriosis",
       "level": "high",
@@ -284,7 +284,7 @@
       "userId": "b897"
     },
     {
-      "id": "dqnl",
+      "id": "npwi",
       "category": "weather",
       "type": "frost",
       "level": "high",
@@ -296,7 +296,7 @@
       "userId": "b897"
     },
     {
-      "id": "szvl",
+      "id": "baul",
       "category": "disease",
       "disease": "mildiu",
       "level": "high",
@@ -311,7 +311,7 @@
       "userId": "b897"
     },
     {
-      "id": "fcoq",
+      "id": "ntdt",
       "category": "disease",
       "disease": "botrytis",
       "level": "medium",
@@ -326,7 +326,7 @@
       "userId": "b897"
     },
     {
-      "id": "acdm",
+      "id": "lqwm",
       "category": "disease",
       "disease": "oidio",
       "level": "medium",
@@ -340,7 +340,7 @@
       "userId": "b897"
     },
     {
-      "id": "nokv",
+      "id": "geyj",
       "category": "disease",
       "disease": "excoriosis",
       "level": "high",
@@ -355,7 +355,7 @@
       "userId": "b897"
     },
     {
-      "id": "acpb",
+      "id": "aywq",
       "category": "weather",
       "type": "frost",
       "level": "high",
