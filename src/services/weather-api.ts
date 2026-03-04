@@ -18,6 +18,37 @@ export class WeatherApiError extends Error {
   }
 }
 
+async function makeRequest<T>(url: string): Promise<T> {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS)
+
+  try {
+    const response = await fetch(url, { signal: controller.signal })
+
+    if (!response.ok) {
+      throw new WeatherApiError(
+        `HTTP error: ${response.status} ${response.statusText}`,
+        response.status
+      )
+    }
+
+    const data = await response.json()
+
+    if (data.error) {
+      throw new WeatherApiError(data.reason ?? 'API returned error')
+    }
+
+    return data as T
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new WeatherApiError('Request timeout exceeded')
+    }
+    throw error instanceof Error ? error : new WeatherApiError('Unknown error occurred')
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
 export async function fetchWeatherForecast(
   location: WeatherLocation,
   options: WeatherOptions = {}
@@ -40,39 +71,7 @@ export async function fetchWeatherForecast(
     past_days: pastDays.toString(),
   })
 
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS)
-
-  try {
-    const response = await fetch(`${BASE_URL}?${params}`, {
-      signal: controller.signal,
-    })
-
-    if (!response.ok) {
-      throw new WeatherApiError(
-        `HTTP error: ${response.status} ${response.statusText}`,
-        response.status
-      )
-    }
-
-    const data = await response.json()
-
-    if (data.error) {
-      throw new WeatherApiError(data.reason ?? 'API returned error')
-    }
-
-    return data as WeatherResponse
-  } catch (error) {
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        throw new WeatherApiError('Request timeout exceeded')
-      }
-      throw error
-    }
-    throw new WeatherApiError('Unknown error occurred')
-  } finally {
-    clearTimeout(timeoutId)
-  }
+  return makeRequest<WeatherResponse>(`${BASE_URL}?${params}`)
 }
 
 export async function fetchCurrentWeather(
@@ -86,39 +85,11 @@ export async function fetchCurrentWeather(
     timezone: 'UTC',
   })
 
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS)
-
-  try {
-    const response = await fetch(`${BASE_URL}?${params}`, {
-      signal: controller.signal,
-    })
-
-    if (!response.ok) {
-      throw new WeatherApiError(
-        `HTTP error: ${response.status} ${response.statusText}`,
-        response.status
-      )
-    }
-
-    const data = await response.json()
-
-    if (data.error) {
-      throw new WeatherApiError(data.reason ?? 'API returned error')
-    }
-
-    return data.current as CurrentData
-  } catch (error) {
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        throw new WeatherApiError('Request timeout exceeded')
-      }
-      throw error
-    }
-    throw new WeatherApiError('Unknown error occurred')
-  } finally {
-    clearTimeout(timeoutId)
+  const data = await makeRequest<{ current: CurrentData }>(`${BASE_URL}?${params}`)
+  if (!data.current) {
+    throw new WeatherApiError('Current weather data not available')
   }
+  return data.current
 }
 
 export async function fetchWeatherData(
@@ -144,50 +115,24 @@ export async function fetchWeatherData(
     past_days: pastDays.toString(),
   })
 
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS)
+  const data = await makeRequest<WeatherResponse>(`${BASE_URL}?${params}`)
 
-  try {
-    const response = await fetch(`${BASE_URL}?${params}`, {
-      signal: controller.signal,
-    })
+  if (!data.current) {
+    throw new WeatherApiError('Current weather data not available')
+  }
 
-    if (!response.ok) {
-      throw new WeatherApiError(
-        `HTTP error: ${response.status} ${response.statusText}`,
-        response.status
-      )
-    }
-
-    const data = await response.json()
-
-    if (data.error) {
-      throw new WeatherApiError(data.reason ?? 'API returned error')
-    }
-
-    return {
-      current: data.current,
-      hourly: data.hourly,
-      daily: data.daily,
-      metadata: {
-        latitude: data.latitude,
-        longitude: data.longitude,
-        elevation: data.elevation,
-        utc_offset_seconds: data.utc_offset_seconds,
-        timezone: data.timezone,
-        timezone_abbreviation: data.timezone_abbreviation,
-        generationtime_ms: data.generationtime_ms,
-      },
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        throw new WeatherApiError('Request timeout exceeded')
-      }
-      throw error
-    }
-    throw new WeatherApiError('Unknown error occurred')
-  } finally {
-    clearTimeout(timeoutId)
+  return {
+    current: data.current,
+    hourly: data.hourly,
+    daily: data.daily,
+    metadata: {
+      latitude: data.latitude,
+      longitude: data.longitude,
+      elevation: data.elevation,
+      utc_offset_seconds: data.utc_offset_seconds,
+      timezone: data.timezone,
+      timezone_abbreviation: data.timezone_abbreviation,
+      generationtime_ms: data.generationtime_ms,
+    },
   }
 }
