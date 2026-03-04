@@ -203,7 +203,7 @@
       "id": "22a8"
     },
     {
-      "name": "qvvvv",
+      "name": "x",
       "latitude": 43.3571,
       "longitude": -2.9348,
       "denomination": "Bizkaia",
@@ -221,7 +221,7 @@
   ],
   "alerts": [
     {
-      "id": "cbbb",
+      "id": "vfxn",
       "category": "disease",
       "disease": "mildiu",
       "level": "high",
@@ -237,7 +237,7 @@
       "userId": "b897"
     },
     {
-      "id": "picr",
+      "id": "wzli",
       "category": "disease",
       "disease": "botrytis",
       "level": "medium",
@@ -253,7 +253,7 @@
       "userId": "b897"
     },
     {
-      "id": "zjzi",
+      "id": "uchn",
       "category": "disease",
       "disease": "oidio",
       "level": "medium",
@@ -268,7 +268,7 @@
       "userId": "b897"
     },
     {
-      "id": "ypeo",
+      "id": "yyaq",
       "category": "disease",
       "disease": "excoriosis",
       "level": "high",
@@ -284,7 +284,7 @@
       "userId": "b897"
     },
     {
-      "id": "nqwk",
+      "id": "dqnl",
       "category": "weather",
       "type": "frost",
       "level": "high",
@@ -296,7 +296,7 @@
       "userId": "b897"
     },
     {
-      "id": "cdbw",
+      "id": "szvl",
       "category": "disease",
       "disease": "mildiu",
       "level": "high",
@@ -311,7 +311,7 @@
       "userId": "b897"
     },
     {
-      "id": "tnev",
+      "id": "fcoq",
       "category": "disease",
       "disease": "botrytis",
       "level": "medium",
@@ -326,7 +326,7 @@
       "userId": "b897"
     },
     {
-      "id": "igwq",
+      "id": "acdm",
       "category": "disease",
       "disease": "oidio",
       "level": "medium",
@@ -340,7 +340,7 @@
       "userId": "b897"
     },
     {
-      "id": "narj",
+      "id": "nokv",
       "category": "disease",
       "disease": "excoriosis",
       "level": "high",
@@ -355,7 +355,7 @@
       "userId": "b897"
     },
     {
-      "id": "irrj",
+      "id": "acpb",
       "category": "weather",
       "type": "frost",
       "level": "high",
@@ -364,440 +364,6 @@
       "recommendation": "Cubrir parcelas con manta térmica. Activar riego por aspersión antes del amanecer.",
       "detectedAt": "2025-03-17T06:00:00.000Z",
       "plotId": "p002",
-      "userId": "b897"
-    },
-    {
-      "id": "wxke",
-      "category": "disease",
-      "disease": "mildiu",
-      "level": "medium",
-      "probability": 50,
-      "conditions": [
-        "Humedad: 89%",
-        "Precipitación: 4.3mm"
-      ],
-      "recommendation": "Aplicar fungicida preventivo en próximos 7 días",
-      "detectedAt": "2025-07-02T12:00:00.000Z",
-      "plotId": "4882",
-      "userId": "b897"
-    },
-    {
-      "id": "csto",
-      "category": "disease",
-      "disease": "oidio",
-      "level": "medium",
-      "probability": 50,
-      "conditions": [
-        "Precipitación: 3.4mm"
-      ],
-      "recommendation": "Aplicar tratamiento preventivo en 7 días",
-      "detectedAt": "2025-02-28T12:00:00.000Z",
-      "plotId": "4882",
-      "userId": "b897"
-    },
-    {
-      "id": "rojq",
-      "category": "weather",
-      "type": "excessiveRain",
-      "level": "medium",
-      "title": "Exceso de Precipitación",
-      "description": "Precipitación acumulada de 82.1mm en 24 horas. Riesgo de lavado de tratamientos.",
-      "recommendation": "Verificar drenaje. Re-aplicar tratamientos fitosanitarios tras estabilización.",
-      "detectedAt": "2025-10-04T12:00:00.000Z",
-      "plotId": "4882",
-      "userId": "b897"
-    },
-    {
-      "id": "yrwt",
-      "category": "weather",
-      "type": "drought",
-      "level": "critical",
-      "title": "Sequía Prolongada",
-      "description": "87 días sin precipitación significativa. Reserves de agua agotadas.",
-      "recommendation": "Riego de emergencia necesario. Considerar mulching para retener humedad.",
-      "detectedAt": "2025-11-02T12:00:00.000Z",
-      "plotId": "4882",
-      "userId": "b897"
-    },
-    {
-      "id": "cdvx",
-      "category": "disease",
-      "disease": "mildiu",
-      "level": "medium",
-      "probability": 59,
-      "conditions": [
-        "Temperatura media: 15.5°C",
-        "Precipitación: 0.7mm"
-      ],
-      "recommendation": "Aplicar fungicida preventivo en próximos 7 días",
-      "detectedAt": "2025-05-18T12:00:00.000Z",
-      "plotId": "1069",
-      "userId": "b897"
-    },
-    {
-      "id": "yzyn",
-      "category": "disease",
-      "disease": "botrytis",
-      "level": "medium",
-      "probability": 55,
-      "conditions": [
-        "Temperatura media: 19.0°C",
-        "Precipitación: 2.8mm"
-      ],
-      "recommendation": "Mejorar ventilación. Aplicar tratamiento fungicida",
-      "detectedAt": "2025-05-30T12:00:00.000Z",
-      "plotId": "1069",
-      "userId": "b897"
-    },
-    {
-      "id": "bvsw",
-      "category": "disease",
-      "disease": "oidio",
-      "level": "medium",
-      "probability": 51,
-      "conditions": [
-        "Temperatura media: 23.4°C",
-        "Precipitación: 0.4mm"
-      ],
-      "recommendation": "Aplicar tratamiento preventivo en 7 días",
-      "detectedAt": "2025-08-06T12:00:00.000Z",
-      "plotId": "1069",
-      "userId": "b897"
-    },
-    {
-      "id": "oeau",
-      "category": "disease",
-      "disease": "excoriosis",
-      "level": "medium",
-      "probability": 59,
-      "conditions": [
-        "Humedad: 84%",
-        "Precipitación: 18.1mm"
-      ],
-      "recommendation": "Aplicar tratamiento preventivo en próximos 7 días",
-      "detectedAt": "2025-11-15T12:00:00.000Z",
-      "plotId": "1069",
-      "userId": "b897"
-    },
-    {
-      "id": "rhmv",
-      "category": "weather",
-      "type": "excessiveRain",
-      "level": "medium",
-      "title": "Exceso de Precipitación",
-      "description": "Precipitación acumulada de 118.6mm en 24 horas. Riesgo de lavado de tratamientos.",
-      "recommendation": "Verificar drenaje. Re-aplicar tratamientos fitosanitarios tras estabilización.",
-      "detectedAt": "2026-02-04T12:00:00.000Z",
-      "plotId": "1069",
-      "userId": "b897"
-    },
-    {
-      "id": "fkhz",
-      "category": "weather",
-      "type": "drought",
-      "level": "high",
-      "title": "Sequía Prolongada",
-      "description": "24 días sin precipitación significativa. Reserves de agua agotadas.",
-      "recommendation": "Riego de emergencia necesario. Considerar mulching para retener humedad.",
-      "detectedAt": "2025-07-01T12:00:00.000Z",
-      "plotId": "1069",
-      "userId": "b897"
-    },
-    {
-      "id": "zubn",
-      "category": "disease",
-      "disease": "oidio",
-      "level": "medium",
-      "probability": 50,
-      "conditions": [
-        "Precipitación: 0.7mm"
-      ],
-      "recommendation": "Aplicar tratamiento preventivo en 7 días",
-      "detectedAt": "2025-02-28T12:00:00.000Z",
-      "plotId": "8f27",
-      "userId": "b897"
-    },
-    {
-      "id": "mlyg",
-      "category": "weather",
-      "type": "drought",
-      "level": "critical",
-      "title": "Sequía Prolongada",
-      "description": "93 días sin precipitación significativa. Reserves de agua agotadas.",
-      "recommendation": "Riego de emergencia necesario. Considerar mulching para retener humedad.",
-      "detectedAt": "2025-03-10T12:00:00.000Z",
-      "plotId": "8f27",
-      "userId": "b897"
-    },
-    {
-      "id": "pule",
-      "category": "disease",
-      "disease": "mildiu",
-      "level": "high",
-      "probability": 60,
-      "conditions": [
-        "Temperatura media: 13.4°C",
-        "Precipitación: 1.3mm"
-      ],
-      "recommendation": "Aplicar fungicida inmediatamente. Aumentar aireació",
-      "detectedAt": "2025-06-25T12:00:00.000Z",
-      "plotId": "1f02",
-      "userId": "b897"
-    },
-    {
-      "id": "vpvp",
-      "category": "disease",
-      "disease": "botrytis",
-      "level": "medium",
-      "probability": 59,
-      "conditions": [
-        "Temperatura media: 18.8°C"
-      ],
-      "recommendation": "Mejorar ventilación. Aplicar tratamiento fungicida",
-      "detectedAt": "2025-04-26T12:00:00.000Z",
-      "plotId": "1f02",
-      "userId": "b897"
-    },
-    {
-      "id": "kxxa",
-      "category": "disease",
-      "disease": "oidio",
-      "level": "high",
-      "probability": 64,
-      "conditions": [
-        "Temperatura media: 23.6°C"
-      ],
-      "recommendation": "Aplicar azufre o fungicida sistémico inmediatamente",
-      "detectedAt": "2025-02-20T12:00:00.000Z",
-      "plotId": "1f02",
-      "userId": "b897"
-    },
-    {
-      "id": "fftz",
-      "category": "disease",
-      "disease": "excoriosis",
-      "level": "medium",
-      "probability": 57,
-      "conditions": [
-        "Temperatura media: 12.0°C"
-      ],
-      "recommendation": "Aplicar tratamiento preventivo en próximos 7 días",
-      "detectedAt": "2025-06-13T12:00:00.000Z",
-      "plotId": "1f02",
-      "userId": "b897"
-    },
-    {
-      "id": "ryrv",
-      "category": "weather",
-      "type": "drought",
-      "level": "critical",
-      "title": "Sequía Prolongada",
-      "description": "172 días sin precipitación significativa. Reserves de agua agotadas.",
-      "recommendation": "Riego de emergencia necesario. Considerar mulching para retener humedad.",
-      "detectedAt": "2025-09-08T12:00:00.000Z",
-      "plotId": "1f02",
-      "userId": "b897"
-    },
-    {
-      "id": "wgwi",
-      "category": "irrigation",
-      "type": "irrigation",
-      "level": "critical",
-      "action": "increase",
-      "reason": "Soil moisture bajo (0.0% promedio) durante 366 días",
-      "recommendation": "Incrementar frecuencia de riego. Aplicar 20% más de agua en horario nocturno.",
-      "detectedAt": "2025-07-15T08:00:00.000Z",
-      "plotId": "1f02",
-      "userId": "b897"
-    },
-    {
-      "id": "syhg",
-      "category": "disease",
-      "disease": "mildiu",
-      "level": "high",
-      "probability": 75,
-      "conditions": [
-        "Temperatura media: 24.3°C",
-        "Humedad: 88%",
-        "Precipitación: 33.7mm"
-      ],
-      "recommendation": "Aplicar fungicida inmediatamente. Aumentar aireació",
-      "detectedAt": "2025-03-11T12:00:00.000Z",
-      "plotId": "8bc7",
-      "userId": "b897"
-    },
-    {
-      "id": "uczu",
-      "category": "disease",
-      "disease": "oidio",
-      "level": "critical",
-      "probability": 90,
-      "conditions": [
-        "Temperatura media: 24.3°C",
-        "Humedad: 88%",
-        "Precipitación: 33.7mm"
-      ],
-      "recommendation": "Tratamiento urgente. Azufre en polvo y sistémico",
-      "detectedAt": "2025-03-11T12:00:00.000Z",
-      "plotId": "8bc7",
-      "userId": "b897"
-    },
-    {
-      "id": "wnqc",
-      "category": "weather",
-      "type": "excessiveRain",
-      "level": "medium",
-      "title": "Exceso de Precipitación",
-      "description": "Precipitación acumulada de 60.5mm en 24 horas. Riesgo de lavado de tratamientos.",
-      "recommendation": "Verificar drenaje. Re-aplicar tratamientos fitosanitarios tras estabilización.",
-      "detectedAt": "2025-04-13T12:00:00.000Z",
-      "plotId": "8bc7",
-      "userId": "b897"
-    },
-    {
-      "id": "vcge",
-      "category": "disease",
-      "disease": "mildiu",
-      "level": "high",
-      "probability": 72,
-      "conditions": [
-        "Temperatura media: 17.8°C",
-        "Humedad: 89%",
-        "Precipitación: 5.6mm"
-      ],
-      "recommendation": "Aplicar fungicida inmediatamente. Aumentar aireació",
-      "detectedAt": "2025-04-21T12:00:00.000Z",
-      "plotId": "7e5f",
-      "userId": "b897"
-    },
-    {
-      "id": "jelv",
-      "category": "disease",
-      "disease": "botrytis",
-      "level": "medium",
-      "probability": 58,
-      "conditions": [
-        "Temperatura media: 18.2°C",
-        "Humedad: 97%",
-        "Precipitación: 19.8mm"
-      ],
-      "recommendation": "Mejorar ventilación. Aplicar tratamiento fungicida",
-      "detectedAt": "2025-04-23T12:00:00.000Z",
-      "plotId": "7e5f",
-      "userId": "b897"
-    },
-    {
-      "id": "kmfa",
-      "category": "disease",
-      "disease": "oidio",
-      "level": "high",
-      "probability": 62,
-      "conditions": [
-        "Temperatura media: 23.0°C",
-        "Precipitación: 17.5mm"
-      ],
-      "recommendation": "Aplicar azufre o fungicida sistémico inmediatamente",
-      "detectedAt": "2025-07-24T12:00:00.000Z",
-      "plotId": "7e5f",
-      "userId": "b897"
-    },
-    {
-      "id": "gcaq",
-      "category": "disease",
-      "disease": "excoriosis",
-      "level": "medium",
-      "probability": 59,
-      "conditions": [
-        "Temperatura media: 11.8°C",
-        "Precipitación: 0.5mm"
-      ],
-      "recommendation": "Aplicar tratamiento preventivo en próximos 7 días",
-      "detectedAt": "2025-11-22T12:00:00.000Z",
-      "plotId": "7e5f",
-      "userId": "b897"
-    },
-    {
-      "id": "kjxh",
-      "category": "weather",
-      "type": "excessiveRain",
-      "level": "medium",
-      "title": "Exceso de Precipitación",
-      "description": "Precipitación acumulada de 97.6mm en 24 horas. Riesgo de lavado de tratamientos.",
-      "recommendation": "Verificar drenaje. Re-aplicar tratamientos fitosanitarios tras estabilización.",
-      "detectedAt": "2025-05-29T12:00:00.000Z",
-      "plotId": "7e5f",
-      "userId": "b897"
-    },
-    {
-      "id": "wgsl",
-      "category": "weather",
-      "type": "drought",
-      "level": "critical",
-      "title": "Sequía Prolongada",
-      "description": "92 días sin precipitación significativa. Reserves de agua agotadas.",
-      "recommendation": "Riego de emergencia necesario. Considerar mulching para retener humedad.",
-      "detectedAt": "2025-11-25T12:00:00.000Z",
-      "plotId": "7e5f",
-      "userId": "b897"
-    },
-    {
-      "id": "rrhc",
-      "category": "disease",
-      "disease": "mildiu",
-      "level": "high",
-      "probability": 62,
-      "conditions": [
-        "Temperatura media: 15.9°C",
-        "Precipitación: 1.5mm"
-      ],
-      "recommendation": "Aplicar fungicida inmediatamente. Aumentar aireació",
-      "detectedAt": "2025-03-06T12:00:00.000Z",
-      "plotId": "22a8",
-      "userId": "b897"
-    },
-    {
-      "id": "czlg",
-      "category": "disease",
-      "disease": "botrytis",
-      "level": "medium",
-      "probability": 53,
-      "conditions": [
-        "Temperatura media: 18.1°C",
-        "Precipitación: 0.2mm"
-      ],
-      "recommendation": "Mejorar ventilación. Aplicar tratamiento fungicida",
-      "detectedAt": "2025-06-07T12:00:00.000Z",
-      "plotId": "22a8",
-      "userId": "b897"
-    },
-    {
-      "id": "hnzd",
-      "category": "disease",
-      "disease": "oidio",
-      "level": "high",
-      "probability": 60,
-      "conditions": [
-        "Temperatura media: 24.4°C"
-      ],
-      "recommendation": "Aplicar azufre o fungicida sistémico inmediatamente",
-      "detectedAt": "2025-06-19T12:00:00.000Z",
-      "plotId": "22a8",
-      "userId": "b897"
-    },
-    {
-      "id": "eocw",
-      "category": "disease",
-      "disease": "excoriosis",
-      "level": "high",
-      "probability": 62,
-      "conditions": [
-        "Temperatura media: 10.6°C",
-        "Humedad: 81%",
-        "Precipitación: 31.3mm"
-      ],
-      "recommendation": "Eliminar restos de poda. Aplicar fungicida",
-      "detectedAt": "2025-03-24T12:00:00.000Z",
-      "plotId": "22a8",
       "userId": "b897"
     }
   ],
@@ -817,13 +383,6 @@
       "botrytis": 1,
       "oidio": 1,
       "excoriosis": 1
-    }
-  ],
-  "alertLogApi": [
-    {
-      "id": "global",
-      "lastQueryDate": "2026-03-03T13:15:24.938Z",
-      "yearGenerated": 2025
     }
   ]
 }
