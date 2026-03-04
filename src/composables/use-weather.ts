@@ -208,9 +208,6 @@ export function useWeather(options: UseWeatherOptions = {}) {
 
     if (!current) return null
 
-    const now = new Date()
-    const currentHour = now.getUTCHours()
-
     // Helper to calculate moisture levels for a specific day index
     const getSoilMoistureForDay = (dayIdx: number) => {
       const start = dayIdx * 24

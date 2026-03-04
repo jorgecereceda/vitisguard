@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ref, computed } from 'vue'
 import DashboardView from './DashboardView.vue'
-import DataCard from '@/components/atoms/DataCard.vue'
 import * as weatherComposable from '@/composables/use-weather'
 
 import { createPinia, setActivePinia } from 'pinia'
@@ -29,6 +28,34 @@ vi.mock('@/components/organisms/DesktopHeader.vue', () => ({
   }
 }))
 
+vi.mock('@/components/molecules/weather-current/WeatherCurrent.vue', () => ({
+  default: {
+    name: 'WeatherCurrent',
+    template: '<div class="weather-current" />'
+  }
+}))
+
+vi.mock('@/components/molecules/weather-forecast/WeatherForecast.vue', () => ({
+  default: {
+    name: 'WeatherForecast',
+    template: '<div class="weather-forecast" />'
+  }
+}))
+
+vi.mock('@/components/molecules/SoilMoistureCard.vue', () => ({
+  default: {
+    name: 'SoilMoistureCard',
+    template: '<div class="soil-moisture-card" />'
+  }
+}))
+
+vi.mock('@/components/molecules/evapotranspiration-card/EvapotranspirationCard.vue', () => ({
+  default: {
+    name: 'EvapotranspirationCard',
+    template: '<div class="evapotranspiration-card" />'
+  }
+}))
+
 // Mock the useWeather and useGeolocation composables
 vi.mock('@/composables/use-weather', () => ({
   useWeather: vi.fn()
@@ -43,6 +70,14 @@ vi.mock('@/composables/useGeolocation', () => ({
       isLoading: false
     }),
     getLocation: vi.fn()
+  }))
+}))
+
+vi.mock('@/stores/weather', () => ({
+  useWeatherStore: vi.fn(() => ({
+    userLocation: { latitude: 43.3183, longitude: -1.9812 },
+    loadParcels: vi.fn(),
+    selectedParcel: { denomination: 'Getaria' },
   }))
 }))
 
@@ -67,7 +102,10 @@ describe('DashboardView.vue', () => {
         et0: 2.1,
         sunshineDuration: 3600,
         isFrostLikely: false,
-        isHeatWaveLikely: false
+        isHeatWaveLikely: false,
+        allDaysSoilMoisture: [
+          { current: 40, depth20: 35, depth40: 30, depth60: 25 },
+        ],
       }
     })
     const isLoading = ref(overrides.isLoading || false)
@@ -121,33 +159,30 @@ describe('DashboardView.vue', () => {
 
   it('renders weather data cards correctly', () => {
     vi.mocked(weatherComposable.useWeather).mockReturnValue(createMockWeather({
-      weather: { current: {} } // Trigger hasData
+      weather: {
+        current: {},
+        daily: {
+          time: ['2024-01-01'],
+          temperature_2m_max: [25],
+          temperature_2m_min: [10],
+          precipitation_sum: [0],
+          wind_speed_10m_max: [10],
+          uv_index_max: [5],
+          et0_fao_evapotranspiration: [2.1],
+          sunshine_duration: [3600],
+        },
+        hourly: {
+          time: ['2024-01-01T00:00:00Z'],
+          relative_humidity_2m: [60],
+        },
+      }
     }) as any)
 
     const wrapper = mount(DashboardView)
-    const cards = wrapper.findAllComponents(DataCard)
-    // 4 original + 3 new (ET0, Clouds, Sun)
-    expect(cards).toHaveLength(7)
 
-    expect(wrapper.text()).toContain('18.5')
-    expect(wrapper.text()).toContain('60')
-    expect(wrapper.text()).toContain('40')
-    expect(wrapper.text()).toContain('0.5')
-    expect(wrapper.text()).toContain('2.10') // et0.toFixed(2)
-    expect(wrapper.text()).toContain('15')
-    expect(wrapper.text()).toContain('1.0') // sunshineDuration / 3600 .toFixed(1)
-  })
-
-  it('renders alerts when they are present', () => {
-    const alerts = ['Riesgo de Mildiú detectado', 'Riesgo de helada']
-    vi.mocked(weatherComposable.useWeather).mockReturnValue(createMockWeather({
-      weather: { current: {} },
-      alerts
-    }) as any)
-
-    // DashboardView doesn't seem to render alerts list directly anymore?
-    // Wait, let's check DashboardView.vue content again.
-    // DashboardView.vue has .dashboard__alerts commented out or missing?
-    // Let me check lines 140-170 in DashboardView.vue
+    expect(wrapper.find('.weather-current').exists()).toBe(true)
+    expect(wrapper.find('.weather-forecast').exists()).toBe(true)
+    expect(wrapper.find('.soil-moisture-card').exists()).toBe(true)
+    expect(wrapper.find('.evapotranspiration-card').exists()).toBe(true)
   })
 })

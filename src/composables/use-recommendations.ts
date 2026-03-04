@@ -48,6 +48,9 @@ export function useRecommendations() {
       conditions.humidity,
       conditions.precipitation,
       conditions.windSpeed,
+      null,
+      null,
+      conditions.soilMoisture,
       daysWithoutRain
     )
 

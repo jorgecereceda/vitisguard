@@ -91,9 +91,9 @@ export function calculateHistoricalDateRange(): {
   const currentMonth = fiveDaysAgo.getMonth()
   const currentDay = fiveDaysAgo.getDate()
 
-  let startYear = currentYear - 1
-  let startMonth = currentMonth
-  let startDay = currentDay
+  const startYear = currentYear - 1
+  const startMonth = currentMonth
+  const startDay = currentDay
 
   const startDate = `${startYear}-${String(startMonth + 1).padStart(2, '0')}-${String(startDay).padStart(2, '0')}`
   const endDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`

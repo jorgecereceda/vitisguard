@@ -83,55 +83,60 @@ export function generateWeatherAlerts(
   windSpeed: number | null,
   minDailyTemp: number | null = null,
   maxDailyTemp: number | null = null,
-  soilMoisture: number | null = null
+  soilMoisture: number | null = null,
+  daysWithoutRain: number = 0
 ): WeatherAlert[] {
   const alerts: WeatherAlert[] = []
   const now = new Date()
   const month = now.getMonth() + 1
 
-  if (minDailyTemp !== null) {
-    if (minDailyTemp < 3 && month >= 3 && month <= 5) {
+  // Use current temperature as fallback for daily temps if not provided
+  const effectiveMinTemp = minDailyTemp ?? temperature
+  const effectiveMaxTemp = maxDailyTemp ?? temperature
+
+  if (effectiveMinTemp !== null) {
+    if (effectiveMinTemp < 3 && month >= 3 && month <= 5) {
       // Prioritize Late Frost in spring
       alerts.push({
         id: `lateFrost-${now.getTime()}`,
         category: 'weather',
         type: 'lateFrost',
-        level: minDailyTemp < 0 ? 'critical' : 'high',
+        level: effectiveMinTemp < 0 ? 'critical' : 'high',
         title: WEATHER_ALERT_CONFIGS.lateFrost.title,
-        description: `Temperatura mínima: ${minDailyTemp.toFixed(1)}°C en primavera`,
+        description: `Temperatura mínima: ${effectiveMinTemp.toFixed(1)}°C en primavera`,
         recommendation: WEATHER_ALERT_CONFIGS.lateFrost.recommendations[
-          minDailyTemp < 0 ? 'critical' : 'high'
+          effectiveMinTemp < 0 ? 'critical' : 'high'
         ],
         detectedAt: now,
       })
-    } else if (minDailyTemp < 2) {
+    } else if (effectiveMinTemp < 2) {
       // Regular Frost
       alerts.push({
         id: `frost-${now.getTime()}`,
         category: 'weather',
         type: 'frost',
-        level: minDailyTemp < 0 ? 'critical' : 'high',
+        level: effectiveMinTemp < 0 ? 'critical' : 'high',
         title: WEATHER_ALERT_CONFIGS.frost.title,
-        description: `Temperatura mínima: ${minDailyTemp.toFixed(1)}°C`,
+        description: `Temperatura mínima: ${effectiveMinTemp.toFixed(1)}°C`,
         recommendation: WEATHER_ALERT_CONFIGS.frost.recommendations[
-          minDailyTemp < 0 ? 'critical' : 'high'
+          effectiveMinTemp < 0 ? 'critical' : 'high'
         ],
         detectedAt: now,
       })
     }
   }
 
-  if (maxDailyTemp !== null) {
-    if (maxDailyTemp > 32) {
+  if (effectiveMaxTemp !== null) {
+    if (effectiveMaxTemp > 32) {
       alerts.push({
         id: `heatwave-${now.getTime()}`,
         category: 'weather',
         type: 'heatwave',
-        level: maxDailyTemp > 40 ? 'critical' : 'high',
+        level: effectiveMaxTemp > 40 ? 'critical' : 'high',
         title: WEATHER_ALERT_CONFIGS.heatwave.title,
-        description: `Temperatura máxima: ${maxDailyTemp.toFixed(1)}°C`,
+        description: `Temperatura máxima: ${effectiveMaxTemp.toFixed(1)}°C`,
         recommendation: WEATHER_ALERT_CONFIGS.heatwave.recommendations[
-          maxDailyTemp > 40 ? 'critical' : 'high'
+          effectiveMaxTemp > 40 ? 'critical' : 'high'
         ],
         detectedAt: now,
       })
@@ -151,7 +156,21 @@ export function generateWeatherAlerts(
     })
   }
 
-  if (precipitation !== null && precipitation === 0 && soilMoisture !== null && soilMoisture < 20) {
+  // Check drought based on daysWithoutRain parameter
+  if (daysWithoutRain >= 7) {
+    alerts.push({
+      id: `drought-${now.getTime()}`,
+      category: 'weather',
+      type: 'drought',
+      level: daysWithoutRain >= 14 ? 'critical' : daysWithoutRain >= 10 ? 'high' : 'medium',
+      title: WEATHER_ALERT_CONFIGS.drought.title,
+      description: `${daysWithoutRain} días sin precipitación`,
+      recommendation: WEATHER_ALERT_CONFIGS.drought.recommendations[
+        daysWithoutRain >= 14 ? 'critical' : daysWithoutRain >= 10 ? 'high' : 'medium'
+      ],
+      detectedAt: now,
+    })
+  } else if (precipitation !== null && precipitation === 0 && soilMoisture !== null && soilMoisture < 20) {
     alerts.push({
       id: `drought-${now.getTime()}`,
       category: 'weather',

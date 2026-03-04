@@ -4,7 +4,6 @@ import type { Alert, AlertStats } from '@/types/alert'
 import {
   getAlerts,
   getAlertStats,
-  getAlertStatsByPeriod,
   deleteAlert,
   deleteAllAlerts,
   createAlert,

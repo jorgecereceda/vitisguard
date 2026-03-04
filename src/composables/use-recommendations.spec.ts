@@ -31,7 +31,10 @@ describe('useRecommendations', () => {
     const recommendations = analyzeWeatherData(coldCurrent, mockHourly)
     const weatherAlerts = recommendations.filter(r => r.category === 'weather')
     expect(weatherAlerts.length).toBeGreaterThan(0)
-    expect(weatherAlerts.some(a => 'type' in a && a.type === 'frost')).toBe(true)
+    const hasFrostAlert = weatherAlerts.some(
+      a => 'type' in a && (a.type === 'frost' || a.type === 'lateFrost')
+    )
+    expect(hasFrostAlert).toBe(true)
   })
 
   it('detects heatwave when temperature > 35', () => {

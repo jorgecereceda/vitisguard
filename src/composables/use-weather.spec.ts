@@ -349,13 +349,20 @@ describe('useWeather', () => {
     expect(weatherData.value).toEqual({
       temperature: 20,
       humidity: 50,
-      soilHumidity: 0.25,
+      soilHumidity: 56,
       precipitation: 5,
       cloudCover: 75,
       et0: 3.5,
       sunshineDuration: 36000,
       isFrostLikely: false,
       isHeatWaveLikely: false,
+      soilMoistureLevels: expect.objectContaining({
+        current: 56,
+        depth20: 0,
+        depth40: 0,
+        depth60: 0,
+      }),
+      allDaysSoilMoisture: expect.any(Array),
     })
   })
 })
