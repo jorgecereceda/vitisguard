@@ -221,7 +221,7 @@
   ],
   "alerts": [
     {
-      "id": "cbbb",
+      "id": "jtnv",
       "category": "disease",
       "disease": "mildiu",
       "level": "high",
@@ -237,7 +237,7 @@
       "userId": "b897"
     },
     {
-      "id": "picr",
+      "id": "iihy",
       "category": "disease",
       "disease": "botrytis",
       "level": "medium",
@@ -253,7 +253,7 @@
       "userId": "b897"
     },
     {
-      "id": "zjzi",
+      "id": "ztlt",
       "category": "disease",
       "disease": "oidio",
       "level": "medium",
@@ -268,7 +268,7 @@
       "userId": "b897"
     },
     {
-      "id": "ypeo",
+      "id": "qpvr",
       "category": "disease",
       "disease": "excoriosis",
       "level": "high",
@@ -284,7 +284,7 @@
       "userId": "b897"
     },
     {
-      "id": "nqwk",
+      "id": "gsqb",
       "category": "weather",
       "type": "frost",
       "level": "high",
@@ -296,7 +296,7 @@
       "userId": "b897"
     },
     {
-      "id": "cdbw",
+      "id": "dhaj",
       "category": "disease",
       "disease": "mildiu",
       "level": "high",
@@ -311,7 +311,7 @@
       "userId": "b897"
     },
     {
-      "id": "tnev",
+      "id": "udxn",
       "category": "disease",
       "disease": "botrytis",
       "level": "medium",
@@ -326,7 +326,7 @@
       "userId": "b897"
     },
     {
-      "id": "igwq",
+      "id": "kqdy",
       "category": "disease",
       "disease": "oidio",
       "level": "medium",
@@ -340,7 +340,7 @@
       "userId": "b897"
     },
     {
-      "id": "narj",
+      "id": "inoa",
       "category": "disease",
       "disease": "excoriosis",
       "level": "high",
@@ -355,7 +355,7 @@
       "userId": "b897"
     },
     {
-      "id": "irrj",
+      "id": "xbhv",
       "category": "weather",
       "type": "frost",
       "level": "high",
@@ -367,7 +367,7 @@
       "userId": "b897"
     },
     {
-      "id": "wxke",
+      "id": "zkxx",
       "category": "disease",
       "disease": "mildiu",
       "level": "medium",
@@ -382,7 +382,7 @@
       "userId": "b897"
     },
     {
-      "id": "csto",
+      "id": "fyjn",
       "category": "disease",
       "disease": "oidio",
       "level": "medium",
@@ -396,7 +396,7 @@
       "userId": "b897"
     },
     {
-      "id": "rojq",
+      "id": "nxaz",
       "category": "weather",
       "type": "excessiveRain",
       "level": "medium",
@@ -408,7 +408,7 @@
       "userId": "b897"
     },
     {
-      "id": "yrwt",
+      "id": "lbyh",
       "category": "weather",
       "type": "drought",
       "level": "critical",
@@ -420,7 +420,7 @@
       "userId": "b897"
     },
     {
-      "id": "cdvx",
+      "id": "tzys",
       "category": "disease",
       "disease": "mildiu",
       "level": "medium",
@@ -435,7 +435,7 @@
       "userId": "b897"
     },
     {
-      "id": "yzyn",
+      "id": "nhxv",
       "category": "disease",
       "disease": "botrytis",
       "level": "medium",
@@ -450,7 +450,7 @@
       "userId": "b897"
     },
     {
-      "id": "bvsw",
+      "id": "ohaz",
       "category": "disease",
       "disease": "oidio",
       "level": "medium",
@@ -465,7 +465,7 @@
       "userId": "b897"
     },
     {
-      "id": "oeau",
+      "id": "ekzj",
       "category": "disease",
       "disease": "excoriosis",
       "level": "medium",
@@ -480,7 +480,7 @@
       "userId": "b897"
     },
     {
-      "id": "rhmv",
+      "id": "cqmg",
       "category": "weather",
       "type": "excessiveRain",
       "level": "medium",
@@ -492,7 +492,7 @@
       "userId": "b897"
     },
     {
-      "id": "fkhz",
+      "id": "hrto",
       "category": "weather",
       "type": "drought",
       "level": "high",
@@ -504,7 +504,7 @@
       "userId": "b897"
     },
     {
-      "id": "zubn",
+      "id": "agjr",
       "category": "disease",
       "disease": "oidio",
       "level": "medium",
@@ -518,7 +518,7 @@
       "userId": "b897"
     },
     {
-      "id": "mlyg",
+      "id": "umda",
       "category": "weather",
       "type": "drought",
       "level": "critical",
@@ -530,7 +530,7 @@
       "userId": "b897"
     },
     {
-      "id": "pule",
+      "id": "osfe",
       "category": "disease",
       "disease": "mildiu",
       "level": "high",
@@ -545,7 +545,7 @@
       "userId": "b897"
     },
     {
-      "id": "vpvp",
+      "id": "fudx",
       "category": "disease",
       "disease": "botrytis",
       "level": "medium",
@@ -559,7 +559,7 @@
       "userId": "b897"
     },
     {
-      "id": "kxxa",
+      "id": "qvnu",
       "category": "disease",
       "disease": "oidio",
       "level": "high",
@@ -573,7 +573,7 @@
       "userId": "b897"
     },
     {
-      "id": "fftz",
+      "id": "yygz",
       "category": "disease",
       "disease": "excoriosis",
       "level": "medium",
@@ -587,19 +587,19 @@
       "userId": "b897"
     },
     {
-      "id": "ryrv",
+      "id": "gjrv",
       "category": "weather",
       "type": "drought",
       "level": "critical",
       "title": "Sequía Prolongada",
-      "description": "172 días sin precipitación significativa. Reserves de agua agotadas.",
+      "description": "173 días sin precipitación significativa. Reserves de agua agotadas.",
       "recommendation": "Riego de emergencia necesario. Considerar mulching para retener humedad.",
       "detectedAt": "2025-09-08T12:00:00.000Z",
       "plotId": "1f02",
       "userId": "b897"
     },
     {
-      "id": "wgwi",
+      "id": "gvda",
       "category": "irrigation",
       "type": "irrigation",
       "level": "critical",
@@ -611,7 +611,7 @@
       "userId": "b897"
     },
     {
-      "id": "syhg",
+      "id": "rifn",
       "category": "disease",
       "disease": "mildiu",
       "level": "high",
@@ -627,7 +627,7 @@
       "userId": "b897"
     },
     {
-      "id": "uczu",
+      "id": "gomr",
       "category": "disease",
       "disease": "oidio",
       "level": "critical",
@@ -643,7 +643,7 @@
       "userId": "b897"
     },
     {
-      "id": "wnqc",
+      "id": "dbtd",
       "category": "weather",
       "type": "excessiveRain",
       "level": "medium",
@@ -655,7 +655,7 @@
       "userId": "b897"
     },
     {
-      "id": "vcge",
+      "id": "hznx",
       "category": "disease",
       "disease": "mildiu",
       "level": "high",
@@ -671,7 +671,7 @@
       "userId": "b897"
     },
     {
-      "id": "jelv",
+      "id": "nbcg",
       "category": "disease",
       "disease": "botrytis",
       "level": "medium",
@@ -687,7 +687,7 @@
       "userId": "b897"
     },
     {
-      "id": "kmfa",
+      "id": "sfan",
       "category": "disease",
       "disease": "oidio",
       "level": "high",
@@ -702,11 +702,11 @@
       "userId": "b897"
     },
     {
-      "id": "gcaq",
+      "id": "xyas",
       "category": "disease",
       "disease": "excoriosis",
       "level": "medium",
-      "probability": 59,
+      "probability": 58,
       "conditions": [
         "Temperatura media: 11.8°C",
         "Precipitación: 0.5mm"
@@ -717,7 +717,7 @@
       "userId": "b897"
     },
     {
-      "id": "kjxh",
+      "id": "otkv",
       "category": "weather",
       "type": "excessiveRain",
       "level": "medium",
@@ -729,7 +729,7 @@
       "userId": "b897"
     },
     {
-      "id": "wgsl",
+      "id": "lgfg",
       "category": "weather",
       "type": "drought",
       "level": "critical",
@@ -741,7 +741,7 @@
       "userId": "b897"
     },
     {
-      "id": "rrhc",
+      "id": "dsar",
       "category": "disease",
       "disease": "mildiu",
       "level": "high",
@@ -756,7 +756,7 @@
       "userId": "b897"
     },
     {
-      "id": "czlg",
+      "id": "awql",
       "category": "disease",
       "disease": "botrytis",
       "level": "medium",
@@ -771,7 +771,7 @@
       "userId": "b897"
     },
     {
-      "id": "hnzd",
+      "id": "rcyd",
       "category": "disease",
       "disease": "oidio",
       "level": "high",
@@ -785,7 +785,7 @@
       "userId": "b897"
     },
     {
-      "id": "eocw",
+      "id": "bujn",
       "category": "disease",
       "disease": "excoriosis",
       "level": "high",
@@ -822,7 +822,7 @@
   "alertLogApi": [
     {
       "id": "global",
-      "lastQueryDate": "2026-03-03T13:15:24.938Z",
+      "lastQueryDate": "2026-03-04T08:40:37.052Z",
       "yearGenerated": 2025
     }
   ]
