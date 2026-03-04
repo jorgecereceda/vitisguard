@@ -249,7 +249,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 1rem;
+  padding: 1rem 2rem;
   background-color: #f9fbfc;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -284,7 +284,7 @@ onUnmounted(() => {
 }
 
 .location-text {
-  font-size: 0.875rem;
+  font-size: 1.1rem;
   font-weight: 500;
   color: #374151;
   white-space: nowrap;

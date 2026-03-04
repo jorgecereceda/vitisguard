@@ -59,7 +59,7 @@ watch(
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: 80px;
   background: white;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
@@ -77,8 +77,8 @@ watch(
 }
 
 .mobile-header__logo-img {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
@@ -98,9 +98,9 @@ watch(
 
 /* Enhancing LocationSelector prominence on mobile */
 .mobile-header__center :deep(.location-selector__trigger) {
-  padding: 6px 12px;
-  min-width: 140px;
-  max-width: 200px;
+  padding: 8px 16px;
+  min-width: 160px;
+  max-width: 220px;
   background-color: #f9fafb;
 }
 
